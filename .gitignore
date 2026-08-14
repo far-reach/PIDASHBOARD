@@ -1,0 +1,19 @@
+# deps / build
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# local data (PGlite dev database, worker state)
+.data/
+
+# env — secrets are platform-managed, never committed
+.env
+.env.local
+.env.*.local
+
+# test artifacts
+coverage/
+playwright-report/
+test-results/
