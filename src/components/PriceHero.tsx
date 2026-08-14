@@ -1,0 +1,69 @@
+"use client";
+
+import { Card, CardContent, Skeleton } from "@/components/ui";
+import { FreshnessBadge } from "@/components/FreshnessBadge";
+import { fmtCompact, fmtPct, fmtPrice } from "@/lib/format";
+import { useLatestPrice } from "@/lib/hooks";
+import { clsx } from "clsx";
+
+export function PriceHero() {
+  const { data, fromCache, isLoading, isError } = useLatestPrice();
+
+  if (isLoading && !data) {
+    return (
+      <Card>
+        <CardContent className="pt-4">
+          <Skeleton className="h-8 w-40 mb-2" />
+          <Skeleton className="h-4 w-64" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <Card>
+        <CardContent className="pt-4">
+          <p className="text-sm text-muted-foreground">
+            Price feed unavailable right now — all sources unreachable. Retrying automatically.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const change = data.change_pct_24h;
+  const changeTone = change === null ? undefined : change >= 0 ? "text-up" : "text-down";
+
+  return (
+    <Card data-testid="price-hero">
+      <CardContent className="pt-4">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="min-w-0">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-sm font-medium text-muted-foreground">PI / USDT</span>
+              <span className={clsx("text-sm font-semibold font-tabular", changeTone)}>
+                {change !== null ? `${fmtPct(change)} 24h` : ""}
+              </span>
+            </div>
+            <div className="text-4xl font-bold font-tabular tracking-tight mt-0.5">
+              {fmtPrice(data.price)}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1 font-tabular">
+              24h range {fmtPrice(data.low_24h)} – {fmtPrice(data.high_24h)} · vol $
+              {fmtCompact(data.volume_24h)}
+            </div>
+          </div>
+          <FreshnessBadge
+            source={data.source}
+            ts={data.ts}
+            isStale={data.is_stale}
+            isFailover={data.is_failover}
+            divergencePct={data.divergence_pct}
+            fromCache={fromCache}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
