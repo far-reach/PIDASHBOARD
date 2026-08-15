@@ -19,6 +19,17 @@ interface Subsystem {
  * GET /api/health — brief §4 Monitoring: DB reachable, cache reachable,
  * exchange feed fresh, latest report present.
  */
+/**
+ * Internal error strings can carry connection strings, hostnames and driver
+ * internals. The health endpoint is public (uptime monitors need it), so the
+ * detail is redacted in production while the status stays truthful; the full
+ * error still goes to the logs.
+ */
+function detailOf(err: unknown, fallback: string): string {
+  if (process.env.NODE_ENV === "production") return fallback;
+  return err instanceof Error ? err.message : String(err);
+}
+
 export async function GET(): Promise<NextResponse> {
   const subsystems: Record<string, Subsystem> = {};
 
@@ -30,17 +41,28 @@ export async function GET(): Promise<NextResponse> {
   } catch (err) {
     subsystems.database = {
       status: "down",
-      detail: err instanceof Error ? err.message : "unreachable",
+      detail: detailOf(err, "unreachable"),
     };
   }
 
-  // Cache
+  // Cache. The Redis adapter deliberately swallows errors so a cache outage
+  // never breaks a request path — which means "set() did not throw" proves
+  // nothing. Probe with a round-trip instead, so an unreachable Redis is
+  // reported as degraded rather than silently green.
   try {
     const cache = await getCache();
-    await cache.set("health:probe", 1, 5);
-    subsystems.cache = { status: "ok", detail: cache.kind };
+    const probe = `health:probe:${Date.now()}`;
+    await cache.set(probe, "ok", 5);
+    const readBack = await cache.get<string>(probe);
+    subsystems.cache =
+      readBack === "ok"
+        ? { status: "ok", detail: cache.kind }
+        : {
+            status: "degraded",
+            detail: `${cache.kind} did not return the probe value; serving without cache`,
+          };
   } catch (err) {
-    subsystems.cache = { status: "degraded", detail: err instanceof Error ? err.message : "error" };
+    subsystems.cache = { status: "degraded", detail: detailOf(err, "cache error") };
   }
 
   // Feed freshness: worker-written kv first, snapshots as fallback evidence.
@@ -59,7 +81,7 @@ export async function GET(): Promise<NextResponse> {
       };
     }
   } catch (err) {
-    subsystems.feed = { status: "down", detail: err instanceof Error ? err.message : "error" };
+    subsystems.feed = { status: "down", detail: detailOf(err, "feed state unreadable") };
   }
 
   // Latest daily report
@@ -86,7 +108,7 @@ export async function GET(): Promise<NextResponse> {
       subsystems.reports = { status: "degraded", detail: "no reports generated yet" };
     }
   } catch (err) {
-    subsystems.reports = { status: "down", detail: err instanceof Error ? err.message : "error" };
+    subsystems.reports = { status: "down", detail: detailOf(err, "report state unreadable") };
   }
 
   const states = Object.values(subsystems).map((s) => s.status);

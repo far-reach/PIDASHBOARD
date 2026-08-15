@@ -102,6 +102,26 @@ export async function migrate(db: Db, migrationsDir: string = MIGRATIONS_DIR): P
 
 export async function createDb(opts: CreateDbOptions = {}): Promise<Db> {
   const url = opts.databaseUrl ?? process.env.DATABASE_URL;
+
+  // Fail loudly rather than silently falling back to the embedded database in
+  // production: PGlite writes to local disk, which most hosts wipe on every
+  // deploy — a silent fallback would quietly destroy the signal history this
+  // product's credibility rests on. ALLOW_EMBEDDED_DB_IN_PRODUCTION=1 is the
+  // deliberate opt-out for self-hosted setups with real persistent storage.
+  if (
+    !opts.memory &&
+    !url &&
+    process.env.NODE_ENV === "production" &&
+    process.env.ALLOW_EMBEDDED_DB_IN_PRODUCTION !== "1"
+  ) {
+    throw new Error(
+      "DATABASE_URL is not set. Refusing to start in production on the embedded database, " +
+        "which is not durable across deploys and would lose the signal history. " +
+        "Set DATABASE_URL to a managed Postgres connection string, or set " +
+        "ALLOW_EMBEDDED_DB_IN_PRODUCTION=1 if this host has persistent storage."
+    );
+  }
+
   const db =
     !opts.memory && url
       ? await createPgDb(url)
@@ -115,9 +135,19 @@ export async function createDb(opts: CreateDbOptions = {}): Promise<Db> {
 // Singleton for the app / workers. Survives Next.js dev hot-reload via globalThis.
 const globalForDb = globalThis as unknown as { __pipulseDb?: Promise<Db> };
 
+/**
+ * Shared connection. A FAILED connect must not be memoized: caching the
+ * rejected promise would make one transient blip (database restarting, network
+ * hiccup at boot) permanent for the life of the process — every later request
+ * would replay the original failure and the app would never recover without a
+ * redeploy. On rejection the slot is cleared so the next caller retries.
+ */
 export function getDb(): Promise<Db> {
   if (!globalForDb.__pipulseDb) {
-    globalForDb.__pipulseDb = createDb();
+    globalForDb.__pipulseDb = createDb().catch((err) => {
+      globalForDb.__pipulseDb = undefined;
+      throw err;
+    });
   }
   return globalForDb.__pipulseDb;
 }

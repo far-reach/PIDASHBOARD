@@ -15,8 +15,29 @@ export function adminApiKey(): string {
   return process.env.ADMIN_API_KEY ?? "";
 }
 
+/**
+ * Signing key for session cookies. A hardcoded fallback would let anyone who
+ * has read this open-source repo forge a session on a deployment that forgot
+ * to set the variable, so production refuses to sign with a known key.
+ */
 export function sessionSecret(): string {
-  return process.env.SESSION_SECRET ?? "dev-only-insecure-session-secret";
+  const secret = process.env.SESSION_SECRET;
+  if (!secret || secret.startsWith("change-me")) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "SESSION_SECRET is not set (or is still the placeholder). Refusing to sign sessions " +
+          "with a publicly-known key. Generate one with: openssl rand -hex 32"
+      );
+    }
+    return "dev-only-insecure-session-secret";
+  }
+  return secret;
+}
+
+/** Price of the 30-day Pro subscription, in Pi. */
+export function proPricePi(): number {
+  const n = Number(process.env.PRO_PRICE_PI ?? 1);
+  return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
 export function piApiKey(): string {

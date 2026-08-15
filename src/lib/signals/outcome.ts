@@ -45,14 +45,47 @@ export function terminalEvent(events: SignalEventRow[]): SignalEventRow | null {
   return terminals[0] ?? null;
 }
 
+/**
+ * Did the market trade at or through the entry level?
+ * A long is a limit buy at or below entry; a short a limit sell at or above.
+ */
+export function fillsAtPrice(
+  signal: Pick<SignalRow, "direction" | "entry">,
+  price: number
+): boolean {
+  return signal.direction === "long" ? price <= signal.entry : price >= signal.entry;
+}
+
+export function fillEvent(events: SignalEventRow[]): SignalEventRow | null {
+  return events.find((e) => e.type === "filled") ?? null;
+}
+
+/**
+ * A target or stop can only be reached from inside a position, so those
+ * terminal events imply a fill. This keeps records written before
+ * fill-tracking existed scored exactly as they were, while `expired` and
+ * `manual_close` still require explicit fill evidence to count.
+ */
+export function wasFilled(events: SignalEventRow[]): boolean {
+  return events.some((e) => e.type === "filled" || e.type === "hit_tp" || e.type === "hit_sl");
+}
+
 export function deriveOutcome(signal: SignalRow, events: SignalEventRow[]): SignalWithOutcome {
   const term = terminalEvent(events);
   const status: SignalStatus = term ? (term.type as SignalStatus) : "open";
+  const filled = wasFilled(events);
+  const fill = fillEvent(events);
+
   let r: number | null = null;
   let exitPrice: number | null = null;
   if (term && term.price !== null && Number.isFinite(term.price)) {
     exitPrice = term.price;
-    r = computeR(signal.direction, signal.entry, signal.stop, term.price);
+    // An unfilled scenario is recorded but never scored: its entry price never
+    // traded, so there was no position to win or lose. Scoring it would let a
+    // target the market reached "on paper" inflate the published record.
+    if (filled) {
+      r = computeR(signal.direction, signal.entry, signal.stop, term.price);
+    }
   }
   return {
     ...signal,
@@ -61,6 +94,8 @@ export function deriveOutcome(signal: SignalRow, events: SignalEventRow[]): Sign
     r,
     exitPrice,
     closedAt: term ? term.occurredAt : null,
+    filled,
+    filledAt: fill ? fill.occurredAt : null,
   };
 }
 

@@ -20,6 +20,8 @@ import { bitget } from "@/lib/market/bitget";
 
 const FRESH_MS = 15_000; // a websocket/pushed tick older than this is not "fresh"
 const MAX_DIVERGENCE_WARN = 1.0; // percent
+/** How often the non-serving venues are refreshed to keep divergence meaningful. */
+const CROSS_CHECK_INTERVAL_MS = 30_000;
 
 export interface CollectResult {
   tick: Tick;
@@ -104,12 +106,21 @@ export class Aggregator {
       throw new Error("all price sources failed");
     }
 
-    // Non-blocking cross-check refresh (divergence honesty flag).
-    if (this.crossCheck) {
-      void this.crossCheck
+    // Refresh the venues we did NOT serve from, so the divergence check has two
+    // recent, independent prices to compare. Without this the secondary is only
+    // ever fetched while the primary is down, and divergencePct() — the honesty
+    // flag for "these venues disagree" — is structurally always null.
+    const others: ExchangeClient[] = [
+      ...this.feedSources.filter((_, i) => i !== servedIdx),
+      ...(this.crossCheck ? [this.crossCheck] : []),
+    ];
+    for (const client of others) {
+      const last = this.lastTick.get(client.id);
+      if (last && Date.now() - last.ts < CROSS_CHECK_INTERVAL_MS) continue;
+      void client
         .fetchTicker(symbol)
         .then((t) => this.recordSuccess(t))
-        .catch((err) => this.recordFailure(this.crossCheck!.id, err));
+        .catch((err) => this.recordFailure(client.id, err));
     }
 
     const isFailover = servedIdx > 0;

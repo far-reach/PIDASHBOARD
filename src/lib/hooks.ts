@@ -58,13 +58,26 @@ function useCachedQuery<T>(key: string, url: string, refetchMs: number | false) 
     retry: 1,
     staleTime: 2000,
   });
+
   const cached = query.isError ? readCache<T>(key) : null;
+
+  /*
+   * `fromCache` must mean "what you are looking at is NOT live", and that has
+   * to stay true after the first successful load. React Query keeps the last
+   * successful `data` populated when a later refetch fails, so testing
+   * `!query.data` would silently drop the badge exactly when it matters most:
+   * the feed has died and the user is staring at a frozen price. Anything the
+   * query itself reports as errored is therefore stale, whether the value on
+   * screen came from localStorage or from the last good response.
+   */
+  const isStaleView = query.isError;
+
   return {
     data: query.data ?? cached?.value ?? null,
-    fromCache: !query.data && !!cached,
-    cachedAt: cached?.storedAt ?? null,
+    fromCache: isStaleView && (!!cached || !!query.data),
+    cachedAt: cached?.storedAt ?? (query.dataUpdatedAt ? new Date(query.dataUpdatedAt).toISOString() : null),
     isLoading: query.isLoading,
-    isError: query.isError && !cached,
+    isError: query.isError && !cached && !query.data,
     refetch: query.refetch,
   };
 }
@@ -84,6 +97,15 @@ export const useReports = () =>
   useCachedQuery<ReportsResponse>("reports", "/api/reports?limit=30", 300_000);
 
 export const useMe = () => useCachedQuery<MeResponse>("me", "/api/me", false);
+
+export const useFunding = () =>
+  useCachedQuery<{
+    symbol: string;
+    rate: number | null;
+    next_funding_ts: number | null;
+    source: string | null;
+    as_of: string;
+  }>("funding", "/api/funding", 60_000);
 
 /** True when the browser reports no network. */
 export function useOnline(): boolean {

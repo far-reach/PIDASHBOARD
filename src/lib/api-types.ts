@@ -36,7 +36,7 @@ export interface CandlesResponse {
 }
 
 export interface SignalEventDTO {
-  type: "published" | "hit_tp" | "hit_sl" | "expired" | "manual_close";
+  type: "published" | "filled" | "hit_tp" | "hit_sl" | "expired" | "manual_close";
   price: number | null;
   price_source: string | null;
   note: string;
@@ -52,12 +52,15 @@ export interface SignalDTO {
   target: number;
   rationale: string;
   issued_at: string;
+  created_at?: string;
   expires_at: string | null;
   status: "open" | "hit_tp" | "hit_sl" | "expired" | "manual_close";
   r: number | null;
   exit_price: number | null;
   closed_at: string | null;
   unrealized_r: number | null;
+  filled?: boolean;
+  filled_at?: string | null;
   is_test?: boolean;
   events: SignalEventDTO[];
 }

@@ -75,6 +75,21 @@ async function main(): Promise<void> {
     // Outcome mix ≈ 48% wins / 40% losses / 12% expiries — honest, not flattering.
     const roll = rand();
     const closedAt = new Date(issuedAt.getTime() + (0.5 + rand() * 5) * day);
+
+    // Every seeded signal fills shortly after issue; without a fill event a
+    // signal is (correctly) treated as never entered and stays unscored.
+    const filledAt = new Date(issuedAt.getTime() + 0.1 * day);
+    await insertEvent(
+      {
+        signalId: signal.id,
+        type: "filled",
+        price: entry,
+        priceSource: "seed",
+        note: "entry level traded",
+        occurredAt: filledAt.toISOString(),
+      },
+      db
+    );
     if (roll < 0.48) {
       const overshoot = 1 + rand() * 0.004;
       const exit = direction === "long" ? target * overshoot : target / overshoot;

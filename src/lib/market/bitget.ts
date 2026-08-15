@@ -3,7 +3,7 @@
  * to the price feed; see DATA_SOURCES.md).
  * Docs: https://www.bitget.com/api-doc/spot/market/Get-Tickers
  */
-import { fetchJson } from "@/lib/market/http";
+import { fetchJson, optionalNumber, requirePrice } from "@/lib/market/http";
 import type { Candle, ExchangeClient, Tick, Timeframe } from "@/lib/market/types";
 
 const BASE = process.env.BITGET_API_BASE ?? "https://api.bitget.com";
@@ -30,16 +30,16 @@ export const bitget: ExchangeClient = {
     );
     const t = res.data?.[0];
     if (res.code !== "00000" || !t) throw new Error(`bitget: empty ticker for ${symbol}`);
-    const last = Number(t.lastPr);
+    const last = requirePrice(t.lastPr, `bitget ticker ${symbol}`);
     return {
       symbol,
       price: last,
-      bid: Number(t.bidPr) || null,
-      ask: Number(t.askPr) || null,
-      volume24h: Number(t.quoteVolume) || null,
+      bid: optionalNumber(t.bidPr),
+      ask: optionalNumber(t.askPr),
+      volume24h: optionalNumber(t.quoteVolume),
       changePct24h: Number.isFinite(Number(t.change24h)) ? Number(t.change24h) * 100 : null,
-      high24h: Number(t.high24h) || null,
-      low24h: Number(t.low24h) || null,
+      high24h: optionalNumber(t.high24h),
+      low24h: optionalNumber(t.low24h),
       source: "bitget",
       ts: Number(t.ts) || Date.now(),
     };

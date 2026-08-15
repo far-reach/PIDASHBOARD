@@ -125,7 +125,8 @@ export async function insertEvent(input: NewEvent, db?: Db): Promise<SignalEvent
 
 export interface ListOptions {
   symbol?: string;
-  limit?: number;
+  /** Max rows, or `null` for the complete history (used by performance). */
+  limit?: number | null;
   includeTest?: boolean;
 }
 
@@ -134,7 +135,6 @@ export async function listSignalsWithOutcomes(
   db?: Db
 ): Promise<SignalWithOutcome[]> {
   const d = db ?? (await getDb());
-  const limit = Math.min(opts.limit ?? 200, 500);
   const params: unknown[] = [];
   const where: string[] = [];
   if (opts.symbol) {
@@ -145,9 +145,17 @@ export async function listSignalsWithOutcomes(
     where.push(`is_test = false`);
   }
   const whereSql = where.length > 0 ? `WHERE ${where.join(" AND ")}` : "";
-  params.push(limit);
+
+  // `limit: null` means the complete history. Performance statistics MUST use
+  // it: a capped read would silently drop the oldest signals and make the
+  // performance page disagree with the feed about what the record contains.
+  let limitSql = "";
+  if (opts.limit !== null) {
+    params.push(Math.max(1, opts.limit ?? 200));
+    limitSql = ` LIMIT $${params.length}`;
+  }
   const { rows } = await d.query(
-    `SELECT * FROM signals ${whereSql} ORDER BY issued_at DESC LIMIT $${params.length}`,
+    `SELECT * FROM signals ${whereSql} ORDER BY issued_at DESC${limitSql}`,
     params
   );
   const signals = rows.map(mapSignal);
@@ -181,8 +189,15 @@ export async function getSignalWithOutcome(id: string, db?: Db): Promise<SignalW
   return deriveOutcome(signal, eventsRes.rows.map(mapEvent));
 }
 
-/** Signals with no terminal event yet (the resolver's work queue). */
-export async function listOpenSignals(symbol: string | undefined, db?: Db): Promise<SignalRow[]> {
+/**
+ * Signals with no terminal event yet (the resolver's work queue), each
+ * carrying whether its entry has already filled so the resolver knows which
+ * leg of the lifecycle it is on.
+ */
+export async function listOpenSignals(
+  symbol: string | undefined,
+  db?: Db
+): Promise<(SignalRow & { filled: boolean })[]> {
   const d = db ?? (await getDb());
   const params: unknown[] = [];
   let symbolSql = "";
@@ -191,7 +206,12 @@ export async function listOpenSignals(symbol: string | undefined, db?: Db): Prom
     symbolSql = `AND s.symbol = $1`;
   }
   const { rows } = await d.query(
-    `SELECT s.* FROM signals s
+    `SELECT s.*,
+            EXISTS (
+              SELECT 1 FROM signal_events f
+              WHERE f.signal_id = s.id AND f.type = 'filled'
+            ) AS filled
+     FROM signals s
      WHERE NOT EXISTS (
        SELECT 1 FROM signal_events e
        WHERE e.signal_id = s.id
@@ -200,5 +220,5 @@ export async function listOpenSignals(symbol: string | undefined, db?: Db): Prom
      ORDER BY s.issued_at ASC`,
     params
   );
-  return rows.map(mapSignal);
+  return rows.map((r) => ({ ...mapSignal(r), filled: Boolean(r.filled) }));
 }

@@ -26,8 +26,15 @@ export interface DailyReport {
 
 function mapReport(row: Record<string, unknown>): DailyReport {
   const rawDate = row.report_date;
+  // node-postgres parses a `date` column into a Date at LOCAL midnight, so
+  // toISOString() would shift it to the previous day on any host east of UTC.
+  // Read the local calendar fields instead — they are the stored date.
   const reportDate =
-    rawDate instanceof Date ? rawDate.toISOString().slice(0, 10) : String(rawDate).slice(0, 10);
+    rawDate instanceof Date
+      ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, "0")}-${String(
+          rawDate.getDate()
+        ).padStart(2, "0")}`
+      : String(rawDate).slice(0, 10);
   return {
     id: String(row.id),
     symbol: String(row.symbol),
@@ -59,16 +66,17 @@ export function previousUtcDate(now: Date = new Date()): string {
 const fmt = (n: number | null | undefined, dp = 4): string =>
   n === null || n === undefined || !Number.isFinite(n) ? "n/a" : n.toFixed(dp);
 
-const fmtUsd = (n: number | null | undefined): string =>
+/** Compact quantity, unit-agnostic (the caller states the unit). */
+const fmtQty = (n: number | null | undefined): string =>
   n === null || n === undefined || !Number.isFinite(n)
     ? "n/a"
     : n >= 1e9
-      ? `$${(n / 1e9).toFixed(2)}B`
+      ? `${(n / 1e9).toFixed(2)}B`
       : n >= 1e6
-        ? `$${(n / 1e6).toFixed(2)}M`
+        ? `${(n / 1e6).toFixed(2)}M`
         : n >= 1e3
-          ? `$${(n / 1e3).toFixed(1)}K`
-          : `$${n.toFixed(2)}`;
+          ? `${(n / 1e3).toFixed(1)}K`
+          : n.toFixed(2);
 
 export interface ReportInputs {
   date: string;
@@ -142,7 +150,9 @@ export function buildReportContent(inp: ReportInputs): {
   lines.push(
     `| Change | ${changePct === null ? "n/a" : `${changePct >= 0 ? "+" : ""}${changePct.toFixed(2)}%`} |`
   );
-  lines.push(`| Volume (base) | ${day ? fmtUsd(day.volume) : "n/a"} |`);
+  // Candle volume is denominated in the BASE asset (PI), so it must not carry
+  // a dollar sign — that would overstate the figure by the price of PI.
+  lines.push(`| Volume | ${day ? `${fmtQty(day.volume)} PI` : "n/a"} |`);
   if (volumeFlag) {
     lines.push(`| Volume vs 30d avg | ${volRatio!.toFixed(2)}x (${volumeFlag}) |`);
   }
@@ -252,6 +262,17 @@ export async function generateDailyReport(
   }
 
   const inputs = await fetchInputs(symbol, date);
+
+  // Refuse to persist a contentless report. Generation is idempotent, so an
+  // empty row written because the candle window did not reach that date would
+  // be permanent and un-regenerable — a blank day in the archive forever.
+  // Failing instead lets the next scheduled run (or a manual --date) fill it.
+  if (!inputs.day) {
+    throw new Error(
+      `no daily candle available for ${symbol} on ${date}; refusing to persist an empty report — retry once the venue serves that range`
+    );
+  }
+
   const { contentMd, data } = buildReportContent(inputs);
   const day = inputs.day;
   const changePct = day && day.open > 0 ? ((day.close - day.open) / day.open) * 100 : null;

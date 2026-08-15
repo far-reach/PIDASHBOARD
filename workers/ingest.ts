@@ -94,8 +94,25 @@ async function main(): Promise<void> {
     }
   };
 
-  await cycle();
-  const timer = setInterval(() => void cycle(), INGEST_INTERVAL_MS);
+  // Guard against overlap: if a DB or exchange stall makes a cycle take longer
+  // than the interval, plain setInterval would keep launching new ones and pile
+  // up unbounded concurrent work on an already-struggling dependency.
+  let cycleRunning = false;
+  const runGuarded = async () => {
+    if (cycleRunning) {
+      log("warn", "previous ingest cycle still running; skipping this tick");
+      return;
+    }
+    cycleRunning = true;
+    try {
+      await cycle();
+    } finally {
+      cycleRunning = false;
+    }
+  };
+
+  await runGuarded();
+  const timer = setInterval(() => void runGuarded(), INGEST_INTERVAL_MS);
 
   const shutdown = async () => {
     if (stopping) return;

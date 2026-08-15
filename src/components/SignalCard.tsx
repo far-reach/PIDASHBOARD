@@ -23,7 +23,10 @@ const STATUS_META: Record<
 
 export function SignalCard({ signal }: { signal: SignalDTO }) {
   const meta = STATUS_META[signal.status];
-  const r = signal.status === "open" ? signal.unrealized_r : signal.r;
+  // A closed signal that never filled has no R at all — it was never a
+  // position. Showing an unrealized number there would imply a trade existed.
+  const notFilled = signal.filled === false;
+  const r = signal.status === "open" ? (notFilled ? null : signal.unrealized_r) : signal.r;
   const rLabel = signal.status === "open" ? "unrealized" : "realized";
   const closeEvent = signal.events.find((e) =>
     ["hit_tp", "hit_sl", "expired", "manual_close"].includes(e.type)
@@ -38,6 +41,14 @@ export function SignalCard({ signal }: { signal: SignalDTO }) {
               {signal.direction === "long" ? "▲ LONG" : "▼ SHORT"}
             </Badge>
             <Badge tone={meta.tone}>{meta.label}</Badge>
+            {notFilled ? (
+              <Badge
+                tone="neutral"
+                title="The entry level never traded, so no position was ever taken — this signal is excluded from performance statistics."
+              >
+                NOT FILLED · UNSCORED
+              </Badge>
+            ) : null}
             {signal.is_test ? <Badge tone="warn">TEST</Badge> : null}
           </div>
           <span

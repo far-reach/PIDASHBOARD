@@ -38,20 +38,49 @@ async function runOnce(date: string): Promise<void> {
   }
 }
 
+/** UTC date string N days before `from`. */
+function utcDateMinus(from: Date, days: number): string {
+  return new Date(from.getTime() - days * 24 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+/**
+ * Generate the previous day AND backfill any recent day still missing.
+ *
+ * Without backfill a single outage (worker down, exchange unreachable at
+ * 00:05) leaves a permanent hole in the archive, because the scheduler only
+ * ever looks at yesterday. Generation is idempotent, so re-offering days that
+ * already exist costs one indexed lookup each.
+ */
+async function runWithBackfill(now: Date, backfillDays: number): Promise<void> {
+  for (let i = 1; i <= backfillDays; i++) {
+    const date = utcDateMinus(now, i);
+    try {
+      await runOnce(date);
+    } catch (err) {
+      log("warn", "generation failed for date; will retry on a later run", {
+        date,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+}
+
 async function loop(): Promise<void> {
-  log("info", "report scheduler starting", { hourUtc: reportHourUtc() });
-  // Check every minute; generate when we're at HH:05+ UTC and the previous
-  // day's report doesn't exist yet (idempotency makes the extra calls free).
+  const backfillDays = Number(process.env.REPORT_BACKFILL_DAYS ?? 7);
+  log("info", "report scheduler starting", { hourUtc: reportHourUtc(), backfillDays });
+
+  let lastRunDate: string | null = null;
   const tick = async () => {
     const now = new Date();
-    if (now.getUTCHours() === reportHourUtc() && now.getUTCMinutes() >= 5) {
-      try {
-        await runOnce(previousUtcDate(now));
-      } catch (err) {
-        log("error", "scheduled generation failed", {
-          error: err instanceof Error ? err.message : String(err),
-        });
-      }
+    const today = now.toISOString().slice(0, 10);
+    // Fire once per day, at or after the configured hour:05 UTC.
+    if (
+      lastRunDate !== today &&
+      now.getUTCHours() >= reportHourUtc() &&
+      (now.getUTCHours() > reportHourUtc() || now.getUTCMinutes() >= 5)
+    ) {
+      lastRunDate = today;
+      await runWithBackfill(now, backfillDays);
     }
   };
   await tick();

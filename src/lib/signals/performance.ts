@@ -143,8 +143,11 @@ export function buildHistogram(rs: number[]): HistogramBin[] {
   }
   bins.push({ from: edges[edges.length - 1]!, to: BOUND, label: `≥ ${edges[edges.length - 1]}R`, count: 0 });
   for (const r of rs) {
+    // Fall back by SIGN, never blindly to the last bin: an extreme loss
+    // (below the lowest edge) landing in the top "≥ 3R" bin would paint a
+    // catastrophic outcome as the best possible one.
     const bin =
-      bins.find((b) => r >= b.from && r < b.to) ?? bins[bins.length - 1]!;
+      bins.find((b) => r >= b.from && r < b.to) ?? (r < 0 ? bins[0]! : bins[bins.length - 1]!);
     bin.count++;
   }
   return bins;

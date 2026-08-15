@@ -28,6 +28,11 @@ function presentSignal(s: SignalWithOutcome, currentPrice: number | null) {
     r: s.r,
     exit_price: s.exitPrice,
     closed_at: s.closedAt,
+    filled: s.filled,
+    filled_at: s.filledAt,
+    // The row's true insertion time, alongside the operator-declared issue
+    // time: publishing this makes any gap between the two visible.
+    created_at: s.createdAt,
     unrealized_r:
       s.status === "open" && currentPrice !== null
         ? Math.round(unrealizedR(s, currentPrice) * 10000) / 10000
@@ -133,7 +138,24 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     source: input.source,
     isTest: input.is_test,
   });
-  return NextResponse.json({ signal: presentSignal({ ...signal, events: [], status: "open", r: null, exitPrice: null, closedAt: null }, null) }, { status: 201 });
+  return NextResponse.json(
+    {
+      signal: presentSignal(
+        {
+          ...signal,
+          events: [],
+          status: "open",
+          r: null,
+          exitPrice: null,
+          closedAt: null,
+          filled: false,
+          filledAt: null,
+        },
+        null
+      ),
+    },
+    { status: 201 }
+  );
 }
 
 const immutable = () =>

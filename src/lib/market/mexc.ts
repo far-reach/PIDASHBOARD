@@ -5,7 +5,7 @@
  * REST at the ingest interval is sufficient for a failover source — see
  * DATA_SOURCES.md "WebSocket status").
  */
-import { fetchJson } from "@/lib/market/http";
+import { fetchJson, optionalNumber, requirePrice } from "@/lib/market/http";
 import type { Candle, ExchangeClient, Tick, Timeframe } from "@/lib/market/types";
 
 const BASE = process.env.MEXC_API_BASE ?? "https://api.mexc.com";
@@ -28,19 +28,18 @@ export const mexc: ExchangeClient = {
 
   async fetchTicker(symbol: string): Promise<Tick> {
     const t = await fetchJson<Mexc24h>(`${BASE}/api/v3/ticker/24hr?symbol=${symbol}`);
-    const last = Number(t.lastPrice);
-    if (!Number.isFinite(last) || last <= 0) throw new Error(`mexc: empty ticker for ${symbol}`);
+    const last = requirePrice(t.lastPrice, `mexc ticker ${symbol}`);
     return {
       symbol,
       price: last,
-      bid: Number(t.bidPrice) || null,
-      ask: Number(t.askPrice) || null,
-      volume24h: Number(t.quoteVolume) || null,
+      bid: optionalNumber(t.bidPrice),
+      ask: optionalNumber(t.askPrice),
+      volume24h: optionalNumber(t.quoteVolume),
       changePct24h: Number.isFinite(Number(t.priceChangePercent))
         ? Number(t.priceChangePercent) * 100
         : null,
-      high24h: Number(t.highPrice) || null,
-      low24h: Number(t.lowPrice) || null,
+      high24h: optionalNumber(t.highPrice),
+      low24h: optionalNumber(t.lowPrice),
       source: "mexc",
       ts: Date.now(),
     };

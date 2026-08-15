@@ -18,7 +18,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "rate limited" }, { status: 429 });
   }
   const includeTest = isAdminRequest(req) && req.nextUrl.searchParams.get("include_test") === "1";
-  const signals = await listSignalsWithOutcomes({ symbol: SYMBOL, includeTest, limit: 500 });
+  // limit: null — performance is computed over the COMPLETE record. Capping it
+  // would quietly drop the oldest signals and flatter the numbers over time.
+  const signals = await listSignalsWithOutcomes({ symbol: SYMBOL, includeTest, limit: null });
   const summary = computePerformance(signals);
   return NextResponse.json({ performance: summary, symbol: SYMBOL });
 }

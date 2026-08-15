@@ -3,7 +3,7 @@
  * Docs: https://www.okx.com/docs-v5/en/  (public endpoints, no key needed)
  * Spot instrument: PI-USDT; perp (funding context): PI-USDT-SWAP.
  */
-import { fetchJson } from "@/lib/market/http";
+import { fetchJson, optionalNumber, requirePrice } from "@/lib/market/http";
 import type { Candle, ExchangeClient, FundingInfo, Tick, Timeframe } from "@/lib/market/types";
 
 const BASE = process.env.OKX_API_BASE ?? "https://www.okx.com";
@@ -37,17 +37,17 @@ export const okx: ExchangeClient & {
     );
     const t = res.data?.[0];
     if (res.code !== "0" || !t) throw new Error(`okx: empty ticker for ${symbol}`);
-    const last = Number(t.last);
+    const last = requirePrice(t.last, "okx ticker");
     const open = Number(t.open24h);
     return {
       symbol,
       price: last,
-      bid: Number(t.bidPx) || null,
-      ask: Number(t.askPx) || null,
-      volume24h: Number(t.volCcy24h) || null,
-      changePct24h: open > 0 ? ((last - open) / open) * 100 : null,
-      high24h: Number(t.high24h) || null,
-      low24h: Number(t.low24h) || null,
+      bid: optionalNumber(t.bidPx),
+      ask: optionalNumber(t.askPx),
+      volume24h: optionalNumber(t.volCcy24h),
+      changePct24h: Number.isFinite(open) && open > 0 ? ((last - open) / open) * 100 : null,
+      high24h: optionalNumber(t.high24h),
+      low24h: optionalNumber(t.low24h),
       source: "okx",
       ts: Number(t.ts) || Date.now(),
     };

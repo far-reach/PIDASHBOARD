@@ -1,5 +1,18 @@
 import { z } from "zod";
 
+/**
+ * How far in the past `issued_at` may be set when publishing. Backdating is
+ * how a published record gets quietly improved after the fact ("we called
+ * this yesterday"); a small tolerance covers clock skew and queued
+ * publication. The row's true `created_at` is exposed by the API regardless,
+ * so any gap between the two is visible to anyone reading the feed.
+ */
+export const BACKDATE_TOLERANCE_MS = 10 * 60 * 1000;
+const FUTURE_ISSUE_LIMIT_MS = 7 * 24 * 3600 * 1000;
+
+/** Maximum deviation an operator-supplied manual-close price may have from the live market. */
+export const MANUAL_CLOSE_TOLERANCE_PCT = 2;
+
 /** Validation for the operator signal-publishing endpoint (POST /api/signals). */
 export const newSignalSchema = z
   .object({
@@ -33,6 +46,23 @@ export const newSignalSchema = z
     }
     if (v.expires_at && new Date(v.expires_at).getTime() <= Date.now()) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["expires_at"], message: "expiry must be in the future" });
+    }
+    if (v.issued_at) {
+      const skewMs = new Date(v.issued_at).getTime() - Date.now();
+      if (skewMs < -BACKDATE_TOLERANCE_MS) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["issued_at"],
+          message: `issued_at may not be backdated more than ${BACKDATE_TOLERANCE_MS / 60000} minutes`,
+        });
+      }
+      if (skewMs > FUTURE_ISSUE_LIMIT_MS) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["issued_at"],
+          message: "issued_at is more than 7 days in the future",
+        });
+      }
     }
   });
 

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isAdminRequest } from "@/lib/auth";
 import { getLatestPrice } from "@/lib/feed";
 import { getSignalWithOutcome, insertEvent } from "@/lib/signals/repo";
-import { manualCloseSchema } from "@/lib/signals/schema";
+import { manualCloseSchema, MANUAL_CLOSE_TOLERANCE_PCT } from "@/lib/signals/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -44,19 +44,50 @@ export async function POST(
     );
   }
 
-  let price = parsed.data.price ?? null;
-  let priceSource: string | null = "manual";
-  if (price === null) {
-    try {
-      const latest = await getLatestPrice(signal.symbol);
+  // The close price is taken from the live market. An operator-supplied price
+  // is accepted only as a tie-break within a tight band of it — otherwise
+  // "close early at a price of my choosing" would be a direct dial on the
+  // published win rate, which is exactly what the immutable log exists to
+  // prevent.
+  let price: number;
+  let priceSource: string;
+  try {
+    const latest = await getLatestPrice(signal.symbol);
+    const supplied = parsed.data.price;
+    if (supplied !== undefined) {
+      const deviationPct = Math.abs(supplied - latest.price) / latest.price * 100;
+      if (deviationPct > MANUAL_CLOSE_TOLERANCE_PCT) {
+        return NextResponse.json(
+          {
+            error: `supplied price ${supplied} deviates ${deviationPct.toFixed(2)}% from the live market (${latest.price}); max ${MANUAL_CLOSE_TOLERANCE_PCT}%`,
+          },
+          { status: 422 }
+        );
+      }
+      price = supplied;
+      priceSource = `manual (within ${MANUAL_CLOSE_TOLERANCE_PCT}% of ${latest.source})`;
+    } else {
       price = latest.price;
       priceSource = latest.source;
-    } catch {
+    }
+  } catch {
+    // The feed is down. Refusing outright would leave the operator unable to
+    // close a position during exactly the conditions where closing matters
+    // most. Instead the close is allowed with an explicit price, and the
+    // record permanently states that this exit was never market-verified —
+    // the immutable log is what makes that disclosure trustworthy.
+    const supplied = parsed.data.price;
+    if (supplied === undefined) {
       return NextResponse.json(
-        { error: "no live price available — supply an explicit close price" },
+        {
+          error:
+            "no live price available — supply an explicit close price; it will be recorded as operator-supplied and unverified",
+        },
         { status: 503 }
       );
     }
+    price = supplied;
+    priceSource = "operator-supplied (UNVERIFIED — no market feed at close time)";
   }
 
   try {

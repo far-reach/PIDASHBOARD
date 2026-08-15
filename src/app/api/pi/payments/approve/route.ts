@@ -1,9 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getSessionUser } from "@/lib/auth";
-import { approvePayment, PiPlatformError } from "@/lib/pi/server";
+import { approvePayment, getPayment, PiPlatformError } from "@/lib/pi/server";
 import { recordPayment } from "@/lib/users";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
+import { proPricePi } from "@/lib/env";
+import { reportError } from "@/lib/observability";
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +13,11 @@ const bodySchema = z.object({ paymentId: z.string().min(1).max(200) });
 
 /**
  * POST /api/pi/payments/approve { paymentId }
- * Server-side approval leg of the Pi payment flow. The Pi platform is the
- * source of truth for the payment's owner and amount.
+ * Server-side approval leg of the Pi payment flow.
+ *
+ * The payment is READ FROM THE PI PLATFORM FIRST and its owner and amount are
+ * checked BEFORE approving. Approving without checking the amount would let a
+ * user create a payment of any trivial amount and receive a full subscription.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const rl = rateLimit(`pay:${clientKey(req)}`, { capacity: 10, refillPerSec: 0.2 });
@@ -35,17 +40,31 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const payment = await approvePayment(parsed.data.paymentId);
-    if (payment.user_uid !== user.uid) {
+    const pending = await getPayment(parsed.data.paymentId);
+
+    if (pending.user_uid !== user.uid) {
       return NextResponse.json({ error: "payment belongs to a different user" }, { status: 403 });
     }
+
+    const required = proPricePi();
+    const amount = Number(pending.amount);
+    // Tiny tolerance for float representation only — not a discount.
+    if (!Number.isFinite(amount) || amount + 1e-9 < required) {
+      await recordPayment(pending, "failed", null);
+      return NextResponse.json(
+        { error: `payment amount ${amount} π is below the required ${required} π` },
+        { status: 402 }
+      );
+    }
+
+    const payment = await approvePayment(pending.identifier);
     await recordPayment(payment, "approved", null);
     return NextResponse.json({ ok: true, paymentId: payment.identifier });
   } catch (err) {
-    const status = err instanceof PiPlatformError ? (err.status === 501 ? 501 : 502) : 502;
-    return NextResponse.json(
-      { error: "payment approval failed", detail: err instanceof Error ? err.message : "unknown" },
-      { status }
-    );
+    if (err instanceof PiPlatformError && err.status === 501) {
+      return NextResponse.json({ error: "payments are not configured on this deployment" }, { status: 501 });
+    }
+    reportError("pi payment approval failed", err, { paymentId: parsed.data.paymentId });
+    return NextResponse.json({ error: "payment approval failed" }, { status: 502 });
   }
 }
