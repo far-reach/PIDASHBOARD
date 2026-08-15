@@ -54,8 +54,10 @@ test.describe("disclaimers on every screen (brief §3.3)", () => {
 test.describe("mobile viewport integrity (375px — brief §Phase 2.6)", () => {
   for (const path of ["/", "/signals", "/performance", "/reports", "/learn"]) {
     test(`no horizontal page scroll on ${path}`, async ({ page }) => {
-      await page.goto(path);
-      await page.waitForLoadState("networkidle");
+      // NOT networkidle: the dashboard polls prices continuously by design, so
+      // the network never goes idle and the wait would always time out.
+      await page.goto(path, { waitUntil: "load" });
+      await page.waitForTimeout(2500); // let charts and async data lay out
       const scrollWidth = await page.evaluate(
         () => document.scrollingElement?.scrollWidth ?? 0
       );
@@ -106,17 +108,28 @@ test.describe("signal lifecycle: publish → feed → immutable → close → pe
     });
     expect(closeAgain.status()).toBe(409);
 
-    // 5) Performance derives from the event log: +1R at 0.55 on a 0.05 risk.
+    // 5) The anti-inflation invariant: this signal's entry never traded (no
+    //    market feed in CI), so it is recorded but NOT scored. A system that
+    //    scored it would be booking a trade nobody could have taken.
+    const detail = await request.get(`/api/signals/${id}`, { headers: auth });
+    const detailBody = (await detail.json()) as {
+      signal: { status: string; r: number | null; events: { type: string }[] };
+    };
+    expect(detailBody.signal.status).toBe("manual_close");
+    expect(detailBody.signal.r).toBeNull();
+    expect(detailBody.signal.events.some((e) => e.type === "filled")).toBe(false);
+
     const perfRes = await request.get("/api/performance");
     const perf = (await perfRes.json()) as {
-      performance: { scored: number; sumR: number; wins: number };
+      performance: { scored: number; closedSignals: number };
     };
-    expect(perf.performance.scored).toBeGreaterThanOrEqual(1);
-    expect(perf.performance.wins).toBeGreaterThanOrEqual(1);
+    expect(perf.performance.closedSignals).toBeGreaterThanOrEqual(1); // it IS in the record
+    expect(perf.performance.scored).toBe(0); // but contributes no R
 
-    // 6) The loss-transparency invariant: closed signal visible with realized R.
-    await page.goto("/signals");
+    // 6) The record still shows it — recorded and disclosed, never hidden.
+    await page.goto("/signals", { waitUntil: "load" });
     await expect(page.getByTestId("signals-feed")).toContainText("CLOSED EARLY");
+    await expect(page.getByTestId("signals-feed")).toContainText("NOT FILLED");
   });
 
   test("losing and winning signals render with identical card structure", async ({

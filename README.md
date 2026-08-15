@@ -51,7 +51,7 @@ npm run db:seed
 | --- | --- |
 | `npm run dev` | Dev server on `localhost:3000` |
 | `npm run build` / `npm start` | Production build / serve |
-| `npm test` | Vitest unit suite (60 tests) |
+| `npm test` | Vitest unit suite (90 tests) |
 | `npm run test:e2e` | Playwright E2E at Pi Browser's mobile viewport (15 tests) |
 | `npm run lint` / `npm run typecheck` | ESLint / strict TypeScript |
 | `npm run db:migrate` | Apply `db/migrations/*.sql` |
@@ -93,7 +93,8 @@ Key invariants, and where they are enforced:
 | Losses shown equal to wins | Same card component, same size/styling; CVD-validated color pair always paired with text labels; E2E-asserted |
 | Disclaimers everywhere | Layout-level footer + risk banner; E2E asserts every page |
 | Failover with badges | Aggregator promotes MEXC when OKX fails, flags `is_failover` + staleness `> 60s`; unit-tested |
-| Payments verified server-side | Entitlements only after Pi platform confirms `/complete`; client "paid" claims are never trusted |
+| Payments verified server-side | Entitlements only after the Pi platform confirms `/complete` AND the amount covers the price; activation is idempotent per payment id |
+| A call must be takeable to count | A signal is scored only after the market traded at its entry (`filled`); an unfilled scenario is recorded but never enters performance |
 | No data beyond Pi SDK | Schema stores `pi_user_id` + username only; no analytics, no email |
 
 ## Configuration
@@ -108,6 +109,9 @@ See [`.env.example`](.env.example) for every variable. The important ones:
   closed history and performance stay public — see `MONETIZATION.md`)
 
 ## Deployment runbook
+
+> **Publishing to the Pi App Directory?** Follow [`PUBLISHING.md`](PUBLISHING.md) — it is
+> the ordered, check-as-you-go version of everything below plus the Pi portal steps.
 
 1. **Web app** → Vercel or Railway. Set env vars; run `npm run db:migrate` against the
    production `DATABASE_URL` (as a build/release step or one-off).
@@ -135,11 +139,13 @@ See [`.env.example`](.env.example) for every variable. The important ones:
 
 | Doc | Content |
 | --- | --- |
+| **`PUBLISHING.md`** | **Step-by-step guide to publishing on the Pi App Directory** |
 | `SIGNAL_SOURCING.md` | Where trading calls come from (Phase 0 decision) |
 | `DATA_SOURCES.md` | Exchange selection, rate limits, websocket status (Phase 0 decision) |
 | `MONETIZATION.md` | Free vs freemium policy and what may never be gated (Phase 0 decision) |
 | `PI_PLATFORM.md` | Pi SDK/platform integration notes + submission checklist |
 | `PHASE_0_REPORT.md` … `PHASE_5_REPORT.md` | Phase-exit reports with verification status |
+| `PHASE_6_REPORT.md` | Pre-publication adversarial review: every defect found and fixed |
 | `SESSION_NOTES.md` | Running log for the next working session |
 
 ## License
