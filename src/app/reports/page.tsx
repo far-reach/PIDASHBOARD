@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ReportView } from "@/components/ReportView";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState, Skeleton } from "@/components/ui";
 import { useReports } from "@/lib/hooks";
-import { fmtPct } from "@/lib/format";
+import { fmtPct, fmtUtcDateTime } from "@/lib/format";
 import { clsx } from "clsx";
 
 export default function ReportsPage() {
@@ -58,7 +58,7 @@ export default function ReportsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>{current.date}</CardTitle>
-                <Badge tone="neutral">30-day archive</Badge>
+                <Badge tone="neutral">generated {fmtUtcDateTime(current.generated_at)}</Badge>
               </CardHeader>
               <CardContent>
                 <ReportView markdown={current.content_md} />

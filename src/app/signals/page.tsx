@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { SignalCard } from "@/components/SignalCard";
-import { Badge, Card, CardContent, EmptyState, SegmentedControl, Skeleton } from "@/components/ui";
+import { Badge, EmptyState, SegmentedControl, Skeleton } from "@/components/ui";
+import { UpgradeCard } from "@/components/UpgradeCard";
 import { useSignals } from "@/lib/hooks";
 import { fmtUtcTime } from "@/lib/format";
 
@@ -43,16 +44,8 @@ export default function SignalsPage() {
         New here? <a className="text-primary hover:underline" href="/learn">Learn how to read them</a>.
       </p>
 
-      {hiddenOpen > 0 && filter !== "closed" ? (
-        <Card data-testid="gated-open-notice">
-          <CardContent className="pt-4">
-            <p className="text-sm">
-              {hiddenOpen} open signal{hiddenOpen > 1 ? "s are" : " is"} currently live —
-              visible to Pro subscribers. Closed history and performance are free for everyone,
-              always.
-            </p>
-          </CardContent>
-        </Card>
+      {data?.meta.monetization === "freemium" && filter !== "closed" ? (
+        <UpgradeCard hiddenOpenCount={hiddenOpen} />
       ) : null}
 
       {isLoading && !data ? (
