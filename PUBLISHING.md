@@ -18,9 +18,27 @@ current official docs disagree, the docs win.
 3. A GitHub account with this repo (already at `far-reach/PIDASHBOARD`).
 4. Accounts for hosting: **Vercel** (or Railway) and a **Postgres** provider
    (Neon has a usable free tier). Railway/Fly if you want the always-on worker.
-5. A **domain you control**. You need to serve a file at its root for verification, so a
-   Vercel-provided `*.vercel.app` domain works for testing but a real domain is strongly
-   preferred for a listed app.
+
+**You do NOT need to buy a website.** Vercel issues a free `*.vercel.app` HTTPS URL, and
+because this app serves `/validation-key.txt` at its root, that URL passes the Pi
+Developer Portal's domain verification exactly like a purchased domain would.
+
+### Where a `.pi` domain fits (read this if you have one)
+
+A `.pi` name such as `cybrekt.pi` is a **PiNet address, not hosting**. It does not run
+your code and it cannot serve files by itself — it is the address Pioneers type inside Pi
+Browser, which resolves to an app hosted on ordinary HTTPS infrastructure. So the order is:
+
+1. Host the app somewhere real (stage 3) → you get an HTTPS URL.
+2. Register that URL as the app's **App URL** and verify ownership (stages 5-6).
+3. Register your **PiNet URL** in the portal's *PiNet Settings* (stage 7b) — this is what
+   makes the app reachable at a Pi-native address inside Pi Browser.
+
+Note that a newly registered PiNet URL includes a random string of characters; that is a
+deliberate anti-squatting measure. Plain, unsuffixed PiNet URLs are granted by the Pi Core
+Team at their discretion to well-performing apps. Separately, `.pi` domains are reserved
+(and excluded from auction) for apps that have completed PiNet migration and meet the
+Ecosystem listing guidelines — which is the same bar stages 11-13 are aimed at.
 
 ---
 
@@ -92,13 +110,17 @@ heartbeats, and `/api/health` shows `"feed": {"status":"ok", ...}` with a small 
 
 ---
 
-## Stage 4 — Point your domain at it
+## Stage 4 — Settle on your app URL
 
-1. Add your custom domain in Vercel/Railway and complete the DNS records they show.
-2. Wait for the TLS certificate to be issued (usually minutes).
+**If you have no domain (the normal case):** you are already done. Vercel gave you
+`https://<project>.vercel.app` with a valid certificate. Copy it — that is your App URL for
+the rest of this guide. Skip to stage 5.
 
-**Check:** `https://yourdomain.com` loads the dashboard, with a padlock. Pi Browser will
-not accept an app URL without valid HTTPS.
+**Only if you own a regular domain** (a `.com`, not a `.pi`): add it in Vercel/Railway,
+complete the DNS records they show, and wait for the certificate to issue.
+
+**Check:** your URL loads the dashboard with a padlock. Pi Browser will not accept an app
+URL without valid HTTPS.
 
 ---
 
@@ -122,7 +144,8 @@ All of this is inside **Pi Browser** on your phone.
 ## Stage 6 — Verify domain ownership
 
 The portal shows a **validation key** in a grey box. It must be served at
-`https://yourdomain.com/validation-key.txt`.
+`<your app URL>/validation-key.txt` — e.g. `https://pipulse.vercel.app/validation-key.txt`.
+A `*.vercel.app` URL verifies exactly like a purchased domain.
 
 This app serves it from an environment variable, so **you do not need to edit code**:
 
@@ -130,10 +153,10 @@ This app serves it from an environment variable, so **you do not need to edit co
 2. In Vercel/Railway, add env var `PI_VALIDATION_KEY` = that key.
 3. Redeploy (Vercel: Deployments → ⋯ → Redeploy; Railway: it redeploys on variable change).
 
-**Check:** `curl https://yourdomain.com/validation-key.txt` prints exactly the key.
+**Check:** `curl <your app URL>/validation-key.txt` prints exactly the key, nothing else.
 
-4. Back in the portal, set the **App URL** to `https://yourdomain.com` and press
-   **Verify domain**.
+4. Back in the portal, set the **App URL** to your app URL and press **Verify domain**.
+   A green check mark appears next to the URL when it succeeds.
 
 ---
 
@@ -153,6 +176,32 @@ the SDK didn't load — confirm you're in Pi Browser and the app URL matches the
 
 Behind that button the server verifies the token against Pi's `/v2/me` — a client cannot
 fake a sign-in.
+
+---
+
+## Stage 7b — Register your PiNet URL (this is what makes `.pi` work) **[you]**
+
+Your app is now live on the open web, but Pioneers should reach it at a Pi-native address.
+
+1. In the Developer Portal, open your app's dashboard and go to **PiNet Settings**.
+2. Register your **PiNet URL** in the field provided.
+3. The app becomes available at the PiNet URL shown on the dashboard.
+
+Two things to expect, so neither is a surprise:
+
+- The URL you get **includes a random string of characters**. That is deliberate —
+  it prevents domain squatting and impersonation. It is not a misconfiguration and there
+  is no setting to remove it.
+- **Plain, unsuffixed PiNet URLs are granted by the Pi Core Team at their discretion** to
+  well-performing apps. That is also the route by which a `.pi` domain like `cybrekt.pi`
+  becomes the app's public address: `.pi` domains are reserved for apps that have completed
+  PiNet migration and meet the Ecosystem listing guidelines.
+
+In other words, `cybrekt.pi` is earned at the end of this process, not configured at the
+start. Stages 11-13 — a real track record, then listing — are the path to it.
+
+**Check:** opening the PiNet URL in Pi Browser loads the dashboard, and **Sign in with Pi**
+still works from that address.
 
 ---
 
@@ -275,9 +324,10 @@ the pages with whatever counsel says.
 | What | Where |
 | --- | --- |
 | Developer Portal | Pi Browser → `develop.pi` |
-| Validation file | `https://yourdomain.com/validation-key.txt` ← env `PI_VALIDATION_KEY` |
-| Health check | `https://yourdomain.com/api/health` |
-| Operator console | `https://yourdomain.com/admin` (paste `ADMIN_API_KEY`) |
+| Validation file | `<app URL>/validation-key.txt` ← env `PI_VALIDATION_KEY` |
+| Health check | `<app URL>/api/health` |
+| Operator console | `<app URL>/admin` (paste `ADMIN_API_KEY`) |
+| PiNet address | Developer Portal → your app → **PiNet Settings** |
 | Platform API base | `https://api.minepi.com/v2`, header `Authorization: Key <server key>` |
 
 ## Sources
@@ -289,3 +339,5 @@ the pages with whatever counsel says.
 - [pi-platform-docs — Payments](https://github.com/pi-apps/pi-platform-docs/blob/master/payments.md)
 - [Community Developer Guide — Developer Portal](https://pi-apps.github.io/community-developer-guide/docs/gettingStarted/devPortal/)
 - [Community Developer Guide — Getting-started checklist](https://pi-apps.github.io/community-developer-guide/docs/gettingStarted/gettingStartedChecklist/)
+- [Community Developer Guide — PiNet](https://pi-apps.github.io/community-developer-guide/docs/importantTopics/piNet/)
+- [.pi Domain Reservation announcement](https://minepi.com/blog/pi-domain-reservation/)
