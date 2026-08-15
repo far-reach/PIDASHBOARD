@@ -4,6 +4,9 @@
   "private": true,
   "description": "PiPulse — PIUSDT trading dashboard for the Pi Network app ecosystem: live multi-exchange price data, automated daily reports, and an immutable, honestly-tracked trading-calls feed.",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

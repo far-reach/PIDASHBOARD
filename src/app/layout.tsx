@@ -10,8 +10,17 @@ export const metadata: Metadata = {
   description:
     "Live PIUSDT price from multiple exchanges, automated daily market reports, and a transparent, immutable trading-signals record. Educational information — not financial advice.",
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/icon.svg" },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   applicationName: "PiPulse",
+  appleWebApp: { capable: true, title: "PiPulse", statusBarStyle: "black-translucent" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
