@@ -96,10 +96,26 @@ test.describe("signal lifecycle: publish → feed → immutable → close → pe
     });
     expect(noReason.status()).toBe(422);
 
-    const close = await request.post(`/api/signals/${id}/events`, {
+    // Close at the live market price. Deliberately no explicit price: an
+    // operator-chosen exit is only accepted within 2% of the market, so a
+    // hardcoded number here would (correctly) be rejected whenever the runner
+    // can reach the exchanges. Where there is no feed at all, the server asks
+    // for an explicit price and records it as unverified — both branches are
+    // valid outcomes, so the test accepts either and asserts the right one.
+    let close = await request.post(`/api/signals/${id}/events`, {
       headers: auth,
-      data: { note: "e2e early close", price: 0.55 },
+      data: { note: "e2e early close" },
     });
+    if (close.status() === 503) {
+      const body = (await close.json()) as { error: string };
+      expect(body.error).toMatch(/explicit close price/i);
+      close = await request.post(`/api/signals/${id}/events`, {
+        headers: auth,
+        data: { note: "e2e early close", price: 0.55 },
+      });
+      const created = (await close.json()) as { event: { price_source: string } };
+      expect(created.event.price_source).toMatch(/UNVERIFIED/);
+    }
     expect(close.status()).toBe(201);
 
     const closeAgain = await request.post(`/api/signals/${id}/events`, {
