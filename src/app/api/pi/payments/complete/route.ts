@@ -4,7 +4,8 @@ import { getSessionUser, getSubscription } from "@/lib/auth";
 import { completePayment, PiPlatformError } from "@/lib/pi/server";
 import { activateSubscription, recordPayment } from "@/lib/users";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
-import { proPricePi } from "@/lib/env";
+import { maxTipPi, minTipPi, proPricePi, tipsEnabled } from "@/lib/env";
+import { classifyPayment } from "@/lib/pi/products";
 import { reportError } from "@/lib/observability";
 
 export const dynamic = "force-dynamic";
@@ -59,20 +60,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: "Pi platform did not verify the transaction" }, { status: 402 });
     }
 
-    const required = proPricePi();
-    const amount = Number(payment.amount);
-    if (!Number.isFinite(amount) || amount + 1e-9 < required) {
+    const verdict = classifyPayment(payment.metadata, payment.amount, {
+      proPrice: proPricePi(),
+      minTip: minTipPi(),
+      maxTip: maxTipPi(),
+      tipsEnabled: tipsEnabled(),
+    });
+    if (!verdict.ok) {
       await recordPayment(payment, "failed", parsed.data.txid);
-      return NextResponse.json(
-        { error: `payment amount ${amount} π is below the required ${required} π` },
-        { status: 402 }
-      );
+      return NextResponse.json({ error: verdict.error }, { status: verdict.status });
     }
 
-    await recordPayment(payment, "completed", parsed.data.txid);
+    await recordPayment(payment, "completed", parsed.data.txid, verdict.kind);
+
+    // A tip is thanks, not a purchase: it is banked and acknowledged, and it
+    // deliberately does not touch entitlements.
+    if (verdict.kind === "tip") {
+      return NextResponse.json({ ok: true, kind: "tip", amount: verdict.amount });
+    }
+
     const { expiresAt, alreadyCredited } = await activateSubscription(user.uid, payment.identifier);
     const subscription = await getSubscription(user.uid);
-    return NextResponse.json({ ok: true, subscription, expiresAt, alreadyCredited });
+    return NextResponse.json({ ok: true, kind: "pro", subscription, expiresAt, alreadyCredited });
   } catch (err) {
     if (err instanceof PiPlatformError && err.status === 501) {
       return NextResponse.json({ error: "payments are not configured on this deployment" }, { status: 501 });

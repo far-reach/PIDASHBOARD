@@ -106,22 +106,27 @@ export async function signInWithPi(): Promise<{ uid: string; username: string } 
 }
 
 /**
- * Run a Pi subscription payment end-to-end. Resolves once the SERVER has
- * confirmed completion (the subscription is active) — client-side success
- * alone never unlocks anything.
+ * Run a Pi payment end-to-end. Resolves once the SERVER has confirmed
+ * completion — client-side success alone never unlocks anything, and the
+ * server re-reads the payment from the Pi platform to decide what it was for.
  */
-export function subscribeWithPi(amountPi: number): Promise<void> {
+function payWithPi(args: {
+  amountPi: number;
+  memo: string;
+  product: string;
+  unavailable: string;
+}): Promise<void> {
   return new Promise((resolve, reject) => {
     void loadPiSdk().then((sdk) => {
       if (!sdk) {
-        reject(new Error("Pi SDK unavailable — open this app in Pi Browser to subscribe"));
+        reject(new Error(args.unavailable));
         return;
       }
       sdk.createPayment(
         {
-          amount: amountPi,
-          memo: "PiPulse Pro — 30 days",
-          metadata: { product: "pipulse-pro-30d" },
+          amount: args.amountPi,
+          memo: args.memo,
+          metadata: { product: args.product },
         },
         {
           onReadyForServerApproval: (paymentId) => {
@@ -148,5 +153,28 @@ export function subscribeWithPi(amountPi: number): Promise<void> {
         }
       );
     });
+  });
+}
+
+/** Buy (or extend) the 30-day Pro subscription. */
+export function subscribeWithPi(amountPi: number): Promise<void> {
+  return payWithPi({
+    amountPi,
+    memo: "PiPulse Pro — 30 days",
+    product: "pipulse-pro-30d",
+    unavailable: "Pi SDK unavailable — open this app in Pi Browser to subscribe",
+  });
+}
+
+/**
+ * Send the developer a voluntary tip. Unlocks nothing by design — the server
+ * banks it and grants no entitlement, so the free app stays fully free.
+ */
+export function tipWithPi(amountPi: number): Promise<void> {
+  return payWithPi({
+    amountPi,
+    memo: "PiPulse — support the developer",
+    product: "pipulse-tip",
+    unavailable: "Pi SDK unavailable — open this app in Pi Browser to send Pi",
   });
 }

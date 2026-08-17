@@ -26,6 +26,30 @@ This is exactly the split brief §3.8 permits: paid may gate *real-time* value
 The feed meta always reports `hidden_open_count`, so free users see **that** open signals
 exist, only not their levels (avoids the §8 "we're up 300%, trust us" rugpull pattern).
 
+## Tips — direct support, always available
+
+Separate from the subscription, and live in `free` mode too: a **Support PiPulse** card on
+the home screen lets a signed-in Pioneer send Pi straight to the app wallet. Quick-pick
+amounts come from `NEXT_PUBLIC_TIP_PRESETS`; any amount between `MIN_TIP_PI` and
+`MAX_TIP_PI` is accepted.
+
+A tip **grants nothing** — no signals, no access, no entitlement — and the UI says so. That
+is what keeps it compatible with the §3.8 honesty rules and with launching free: there is
+no version of the app where paying reveals a better record.
+
+The two products are distinguished by the payment metadata *as the Pi platform reports it*
+(`pipulse-pro-30d` vs `pipulse-tip`), never by what the browser claims:
+
+| | Subscription | Tip |
+| --- | --- | --- |
+| Amount rule | must be ≥ `PRO_PRICE_PI` | any amount in `[MIN_TIP_PI, MAX_TIP_PI]` |
+| Grants | 30 days of Pro | nothing |
+| Available in `free` mode | ❌ | ✅ |
+| Ledger `payments.kind` | `pro` | `tip` |
+
+An unrecognised product is rejected (422) rather than defaulted, so a tip can never be
+routed through the subscription path or vice versa.
+
 ## Payment mechanics (implemented)
 
 - Pi payment via official SDK `createPayment` → server `approve` → server `complete`
@@ -40,4 +64,5 @@ exist, only not their levels (avoids the §8 "we're up 300%, trust us" rugpull p
 - [ ] Confirm free-at-launch, and the criterion for flipping to freemium
       (suggestion: ≥ 1 full month of public daily reports + signal history, per brief §8)
 - [ ] Pro price in Pi (the amount is a UI/env value; suggest testing sandbox with 1 π)
+- [ ] Tip presets and bounds (defaults: 1 / 5 / 10 π quick-picks, 0.1 – 1000 π accepted)
 - [ ] Whether expired/manual-close open-signal *notifications* land in Pro or free

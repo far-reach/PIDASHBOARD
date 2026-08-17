@@ -6,6 +6,7 @@ import { PriceChart } from "@/components/PriceChart";
 import { StatsGrid } from "@/components/StatsGrid";
 import { ReportView } from "@/components/ReportView";
 import { SignalCard } from "@/components/SignalCard";
+import { SupportCard } from "@/components/SupportCard";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/components/ui";
 import { useReports, useSignals } from "@/lib/hooks";
 import { timeAgo } from "@/lib/format";
@@ -65,6 +66,8 @@ export default function HomePage() {
           )}
         </CardContent>
       </Card>
+
+      <SupportCard />
     </div>
   );
 }

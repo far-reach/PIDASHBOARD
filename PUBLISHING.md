@@ -83,6 +83,10 @@ logs everyone out; rotating `ADMIN_API_KEY` is free.
    | `MONETIZATION_MODE` | `free` |
    | `NEXT_PUBLIC_PI_SANDBOX` | `true` (for now) |
    | `NEXT_PUBLIC_SYMBOL` | `PIUSDT` |
+   | `NEXT_PUBLIC_TIP_PRESETS` | `1,5,10` |
+
+> `MONETIZATION_MODE=free` switches off the **subscription** only. Tips stay on, so
+> Pioneers can send you Pi from day one — see Stage 7c.
 
 4. **Deploy.** The build runs `npm run db:migrate` first, creating the schema and the
    append-only triggers.
@@ -205,16 +209,35 @@ still works from that address.
 
 ---
 
+## Stage 7c — Where the Pi actually lands **[you]**
+
+Both payment paths pay the **app wallet you connected in Stage 7**, not your personal
+wallet. Connect the wallet you intend to receive income in, and confirm a test payment
+arrives there before you rely on it. Two ways to get paid:
+
+| | How it works | Needs |
+| --- | --- | --- |
+| **Tips** | "Support PiPulse" card on the home screen. Any amount from `MIN_TIP_PI` to `MAX_TIP_PI`. Unlocks nothing. | On by default — nothing to switch on |
+| **Pro subscription** | Gates *currently-open* signals for 30 days at `PRO_PRICE_PI`. Closed history and performance stay free. | `MONETIZATION_MODE=freemium` |
+
+Recommended: **launch with tips only** and leave `MONETIZATION_MODE=free`. Flip to
+`freemium` after Stage 11, once the record justifies a price. Set `TIPS_ENABLED=false`
+if you ever want to remove tipping entirely.
+
+---
+
 ## Stage 8 — Test payments in sandbox **[you]**
 
-Only needed if you plan to charge (`MONETIZATION_MODE=freemium`). Skip while free.
+Do this for tips even while free; do the subscription half only if you plan to charge.
 
-1. With the **Testnet** app and `NEXT_PUBLIC_PI_SANDBOX=true`, sign in, then trigger a
-   subscription payment.
-2. Watch your server logs: you should see the approve call, then the complete call, and
-   only then the subscription becoming active.
+1. With the **Testnet** app and `NEXT_PUBLIC_PI_SANDBOX=true`, sign in, then send yourself
+   a small tip from the home screen. Watch the approve → complete calls in the logs and
+   confirm the Pi lands in the app wallet.
+2. Then, if charging: trigger a subscription payment. Watch the logs for the approve call,
+   then the complete call, and only then the subscription becoming active.
 3. Verify the entitlement is real: `curl https://yourdomain.com/api/me` with your session
-   cookie shows `subscription.active: true`.
+   cookie shows `subscription.active: true`. A **tip must NOT** flip that flag — if it
+   does, stop and report it.
 
 **Never** mark anything paid from the client — this app already refuses to
 (`/complete` must return 200 from Pi's servers first). Keep it that way.
@@ -328,6 +351,7 @@ the pages with whatever counsel says.
 | Health check | `<app URL>/api/health` |
 | Operator console | `<app URL>/admin` (paste `ADMIN_API_KEY`) |
 | PiNet address | Developer Portal → your app → **PiNet Settings** |
+| Receiving Pi | App wallet connected in Stage 7 — tips (always on) + subscription (`MONETIZATION_MODE=freemium`) |
 | Platform API base | `https://api.minepi.com/v2`, header `Authorization: Key <server key>` |
 
 ## Sources

@@ -40,6 +40,30 @@ export function proPricePi(): number {
   return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
+/**
+ * Tips are a voluntary payment to the developer and unlock nothing, so unlike
+ * the subscription they are available in `free` mode too — they are on by
+ * default and switched off explicitly.
+ */
+export function tipsEnabled(): boolean {
+  return process.env.TIPS_ENABLED !== "false";
+}
+
+function positiveNumber(raw: string | undefined, fallback: number): number {
+  const n = Number(raw ?? fallback);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+/** Smallest accepted tip, in Pi. Guards against dust payments. */
+export function minTipPi(): number {
+  return positiveNumber(process.env.MIN_TIP_PI, 0.1);
+}
+
+/** Largest accepted tip, in Pi. Guards against a fat-fingered amount. */
+export function maxTipPi(): number {
+  return positiveNumber(process.env.MAX_TIP_PI, 1000);
+}
+
 export function piApiKey(): string {
   return process.env.PI_API_KEY ?? "";
 }

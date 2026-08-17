@@ -1,6 +1,7 @@
 /** User + subscription persistence (Pi identity only — no emails, no tracking). */
 import { getDb, toIso, type Db } from "@/lib/db";
 import type { PiPaymentDTO } from "@/lib/pi/server";
+import type { PaymentKind } from "@/lib/pi/products";
 
 export async function upsertUser(uid: string, username: string, db?: Db): Promise<void> {
   const d = db ?? (await getDb());
@@ -15,15 +16,17 @@ export async function recordPayment(
   payment: PiPaymentDTO,
   status: "created" | "approved" | "completed" | "cancelled" | "failed",
   txid: string | null,
+  kind: PaymentKind = "pro",
   db?: Db
 ): Promise<void> {
   const d = db ?? (await getDb());
   await d.query(
-    `INSERT INTO payments (payment_id, pi_user_id, amount, memo, status, txid, raw)
-     VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
+    `INSERT INTO payments (payment_id, pi_user_id, amount, memo, status, txid, kind, raw)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
      ON CONFLICT (payment_id) DO UPDATE
        SET status = EXCLUDED.status,
            txid = COALESCE(EXCLUDED.txid, payments.txid),
+           kind = EXCLUDED.kind,
            raw = EXCLUDED.raw,
            updated_at = now()`,
     [
@@ -33,6 +36,7 @@ export async function recordPayment(
       payment.memo ?? "",
       status,
       txid,
+      kind,
       JSON.stringify(payment),
     ]
   );

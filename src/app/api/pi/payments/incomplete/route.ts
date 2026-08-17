@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getSessionUser } from "@/lib/auth";
 import { completePayment, getPayment, PiPlatformError } from "@/lib/pi/server";
 import { recordPayment } from "@/lib/users";
+import { productKind } from "@/lib/pi/products";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
 import { reportError } from "@/lib/observability";
 
@@ -51,14 +52,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: "payment belongs to a different user" }, { status: 403 });
     }
 
+    const kind = productKind(current.metadata);
     const txid = parsed.data.txid ?? current.transaction?.txid;
     if (!txid || !current.transaction?.verified) {
-      await recordPayment(current, "cancelled", txid ?? null);
+      await recordPayment(current, "cancelled", txid ?? null, kind);
       return NextResponse.json({ ok: true, resolution: "no verified transaction; left cancelled" });
     }
 
     const completed = await completePayment(current.identifier, txid);
-    await recordPayment(completed, "completed", txid);
+    await recordPayment(completed, "completed", txid, productKind(completed.metadata));
     return NextResponse.json({ ok: true, resolution: "completed" });
   } catch (err) {
     if (err instanceof PiPlatformError && err.status === 501) {
