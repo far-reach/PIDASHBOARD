@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui";
 import { inPiBrowser, loadPiSdk, signInWithPi } from "@/lib/pi/client";
+import { sessionHeaders } from "@/lib/session-client";
 
 /**
  * Operator diagnostics for the Pi handshake. Not linked from the nav: it exists
@@ -55,7 +56,7 @@ export default function PiCheckPage() {
           variant="outline"
           onClick={() => {
             say("session: checking");
-            fetch("/api/me")
+            fetch("/api/me", { headers: sessionHeaders() })
               .then(async (r) => say(`GET /api/me returned ${r.status}: ${(await r.text()).slice(0, 300)}`))
               .catch((e: unknown) => say(`GET /api/me failed: ${e instanceof Error ? e.message : String(e)}`));
           }}

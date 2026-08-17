@@ -36,11 +36,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const piUser = await verifyAccessToken(parsed.data.accessToken);
     await upsertUser(piUser.uid, piUser.username);
     const subscription = await getSubscription(piUser.uid);
+    // The token travels twice: as an httpOnly cookie (primary), and in the
+    // body for clients whose webview drops Set-Cookie on fetch responses;
+    // they replay it via the x-session-token header (see lib/session-client).
+    const sessionToken = createSessionToken(piUser.uid, piUser.username);
     const res = NextResponse.json({
       user: { uid: piUser.uid, username: piUser.username },
       subscription,
+      sessionToken,
     });
-    res.cookies.set(SESSION_COOKIE, createSessionToken(piUser.uid, piUser.username), sessionCookieOptions());
+    res.cookies.set(SESSION_COOKIE, sessionToken, sessionCookieOptions());
     return res;
   } catch (err) {
     if (err instanceof PiPlatformError && err.status === 401) {

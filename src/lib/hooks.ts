@@ -16,6 +16,7 @@ import type {
   ReportsResponse,
   SignalsResponse,
 } from "@/lib/api-types";
+import { sessionHeaders } from "@/lib/session-client";
 
 const LS_PREFIX = "cyberekt:last:";
 
@@ -41,7 +42,9 @@ function writeCache(key: string, value: unknown): void {
 }
 
 async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
+  // sessionHeaders() replays the sign-in token for webviews that drop the
+  // session cookie (Pi Browser on iOS); it is an empty object elsewhere.
+  const res = await fetch(url, { headers: sessionHeaders() });
   if (!res.ok) throw new Error(`${url} → ${res.status}`);
   return (await res.json()) as T;
 }

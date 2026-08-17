@@ -8,6 +8,8 @@
  * works without Pi (brief §Phase 4.1).
  */
 
+import { sessionHeaders, storeSessionToken } from "@/lib/session-client";
+
 export interface PiAuthResult {
   accessToken: string;
   user: { uid: string; username: string };
@@ -123,7 +125,7 @@ async function reportIncompletePayment(payment: {
   try {
     await fetch("/api/pi/payments/incomplete", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...sessionHeaders() },
       body: JSON.stringify({ paymentId: payment.identifier, txid: payment.transaction?.txid }),
     });
   } catch {
@@ -146,7 +148,13 @@ export async function signInWithPi(): Promise<{ uid: string; username: string } 
     body: JSON.stringify({ accessToken: auth.accessToken }),
   });
   if (!res.ok) throw await paymentError(res, "server rejected Pi sign-in");
-  const data = (await res.json()) as { user: { uid: string; username: string } };
+  const data = (await res.json()) as {
+    user: { uid: string; username: string };
+    sessionToken?: string;
+  };
+  // Fallback for webviews that drop the Set-Cookie header (Pi Browser iOS):
+  // keep the signed token locally and replay it per-request via header.
+  storeSessionToken(data.sessionToken);
   return data.user;
 }
 
@@ -195,7 +203,7 @@ function payWithPi(args: {
           onReadyForServerApproval: (paymentId) => {
             void fetch("/api/pi/payments/approve", {
               method: "POST",
-              headers: { "content-type": "application/json" },
+              headers: { "content-type": "application/json", ...sessionHeaders() },
               body: JSON.stringify({ paymentId }),
             }).then(async (res) => {
               if (!res.ok) reject(await paymentError(res, "server approval failed"));
@@ -204,7 +212,7 @@ function payWithPi(args: {
           onReadyForServerCompletion: (paymentId, txid) => {
             void fetch("/api/pi/payments/complete", {
               method: "POST",
-              headers: { "content-type": "application/json" },
+              headers: { "content-type": "application/json", ...sessionHeaders() },
               body: JSON.stringify({ paymentId, txid }),
             }).then(async (res) => {
               if (res.ok) resolve();

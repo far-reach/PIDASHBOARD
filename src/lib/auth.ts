@@ -31,7 +31,10 @@ export interface SessionUser {
 }
 
 export function getSessionUser(req: NextRequest): SessionUser | null {
-  const token = req.cookies.get(SESSION_COOKIE)?.value;
+  // Cookie first; x-session-token header second, for webviews that drop
+  // Set-Cookie on fetch responses (Pi Browser on iOS). Both carry the same
+  // signed token, so verification is identical regardless of transport.
+  const token = req.cookies.get(SESSION_COOKIE)?.value ?? req.headers.get("x-session-token");
   const payload = verifySessionToken(token);
   return payload ? { uid: payload.uid, username: payload.username } : null;
 }
