@@ -15,7 +15,7 @@ import { Button } from "@/components/ui";
 import { useMe } from "@/lib/hooks";
 import { tipWithPi } from "@/lib/pi/client";
 
-const PRESETS = [0.1, 1, 3.14] as const;
+const PRESETS = [1, 3.14, 10] as const;
 
 export function TipButton() {
   const { data } = useMe();
