@@ -20,14 +20,15 @@ export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElemen
 }
 
 export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  // Section header, not a label: full-color text with a brand accent bar so
-  // headings read as structure at a glance. Used on every dashboard section
-  // and every Learn subject, so they all stay consistent.
+  // Section header, not a label: full-color text with a matte accent bar so
+  // headings read as structure at a glance, separated from the body text
+  // below them. Used on every dashboard section and every Learn subject, so
+  // they all stay consistent.
   return (
     <h2
       className={clsx(
-        "flex items-center gap-2 text-base font-bold uppercase tracking-wide text-foreground",
-        "before:h-4 before:w-1 before:shrink-0 before:rounded-full before:bg-gradient-to-b before:from-primary before:to-up before:content-['']",
+        "flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-foreground",
+        "before:h-4 before:w-1 before:shrink-0 before:rounded-full before:bg-accent-bar before:content-['']",
         className
       )}
       {...props}

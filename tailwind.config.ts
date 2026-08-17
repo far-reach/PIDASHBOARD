@@ -20,6 +20,7 @@ const config: Config = {
         up: "hsl(var(--up))",
         down: "hsl(var(--down))",
         warn: "hsl(var(--warn))",
+        "accent-bar": "hsl(var(--accent-bar))",
       },
       borderRadius: {
         lg: "0.625rem",

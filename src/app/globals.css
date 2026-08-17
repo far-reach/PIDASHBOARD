@@ -24,6 +24,11 @@
   --down: 1 83% 63%;
   --warn: 38 92% 58%;
   --glow: 261 84% 76%;
+  /* Section-title accent bar: a matte, desaturated orange (a nod to Pi's
+     own brand color) — distinct from --warn, which stays vivid for real
+     warnings. Same hue across all three themes for brand recall; lightness
+     re-stepped per surface for contrast. */
+  --accent-bar: 27 45% 50%;
 }
 
 html.light {
@@ -40,6 +45,7 @@ html.light {
   --down: 1 68% 42%;
   --warn: 33 95% 33%;
   --glow: 261 60% 45%;
+  --accent-bar: 24 50% 42%;
 }
 
 /*
@@ -62,6 +68,7 @@ html.pi {
   --down: 1 83% 65%;
   --warn: 38 92% 58%;
   --glow: 286 65% 55%;
+  --accent-bar: 27 45% 50%;
 }
 
 html {

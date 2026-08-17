@@ -2,8 +2,9 @@
 
 /**
  * A Card whose body can be collapsed, with the open/closed state remembered
- * per storageKey in localStorage. Defaults to open on first visit: the
- * report is content, not a settings panel that starts hidden.
+ * per storageKey in localStorage. `defaultOpen` sets the first-visit state
+ * (true unless the caller wants it collapsed out of the gate, e.g. the daily
+ * report); once a visitor toggles it, their choice persists regardless.
  *
  * Only the title area toggles: `headerRight` renders as a sibling, not a
  * descendant, of the toggle button, so a link placed there (e.g. "archive")
@@ -20,20 +21,23 @@ export function CollapsibleCard({
   storageKey,
   title,
   headerRight,
+  defaultOpen = true,
   children,
 }: {
   storageKey: string;
   title: React.ReactNode;
   headerRight?: React.ReactNode;
+  defaultOpen?: boolean;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(defaultOpen);
 
   useEffect(() => {
     try {
-      setOpen(window.localStorage.getItem(LS_PREFIX + storageKey) !== "closed");
+      const stored = window.localStorage.getItem(LS_PREFIX + storageKey);
+      if (stored) setOpen(stored === "open");
     } catch {
-      /* storage unavailable: stays open */
+      /* storage unavailable: stays at defaultOpen */
     }
   }, [storageKey]);
 

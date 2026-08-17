@@ -38,6 +38,7 @@ export default function HomePage() {
       <CollapsibleCard
         key="report"
         storageKey="report"
+        defaultOpen={false}
         title={<CardTitle>Daily report</CardTitle>}
         headerRight={
           <>
