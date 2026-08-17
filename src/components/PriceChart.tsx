@@ -10,6 +10,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, SegmentedControl, Skeleton } from "@/components/ui";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { useCandles } from "@/lib/hooks";
+import { useTheme } from "@/lib/theme";
 
 const TF_OPTIONS = [
   { value: "1m", label: "1m" },
@@ -27,6 +28,7 @@ const DOWN = "#ef5350";
 export function PriceChart() {
   const [tf, setTf] = useState<Tf>("1h");
   const { data, fromCache, isLoading } = useCandles(tf);
+  const { resolved } = useTheme();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
 
@@ -34,20 +36,26 @@ export function PriceChart() {
     const el = containerRef.current;
     if (!el) return;
 
+    // Axis ink and crosshair chip per theme; candle colors are the validated
+    // pair and stay constant across both surfaces.
+    const light = resolved === "light";
     const chart = createChart(el, {
       height: 300,
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
-        textColor: "#8b93a3",
+        textColor: light ? "#5b6472" : "#8b93a3",
         fontSize: 11,
       },
       grid: {
-        vertLines: { color: "rgba(139, 147, 163, 0.08)" },
-        horzLines: { color: "rgba(139, 147, 163, 0.08)" },
+        vertLines: { color: light ? "rgba(91, 100, 114, 0.10)" : "rgba(139, 147, 163, 0.08)" },
+        horzLines: { color: light ? "rgba(91, 100, 114, 0.10)" : "rgba(139, 147, 163, 0.08)" },
       },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
-      crosshair: { horzLine: { labelBackgroundColor: "#2a2f3a" }, vertLine: { labelBackgroundColor: "#2a2f3a" } },
+      crosshair: {
+        horzLine: { labelBackgroundColor: light ? "#d8dde6" : "#2a2f3a" },
+        vertLine: { labelBackgroundColor: light ? "#d8dde6" : "#2a2f3a" },
+      },
     });
     chartRef.current = chart;
 
@@ -94,7 +102,7 @@ export function PriceChart() {
       chart.remove();
       chartRef.current = null;
     };
-  }, [data]);
+  }, [data, resolved]);
 
   return (
     <Card>

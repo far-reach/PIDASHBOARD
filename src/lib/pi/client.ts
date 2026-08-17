@@ -178,7 +178,7 @@ function payWithPi(args: {
 export function subscribeWithPi(amountPi: number): Promise<void> {
   return payWithPi({
     amountPi,
-    memo: "Cyberekt Market Pro — 30 days",
+    memo: "Cyberekt Pro — 30 days",
     product: "cyberekt-pro-30d",
     unavailable: "Pi SDK unavailable — open this app in Pi Browser to subscribe",
   });
@@ -191,7 +191,7 @@ export function subscribeWithPi(amountPi: number): Promise<void> {
 export function tipWithPi(amountPi: number): Promise<void> {
   return payWithPi({
     amountPi,
-    memo: "Cyberekt Market — support the developer",
+    memo: "Cyberekt — support the developer",
     product: "cyberekt-tip",
     unavailable: "Pi SDK unavailable — open this app in Pi Browser to send Pi",
   });

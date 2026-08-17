@@ -1,4 +1,4 @@
-# Publishing Cyberekt Market to the Pi App Directory — step by step
+# Publishing Cyberekt to the Pi App Directory — step by step
 
 Every step is ordered; each one has a check you can run before moving on. Steps marked
 **[you]** need a human (a Pi account, a card, a legal review); the rest are commands.
@@ -136,7 +136,7 @@ All of this is inside **Pi Browser** on your phone.
    screen; on newer builds the portal is at `develop.pinet.com` — either entry point
    lands in the same Developer Portal).
 2. Tap **New App**. Fill the three required fields:
-   - **App Name:** `Cyberekt Market` — use only letters, numbers and spaces; no special characters.
+   - **App Name:** `Cyberekt` — use only letters, numbers and spaces; no special characters.
    - **App Network:** ⚠️ **This cannot be changed after registration, and one app connects
      to exactly one network.** Register a **Testnet** app first for sandbox testing, then a
      separate **Mainnet** app for the real listing. Do not try to reuse one for both.
@@ -217,7 +217,7 @@ arrives there before you rely on it. Two ways to get paid:
 
 | | How it works | Needs |
 | --- | --- | --- |
-| **Tips** | "Support Cyberekt Market" card on the home screen. Any amount from `MIN_TIP_PI` to `MAX_TIP_PI`. Unlocks nothing. | On by default — nothing to switch on |
+| **Tips** | "Support Cyberekt" card on the home screen. Any amount from `MIN_TIP_PI` to `MAX_TIP_PI`. Unlocks nothing. | On by default — nothing to switch on |
 | **Pro subscription** | Gates *currently-open* signals for 30 days at `PRO_PRICE_PI`. Closed history and performance stay free. | `MONETIZATION_MODE=freemium` |
 
 Recommended: **launch with tips only** and leave `MONETIZATION_MODE=free`. Flip to
@@ -261,7 +261,7 @@ Learn screens on a real phone.
 
 **Long description (paste-ready):**
 
-> Cyberekt Market gives Pioneers a clear, honest view of the PIUSDT market.
+> Cyberekt gives Pioneers a clear, honest view of the PIUSDT market.
 >
 > • Live price aggregated from OKX and MEXC, with automatic failover and a visible badge
 >   whenever data is stale or coming from the backup source.
@@ -276,7 +276,7 @@ Learn screens on a real phone.
 > • Educational content explaining how to read the signals, what R multiples mean, and a
 >   glossary.
 >
-> Cyberekt Market never executes trades, never holds your funds, and never asks for exchange or
+> Cyberekt never executes trades, never holds your funds, and never asks for exchange or
 > wallet keys. It is an independent community app, not affiliated with the Pi Core Team.
 > Trading involves risk of loss; nothing in the app is financial advice.
 

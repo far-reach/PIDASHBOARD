@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Learn · Cyberekt Market" };
+export const metadata: Metadata = { title: "Learn · Cyberekt" };
 
 /**
  * Educational content: how to read the market data this app reports.
@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Learn · Cyberekt Market" };
 export default function LearnPage() {
   return (
     <div className="space-y-3 pb-4 max-w-2xl">
-      <h1 className="text-lg font-semibold">How to read Cyberekt Market</h1>
+      <h1 className="text-lg font-semibold">How to read Cyberekt</h1>
 
       <Card>
         <CardHeader>
@@ -138,7 +138,7 @@ export default function LearnPage() {
             licensed professional before making financial decisions.
           </p>
           <p>
-            Cyberekt Market never executes trades, never holds funds, and never asks for exchange
+            Cyberekt never executes trades, never holds funds, and never asks for exchange
             API keys or wallet keys. Anyone claiming otherwise in our name is a scam.
           </p>
         </CardContent>

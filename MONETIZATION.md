@@ -28,7 +28,7 @@ exist, only not their levels (avoids the §8 "we're up 300%, trust us" rugpull p
 
 ## Tips — direct support, always available
 
-Separate from the subscription, and live in `free` mode too: a **Support Cyberekt Market** card on
+Separate from the subscription, and live in `free` mode too: a **Support Cyberekt** card on
 the home screen lets a signed-in Pioneer send Pi straight to the app wallet. Quick-pick
 amounts come from `NEXT_PUBLIC_TIP_PRESETS`; any amount between `MIN_TIP_PI` and
 `MAX_TIP_PI` is accepted.

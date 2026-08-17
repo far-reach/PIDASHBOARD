@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SupportContact } from "@/components/SupportContact";
 
-export const metadata: Metadata = { title: "Privacy Policy · Cyberekt Market" };
+export const metadata: Metadata = { title: "Privacy Policy · Cyberekt" };
 
 export default function PrivacyPage() {
   return (

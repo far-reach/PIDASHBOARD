@@ -55,11 +55,11 @@ export function SupportCard() {
   return (
     <Card data-testid="support-card">
       <CardHeader>
-        <CardTitle>Support Cyberekt Market</CardTitle>
+        <CardTitle>Support Cyberekt</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <p className="text-sm leading-relaxed">
-          Cyberekt Market is free and stays free. If it is useful to you, you can send the developer
+          Cyberekt is free and stays free. If it is useful to you, you can send the developer
           Pi directly. It pays for the exchange data feed and hosting. It unlocks nothing,
           and nothing here is hidden behind it.
         </p>

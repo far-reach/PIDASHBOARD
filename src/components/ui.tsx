@@ -6,7 +6,10 @@ import type { HTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={clsx("rounded-lg border border-border bg-card text-card-foreground", className)}
+      className={clsx(
+        "rounded-xl border border-border bg-card text-card-foreground shadow-sm",
+        className
+      )}
       {...props}
     />
   );

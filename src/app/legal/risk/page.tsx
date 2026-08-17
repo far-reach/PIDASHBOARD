@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Risk Disclaimer · Cyberekt Market" };
+export const metadata: Metadata = { title: "Risk Disclaimer · Cyberekt" };
 
 export default function RiskPage() {
   return (
@@ -10,7 +10,7 @@ export default function RiskPage() {
         Draft template. To be reviewed by qualified counsel before App Directory submission.
       </p>
       <p>
-        Cyberekt Market reports market data published by third-party exchanges and generates
+        Cyberekt reports market data published by third-party exchanges and generates
         automatic factual summaries of it, for educational and informational purposes only.
         Nothing in this app constitutes financial, investment, legal, or tax advice, an offer or
         solicitation to buy or sell any asset, or a recommendation tailored to any person.
@@ -26,7 +26,7 @@ export default function RiskPage() {
         fail. You can lose the entire amount you commit.
       </p>
       <p>
-        Cyberekt Market does not execute trades, does not custody funds, and does not access your exchange
+        Cyberekt does not execute trades, does not custody funds, and does not access your exchange
         accounts or wallets. Any trading decision you make, on any venue, is yours alone. Before
         making financial decisions, consider your circumstances and consult a licensed professional
         in your jurisdiction.

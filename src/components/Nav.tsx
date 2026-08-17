@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { BarChart3, BookOpen, FileText, Home, Radio } from "lucide-react";
 import { PiAuthButton } from "@/components/PiAuthButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useOnline } from "@/lib/hooks";
 import { Badge } from "@/components/ui";
 import { SIGNALS_ENABLED } from "@/lib/env";
@@ -41,7 +42,7 @@ export function Nav() {
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary text-sm font-bold">
               π
             </span>
-            <span className="font-semibold tracking-tight">Cyberekt Market</span>
+            <span className="font-semibold tracking-tight">Cyberekt</span>
             <span className="text-[11px] text-muted-foreground hidden sm:inline">PIUSDT dashboard</span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
@@ -62,6 +63,7 @@ export function Nav() {
           </nav>
           <div className="flex items-center gap-2">
             {!online ? <Badge tone="warn">offline</Badge> : null}
+            <ThemeToggle />
             <PiAuthButton />
           </div>
         </div>
@@ -71,7 +73,7 @@ export function Nav() {
         className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur"
         aria-label="Primary"
       >
-        <div className="grid grid-cols-5">
+        <div className={clsx("grid", TABS.length === 5 ? "grid-cols-5" : "grid-cols-3")}>
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = pathname === t.href;

@@ -107,6 +107,31 @@ export const useFunding = () =>
     as_of: string;
   }>("funding", "/api/funding", 60_000);
 
+export interface PiStatsResponse {
+  stats: {
+    circulatingSupply: number | null;
+    totalSupply: number | null;
+    maxSupply: number | null;
+    circulatingPctOfMax: number | null;
+    marketCapUsd: number | null;
+    fdvUsd: number | null;
+    volume24hUsd: number | null;
+    priceUsd: number | null;
+    changePct24h: number | null;
+    athUsd: number | null;
+    athDate: string | null;
+    source: string;
+    asOf: string;
+  } | null;
+  history: { date: string; circulatingSupply: number | null; marketCapUsd: number | null }[];
+  behavior: string | null;
+  cached: boolean;
+  asOf: string;
+  attribution: string;
+}
+
+export const usePiStats = () => useCachedQuery<PiStatsResponse>("pistats", "/api/pi-stats", 300_000);
+
 /** True when the browser reports no network. */
 export function useOnline(): boolean {
   return useSyncExternalStore(

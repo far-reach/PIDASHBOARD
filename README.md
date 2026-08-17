@@ -1,4 +1,4 @@
-# Cyberekt Market — PIUSDT Dashboard for the Pi Network ecosystem
+# Cyberekt — PIUSDT Dashboard for the Pi Network ecosystem
 
 A mobile-first web app, built to ship in the **Pi Network App Directory**, that gives Pioneers
 an honest view of the PIUSDT market:

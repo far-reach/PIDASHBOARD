@@ -21,14 +21,14 @@ Also: using "Pi" in an app name at all requires an executed **Trademark Licensin
 Agreement**, and *"your app's URL/domain must not start with 'pi'"*
 ([Mainnet Listing Requirements](https://pi-apps.github.io/community-developer-guide/docs/gettingStarted/mainnetListingRequirements/)).
 
-**Decision:** the app is named **Cyberekt Market** — no "Pi" in the name, so no trademark
+**Decision:** the app is named **Cyberekt** — no "Pi" in the name, so no trademark
 agreement is needed and the domain rule is satisfied automatically. It was previously
 "PiPulse", which was in the prohibited form.
 
 Pinned by `test/compliance.test.ts`.
 
 **Consequence for hosting:** the deployment URL must not start with `pi`. Use
-`cyberekt-market.vercel.app` or similar — never `pipulse.vercel.app`.
+`cyberekt.vercel.app` or similar — never `pipulse.vercel.app`.
 
 ## 2. No claims about the value or valuation of Pi ⚠️
 
@@ -72,6 +72,21 @@ official SDK and required for the app to function. No documentation links, no so
 links, no exchange links. Pinned by `test/compliance.test.ts`.
 
 If you ever add an outbound link, that test fails — that is the intent.
+
+## 3b. Third-party data attribution, without outbound links
+
+The network panel uses CoinGecko's free API, whose terms ask for public
+attribution. Attribution is given as plain text in the panel ("Market data:
+CoinGecko, OKX, MEXC") rather than a hyperlink, because rule 3 above weighs
+against sending users off-site. If CoinGecko ever requires a clickable link for
+free-tier use, revisit both constraints together before changing anything.
+
+The panel's figures are all observations (supply, market cap, volume) with
+their source and timestamp shown. The 24h behavior line is computed from the
+app's own candle data and states only what happened. Nothing in the panel
+projects, targets or values anything; the unlock projections third parties
+publish are deliberately excluded because no dependable free source exists,
+and the app records its own daily supply snapshots instead.
 
 ## 4. Trading signals are regulated independently of Pi
 

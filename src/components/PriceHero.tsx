@@ -36,7 +36,11 @@ export function PriceHero() {
   const changeTone = change === null ? undefined : change >= 0 ? "text-up" : "text-down";
 
   return (
-    <Card data-testid="price-hero">
+    <Card data-testid="price-hero" className="relative overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-20 -right-16 h-48 w-48 rounded-full bg-primary/10 blur-3xl"
+      />
       <CardContent className="pt-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="min-w-0">
@@ -46,7 +50,7 @@ export function PriceHero() {
                 {change !== null ? `${fmtPct(change)} 24h` : ""}
               </span>
             </div>
-            <div className="text-4xl font-bold font-tabular tracking-tight mt-0.5">
+            <div className="text-5xl font-bold font-tabular tracking-tight mt-0.5">
               {fmtPrice(data.price)}
             </div>
             <div className="text-xs text-muted-foreground mt-1 font-tabular">

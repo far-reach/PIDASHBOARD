@@ -1,30 +1,37 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { SlidersHorizontal } from "lucide-react";
 import { PriceHero } from "@/components/PriceHero";
 import { PriceChart } from "@/components/PriceChart";
 import { StatsGrid } from "@/components/StatsGrid";
+import { PiNetworkPanel } from "@/components/PiNetworkPanel";
 import { ReportView } from "@/components/ReportView";
 import { SignalCard } from "@/components/SignalCard";
 import { SupportCard } from "@/components/SupportCard";
+import { CustomizePanel } from "@/components/CustomizePanel";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/components/ui";
 import { useReports, useSignals } from "@/lib/hooks";
 import { timeAgo } from "@/lib/format";
 import { SIGNALS_ENABLED } from "@/lib/env";
+import { useLayoutPrefs, type SectionId } from "@/lib/layout-prefs";
 
 export default function HomePage() {
   const { data: reports, fromCache: reportsFromCache } = useReports();
   const { data: signals } = useSignals();
+  const prefs = useLayoutPrefs();
+  const [editing, setEditing] = useState(false);
+
   const latestReport = reports?.reports[0] ?? null;
   const recentSignals = SIGNALS_ENABLED ? (signals?.signals.slice(0, 3) ?? []) : [];
 
-  return (
-    <div className="space-y-3 pb-4">
-      <PriceHero />
-      <StatsGrid />
-      <PriceChart />
-
-      <Card>
+  const sections: Record<SectionId, React.ReactNode> = {
+    stats: <StatsGrid key="stats" />,
+    network: <PiNetworkPanel key="network" />,
+    chart: <PriceChart key="chart" />,
+    report: (
+      <Card key="report">
         <CardHeader>
           <CardTitle>Daily report</CardTitle>
           <span className="inline-flex items-center gap-1.5">
@@ -48,6 +55,35 @@ export default function HomePage() {
           )}
         </CardContent>
       </Card>
+    ),
+    about: (
+      <Card key="about">
+        <CardHeader>
+          <CardTitle>What this app does, and what it does not</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm leading-relaxed">
+          <p>
+            Cyberekt reports what the PIUSDT market <em>did</em>: prices as published by
+            public exchanges, with the source and timestamp shown, and an automatic daily
+            summary of the session.
+          </p>
+          <p className="text-muted-foreground">
+            It does not forecast prices, assert what any asset is worth, recommend buying or
+            selling, or set levels to trade against. It is a record of observed market data,
+            for informational and educational use only.{" "}
+            <Link href="/learn" className="text-primary hover:underline">
+              How to read this data →
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    ),
+    support: <SupportCard key="support" />,
+  };
+
+  return (
+    <div className="space-y-3 pb-4">
+      <PriceHero />
 
       {SIGNALS_ENABLED ? (
         <Card>
@@ -68,30 +104,27 @@ export default function HomePage() {
             )}
           </CardContent>
         </Card>
+      ) : null}
+
+      {editing ? (
+        <CustomizePanel onClose={() => setEditing(false)} />
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>What this app does, and what it does not</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm leading-relaxed">
-            <p>
-              Cyberekt Market reports what the PIUSDT market <em>did</em>: prices as published by
-              public exchanges, with the source and timestamp shown, and an automatic daily
-              summary of the session.
-            </p>
-            <p className="text-muted-foreground">
-              It does not forecast prices, assert what any asset is worth, recommend buying
-              or selling, or set levels to trade against. It is a record of observed market
-              data, for informational and educational use only.{" "}
-              <Link href="/learn" className="text-primary hover:underline">
-                How to read this data →
-              </Link>
-            </p>
-          </CardContent>
-        </Card>
+        prefs.order.filter((id) => !prefs.hidden.includes(id)).map((id) => sections[id])
       )}
 
-      <SupportCard />
+      {!editing ? (
+        <div className="flex justify-center pt-1">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-2 px-3"
+            data-testid="customize-open"
+          >
+            <SlidersHorizontal size={13} />
+            Arrange dashboard
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

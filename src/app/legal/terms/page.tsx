@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SupportContact } from "@/components/SupportContact";
 
-export const metadata: Metadata = { title: "Terms of Use · Cyberekt Market" };
+export const metadata: Metadata = { title: "Terms of Use · Cyberekt" };
 
 export default function TermsPage() {
   return (
@@ -12,7 +12,7 @@ export default function TermsPage() {
       </p>
       <ol className="list-decimal pl-5 space-y-2">
         <li>
-          <strong>Service.</strong> Cyberekt Market is an informational dashboard for the PIUSDT
+          <strong>Service.</strong> Cyberekt is an informational dashboard for the PIUSDT
           market: prices reported by third-party exchanges, automated daily summaries, a permanent
           archive of those reports, and educational content. The service is provided &quot;as
           is&quot; without warranties of any kind.
@@ -42,7 +42,7 @@ export default function TermsPage() {
           data belongs to its originating venues and is redistributed for display only.
         </li>
         <li>
-          <strong>Liability.</strong> To the maximum extent permitted by law, Cyberekt Market and its
+          <strong>Liability.</strong> To the maximum extent permitted by law, Cyberekt and its
           operator are not liable for trading losses, data inaccuracies, downtime, or any indirect
           or consequential damages arising from use of the service.
         </li>
@@ -58,7 +58,7 @@ export default function TermsPage() {
       </ol>
       <SupportContact />
       <p className="text-xs text-muted-foreground">
-        Cyberekt Market is an independent community application and is not affiliated with, endorsed by, or
+        Cyberekt is an independent community application and is not affiliated with, endorsed by, or
         sponsored by the Pi Core Team or Pi Network.
       </p>
     </article>

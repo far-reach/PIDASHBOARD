@@ -3,11 +3,12 @@
 @tailwind utilities;
 
 /*
- * Cyberekt Market commits to a single dark trading look; every surface is painted
- * explicitly so no host webview theme can invert it. Win/loss colors
- * (--up / --down) are a CVD-validated pair (ΔE deutan 11.6 on this surface)
- * and are ALWAYS accompanied by a text label; color never carries meaning
- * alone. Both share visual weight by design (brief §8).
+ * Two explicit themes, dark first. Every surface is painted from these tokens
+ * so no host webview can half-invert the app. Win/loss colors (--up / --down)
+ * are a CVD-validated pair on each surface and are ALWAYS accompanied by a
+ * text label; color never carries meaning alone. Both share visual weight by
+ * design (brief §8). The light values re-step the same hues for a white
+ * surface: darker, saturated ink instead of pastel glow.
  */
 :root {
   --background: 222 16% 6%;
@@ -22,14 +23,38 @@
   --up: 174 63% 40%;
   --down: 1 83% 63%;
   --warn: 38 92% 58%;
+  --glow: 261 84% 76%;
+}
+
+html.light {
+  --background: 216 33% 97%;
+  --foreground: 222 25% 13%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 25% 13%;
+  --muted: 216 18% 92%;
+  --muted-foreground: 218 12% 40%;
+  --border: 216 16% 86%;
+  --primary: 261 60% 45%;
+  --primary-foreground: 0 0% 100%;
+  --up: 174 75% 27%;
+  --down: 1 68% 42%;
+  --warn: 33 95% 33%;
+  --glow: 261 60% 45%;
 }
 
 html {
   color-scheme: dark;
 }
+html.light {
+  color-scheme: light;
+}
 
 body {
   background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(60rem 30rem at 85% -10%, hsl(var(--glow) / 0.07), transparent 60%),
+    radial-gradient(40rem 24rem at -10% 30%, hsl(var(--glow) / 0.05), transparent 55%);
+  background-attachment: fixed;
   color: hsl(var(--foreground));
   -webkit-tap-highlight-color: transparent;
 }

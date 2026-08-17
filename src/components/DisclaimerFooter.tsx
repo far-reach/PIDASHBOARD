@@ -10,7 +10,7 @@ export function DisclaimerFooter() {
         informational and educational, generated from market data published by third-party
         exchanges. This app makes no forecasts, no valuation claims and no recommendations.
         Prices are shown &quot;as of&quot; their stated UTC timestamps and differ between
-        exchanges. Cyberekt Market is an independent community app and is not affiliated with or
+        exchanges. Cyberekt is an independent community app and is not affiliated with or
         endorsed by the Pi Core Team.
       </p>
       <nav className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[11px] text-muted-foreground">

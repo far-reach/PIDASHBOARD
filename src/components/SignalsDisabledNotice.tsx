@@ -17,7 +17,7 @@ export function SignalsDisabledNotice() {
         </CardHeader>
         <CardContent className="space-y-2 text-sm leading-relaxed">
           <p>
-            Cyberekt Market reports observed market data and publishes a factual daily summary.
+            Cyberekt reports observed market data and publishes a factual daily summary.
             It does not publish buy or sell recommendations, entry or exit levels, profit
             objectives, or forecasts of what any asset will be worth.
           </p>

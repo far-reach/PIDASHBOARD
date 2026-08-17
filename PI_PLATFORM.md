@@ -45,14 +45,14 @@ noted in PHASE_4_REPORT as the one brief §Phase 4.3 item that is platform-block
 ## Operator actions (cannot be done by the coding agent)
 
 - [ ] Create the developer account: open `develop.pi` in Pi Browser (or
-      minepi.com/developers), register **Cyberekt Market** as an app
+      minepi.com/developers), register **Cyberekt** as an app
 - [ ] Complete app checklist: app URL (production deploy), domain validation key,
       description, logo (use `public/icon.svg` as the master; export PNG sizes the portal
       asks for)
 - [ ] Obtain `PI_API_KEY` from the portal → set as a server secret
 - [ ] Sandbox test: full auth + 1 π payment flow end-to-end in the Pi sandbox
       (screenshots into PHASE_4_REPORT)
-- [ ] Naming/trademark check: "Cyberekt Market" and any use of "Pi" must be cleared against the
+- [ ] Naming/trademark check: "Cyberekt" and any use of "Pi" must be cleared against the
       Pi Core Team's brand guidelines during review; the app already self-identifies as
       independent/unaffiliated in the footer and legal pages
 - [ ] Submission per the current App Directory process (re-read the developer docs at
