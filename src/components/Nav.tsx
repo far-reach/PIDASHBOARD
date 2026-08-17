@@ -38,11 +38,11 @@ export function Nav() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-        <div className="mx-auto max-w-5xl px-4 h-16 flex items-center justify-between gap-2">
+        <div className="mx-auto max-w-5xl px-4 h-14 flex items-center justify-between gap-2">
           <Link href="/" className="flex items-center gap-2.5 min-w-0">
             {/* eslint-disable-next-line @next/next/no-img-element -- static
                 same-origin SVG; next/image adds nothing for a vector */}
-            <img src="/icon.svg" alt="" className="h-9 w-9 rounded-xl" />
+            <img src="/icon.svg" alt="" className="h-8 w-8 rounded-lg" />
             <span className="font-bold text-lg tracking-tight">Cyberekt</span>
             <span className="text-[11px] text-muted-foreground hidden sm:inline">PIUSDT dashboard</span>
           </Link>
@@ -64,9 +64,9 @@ export function Nav() {
           </nav>
           <div className="flex items-center gap-2">
             {!online ? <Badge tone="warn">offline</Badge> : null}
-            <TipButton />
             <PiAuthButton />
             <ThemeToggle />
+            <TipButton />
           </div>
         </div>
       </header>

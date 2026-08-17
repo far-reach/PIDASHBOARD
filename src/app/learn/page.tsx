@@ -65,6 +65,14 @@ export default function LearnPage() {
             has its own order book and its own participants. A price is always &quot;the price
             at this venue, at this moment&quot;, never a single universal number.
           </p>
+          <p>
+            The &quot;Today in context&quot; panel compares the current day against the same
+            venue&apos;s own recent daily candles: how wide today&apos;s swing is next to the
+            last 30 days, how volume compares with a typical full day, and where the price
+            sits inside the range those days covered. These are descriptive comparisons of
+            recorded data, and nothing more: past behaviour indicates nothing about what
+            happens next.
+          </p>
         </CardContent>
       </Card>
 

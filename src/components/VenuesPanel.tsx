@@ -23,9 +23,7 @@ export function VenuesPanel() {
     <Card data-testid="venues-panel">
       <CardHeader>
         <CardTitle>Across venues</CardTitle>
-        <span className="text-[11px] text-muted-foreground">
-          as of {fmtUtcTime(data.as_of)} UTC
-        </span>
+        <span className="text-[11px] text-muted-foreground">as of {fmtUtcTime(data.as_of)}</span>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="overflow-x-auto">
