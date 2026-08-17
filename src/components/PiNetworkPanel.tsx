@@ -38,7 +38,6 @@ export function PiNetworkPanel() {
   }
 
   const stats = data?.stats ?? null;
-  const behavior = data?.behavior ?? null;
   const pct = stats?.circulatingPctOfMax ?? null;
 
   return (
@@ -51,12 +50,6 @@ export function PiNetworkPanel() {
         </span>
       </CardHeader>
       <CardContent className="space-y-3">
-        {behavior ? (
-          <p className="text-sm leading-relaxed" data-testid="behavior-line">
-            {behavior}
-          </p>
-        ) : null}
-
         {stats ? (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">

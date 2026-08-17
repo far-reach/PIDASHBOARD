@@ -3,11 +3,14 @@
 import { Card, CardContent, Skeleton } from "@/components/ui";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { fmtPct, fmtPrice } from "@/lib/format";
-import { useLatestPrice } from "@/lib/hooks";
+import { useLatestPrice, usePiStats } from "@/lib/hooks";
 import { clsx } from "clsx";
 
 export function PriceHero() {
   const { data, fromCache, isLoading, isError } = useLatestPrice();
+  // The plain-English session summary, served alongside the network stats.
+  const { data: stats } = usePiStats();
+  const behavior = stats?.behavior ?? null;
 
   if (isLoading && !data) {
     return (
@@ -63,6 +66,14 @@ export function PriceHero() {
             fromCache={fromCache}
           />
         </div>
+        {behavior ? (
+          <p
+            className="mt-3 border-t border-border pt-3 text-sm leading-relaxed text-muted-foreground"
+            data-testid="behavior-line"
+          >
+            {behavior}
+          </p>
+        ) : null}
       </CardContent>
     </Card>
   );

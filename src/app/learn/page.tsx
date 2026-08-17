@@ -17,6 +17,7 @@ const SECTIONS = [
   { id: "sources", label: "Where the numbers come from" },
   { id: "distrust", label: "When to distrust the data" },
   { id: "glossary", label: "Glossary" },
+  { id: "methodology", label: "How the comparisons work" },
   { id: "daily-report", label: "The daily report" },
   { id: "risk", label: "Risk, plainly" },
 ] as const;
@@ -64,14 +65,6 @@ export default function LearnPage() {
             Exchanges disagree. Prices differ between venues at the same instant because each
             has its own order book and its own participants. A price is always &quot;the price
             at this venue, at this moment&quot;, never a single universal number.
-          </p>
-          <p>
-            The &quot;Today in context&quot; panel compares the current day against the same
-            venue&apos;s own recent daily candles: how wide today&apos;s swing is next to the
-            last 30 days, how volume compares with a typical full day, and where the price
-            sits inside the range those days covered. These are descriptive comparisons of
-            recorded data, and nothing more: past behaviour indicates nothing about what
-            happens next.
           </p>
         </CardContent>
       </Card>
@@ -147,6 +140,51 @@ export default function LearnPage() {
               </div>
             ))}
           </dl>
+        </CardContent>
+      </Card>
+
+      <Card id="methodology" className={SECTION_ANCHOR}>
+        <CardHeader>
+          <CardTitle>How the comparisons work</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm leading-relaxed space-y-2">
+          <p>
+            The home screen says things like &quot;wider than 23% of days&quot; and
+            &quot;0.68× the usual day&quot;. Every one of those comparisons is arithmetic on
+            the same venue&apos;s own daily candles for roughly the last 30 days, so you can
+            check them against the chart yourself.
+          </p>
+          <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+            <li>
+              <strong className="text-foreground">Price movement</strong>: today&apos;s high
+              minus its low, as a percentage of the low, ranked against the same figure for
+              each of the previous days.
+            </li>
+            <li>
+              <strong className="text-foreground">Trading activity</strong>: volume so far
+              today divided by the median volume of a complete day. Because today is
+              usually unfinished, the app shows how much of the UTC day has elapsed next to
+              it, and never scales the number up to guess a full-day total.
+            </li>
+            <li>
+              <strong className="text-foreground">Where price sits</strong>: the lowest low
+              and highest high across those days form a band, and the current price is
+              placed inside it.
+            </li>
+            <li>
+              <strong className="text-foreground">Venue agreement</strong>: the widest gap
+              between the venues quoting at that moment, as a percentage of their midpoint.
+            </li>
+          </ul>
+          <p>
+            The median is used rather than the average because one frantic day would drag an
+            average upwards and make every ordinary day afterwards look quiet by comparison.
+          </p>
+          <p>
+            All of it is descriptive: it says what the recorded data shows and nothing else.
+            Past behaviour indicates nothing about what happens next, and none of these
+            figures is a recommendation to do anything.
+          </p>
         </CardContent>
       </Card>
 

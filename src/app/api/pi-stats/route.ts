@@ -25,8 +25,19 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
   let behavior: string | null = null;
   try {
-    const { candles } = await getAggregator().collectCandles(SYMBOL, "1d", 30);
-    behavior = buildBehaviorLine({ symbol: SYMBOL, daily: candles });
+    const agg = getAggregator();
+    const { candles } = await agg.collectCandles(SYMBOL, "1d", 30);
+    // Venue agreement comes from the aggregator's own cross-check, which is
+    // only meaningful when at least two venues answered recently; the line
+    // omits the clause rather than inventing a comparison.
+    const status = agg.feedStatus(null, false);
+    const freshVenues = status.sources.filter((s) => s.ok).length;
+    behavior = buildBehaviorLine({
+      symbol: SYMBOL,
+      daily: candles,
+      divergencePct: status.divergencePct,
+      venueCount: freshVenues,
+    });
   } catch {
     // Candles unavailable: the line is simply omitted rather than guessed.
   }
