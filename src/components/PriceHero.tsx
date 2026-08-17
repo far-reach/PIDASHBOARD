@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, Skeleton } from "@/components/ui";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
+import { Sparkline } from "@/components/Sparkline";
+import { ChartOverlay } from "@/components/ChartOverlay";
 import { fmtPct, fmtPrice } from "@/lib/format";
-import { useLatestPrice, usePiStats } from "@/lib/hooks";
+import { useCandles, useLatestPrice, usePiStats } from "@/lib/hooks";
+import type { Tf } from "@/lib/chart-timeframes";
 import { clsx } from "clsx";
 
 export function PriceHero() {
@@ -11,6 +15,14 @@ export function PriceHero() {
   // The plain-English session summary, served alongside the network stats.
   const { data: stats } = usePiStats();
   const behavior = stats?.behavior ?? null;
+
+  // The sparkline's own expand path, independent of the dashboard chart
+  // card's timeframe: this is a separate mounted chart, opened as the
+  // medium "vertical mode" panel rather than straight to fullscreen, since
+  // (unlike the card) nothing is already visible on the page to expand from.
+  const [chartTf, setChartTf] = useState<Tf>("1h");
+  const [chartOpen, setChartOpen] = useState(false);
+  const { data: chartData, fromCache: chartFromCache } = useCandles(chartTf);
 
   if (isLoading && !data) {
     return (
@@ -74,7 +86,21 @@ export function PriceHero() {
             {behavior}
           </p>
         ) : null}
+        <Sparkline onExpand={() => setChartOpen(true)} />
       </CardContent>
+
+      {chartOpen ? (
+        <ChartOverlay
+          tf={chartTf}
+          onTfChange={setChartTf}
+          candles={chartData?.candles ?? []}
+          source={chartData?.source ?? null}
+          asOf={chartData?.as_of ?? null}
+          isFailover={chartData?.is_failover}
+          fromCache={chartFromCache}
+          onClose={() => setChartOpen(false)}
+        />
+      ) : null}
     </Card>
   );
 }

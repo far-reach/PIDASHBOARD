@@ -64,9 +64,9 @@ export function Nav() {
           </nav>
           <div className="flex items-center gap-2">
             {!online ? <Badge tone="warn">offline</Badge> : null}
-            <PiAuthButton />
             <ThemeToggle />
             <TipButton />
+            <PiAuthButton />
           </div>
         </div>
       </header>
