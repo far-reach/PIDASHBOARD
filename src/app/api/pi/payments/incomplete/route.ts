@@ -23,7 +23,7 @@ const bodySchema = z.object({
  * Requires a session, and the payment must belong to that user: without the
  * ownership check any caller could push arbitrary payment ids through this
  * endpoint and write rows into the payments ledger. No entitlement is granted
- * here — the user's normal /complete flow does that, with its own amount and
+ * here; the user's normal /complete flow does that, with its own amount and
  * ownership checks.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {

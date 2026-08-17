@@ -19,7 +19,7 @@ const bodySchema = z.object({
  * POST /api/pi/payments/complete { paymentId, txid }
  *
  * Completion leg. Three independent checks must pass before any entitlement:
- *   1. the Pi platform confirms the transaction (never the client — a hacked
+ *   1. the Pi platform confirms the transaction (never the client; a hacked
  *      SDK can claim anything; the official docs are explicit about this)
  *   2. the payment belongs to the session user
  *   3. the amount covers the advertised price

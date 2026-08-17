@@ -25,7 +25,7 @@ export default function PerformancePage() {
       </div>
 
       <p className="text-xs text-muted-foreground leading-relaxed">
-        Every number below is recomputed from the immutable signal event log on each request —
+        Every number below is recomputed from the immutable signal event log on each request;
         there is no manual override. Full history, including drawdowns. Past performance does not
         indicate future results.
       </p>
@@ -37,7 +37,7 @@ export default function PerformancePage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" data-testid="perf-stats">
             <Stat
               label="Win rate"
-              value={perf.winRatePct !== null ? `${perf.winRatePct.toFixed(1)}%` : "—"}
+              value={perf.winRatePct !== null ? `${perf.winRatePct.toFixed(1)}%` : "n/a"}
               sub={`${perf.wins}W / ${perf.losses}L of ${perf.scored}`}
             />
             <Stat
@@ -56,7 +56,7 @@ export default function PerformancePage() {
               label="Streak"
               value={
                 perf.currentStreak === 0
-                  ? "—"
+                  ? "n/a"
                   : `${Math.abs(perf.currentStreak)} ${perf.currentStreak > 0 ? "win" : "loss"}${Math.abs(perf.currentStreak) > 1 ? "s" : ""}`
               }
               tone={perf.currentStreak > 0 ? "up" : perf.currentStreak < 0 ? "down" : undefined}
@@ -66,7 +66,7 @@ export default function PerformancePage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Cumulative R — full history</CardTitle>
+              <CardTitle>Cumulative R, full history</CardTitle>
             </CardHeader>
             <CardContent>
               <EquityChart curve={perf.equityCurve} />

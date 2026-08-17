@@ -1,8 +1,8 @@
 /**
- * Daily report generator (brief §Phase 1.5): idempotent — for a given
+ * Daily report generator (brief §Phase 1.5): idempotent; for a given
  * (symbol, UTC date) exactly one row ever exists; re-runs are no-ops.
  * Content is computed deterministically from market data and written in
- * model-based, conditional language (brief §2.3 — never advice).
+ * model-based, conditional language (brief §2.3; never advice).
  */
 import { getDb, toIso, toNumOrNull, type Db } from "@/lib/db";
 import { getAggregator } from "@/lib/market/aggregator";
@@ -28,7 +28,7 @@ function mapReport(row: Record<string, unknown>): DailyReport {
   const rawDate = row.report_date;
   // node-postgres parses a `date` column into a Date at LOCAL midnight, so
   // toISOString() would shift it to the previous day on any host east of UTC.
-  // Read the local calendar fields instead — they are the stored date.
+  // Read the local calendar fields instead; they are the stored date.
   const reportDate =
     rawDate instanceof Date
       ? `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, "0")}-${String(
@@ -58,7 +58,7 @@ export function utcDateString(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** Yesterday in UTC — the default report target. */
+/** Yesterday in UTC; the default report target. */
 export function previousUtcDate(now: Date = new Date()): string {
   return utcDateString(new Date(now.getTime() - 24 * 3600 * 1000));
 }
@@ -90,7 +90,7 @@ export interface ReportInputs {
   source: string;
 }
 
-/** Pure content builder — unit-testable without network or DB. */
+/** Pure content builder; unit-testable without network or DB. */
 export function buildReportContent(inp: ReportInputs): {
   contentMd: string;
   data: Record<string, unknown>;
@@ -125,7 +125,7 @@ export function buildReportContent(inp: ReportInputs): {
     `${String(new Date(ts).getUTCHours()).padStart(2, "0")}:00 UTC`;
 
   const lines: string[] = [];
-  lines.push(`# ${inp.symbol} daily report — ${inp.date}`);
+  lines.push(`# ${inp.symbol} daily report · ${inp.date}`);
   lines.push("");
   if (day) {
     const dir =
@@ -151,7 +151,7 @@ export function buildReportContent(inp: ReportInputs): {
     `| Change | ${changePct === null ? "n/a" : `${changePct >= 0 ? "+" : ""}${changePct.toFixed(2)}%`} |`
   );
   // Candle volume is denominated in the BASE asset (PI), so it must not carry
-  // a dollar sign — that would overstate the figure by the price of PI.
+  // a dollar sign; that would overstate the figure by the price of PI.
   lines.push(`| Volume | ${day ? `${fmtQty(day.volume)} PI` : "n/a"} |`);
   if (volumeFlag) {
     lines.push(`| Volume vs 30d avg | ${volRatio!.toFixed(2)}x (${volumeFlag}) |`);
@@ -173,7 +173,7 @@ export function buildReportContent(inp: ReportInputs): {
   lines.push(
     `Based on recent trading: prior-day high/low at ${fmt(prevDay?.high ?? null)} / ${fmt(prevDay?.low ?? null)}, ` +
       `7-day range ${fmt(lo7)}–${fmt(hi7)}, 30-day range ${fmt(lo30)}–${fmt(hi30)}. ` +
-      `Historically, ranges like these have acted as reference zones rather than firm barriers — treat them as context, not targets.`
+      `Historically, ranges like these have acted as reference zones rather than firm barriers. Treat them as context, not as levels to trade.`
   );
   lines.push("");
 
@@ -184,7 +184,7 @@ export function buildReportContent(inp: ReportInputs): {
     lines.push(`## Derivatives context`);
     lines.push("");
     lines.push(
-      `Perpetual funding on the reference venue printed ${bp.toFixed(4)}% at generation time — ${lean} positioning. ` +
+      `Perpetual funding on the reference venue printed ${bp.toFixed(4)}% at generation time, ${lean} positioning. ` +
         `Funding is a crowd-positioning gauge; it shifts quickly and is shown for context only.`
     );
     lines.push("");
@@ -243,7 +243,7 @@ async function fetchInputs(symbol: string, date: string): Promise<ReportInputs> 
 
 /**
  * Generate (or return the existing) report for a UTC date.
- * Returns { report, created } — created=false means the idempotency
+ * Returns { report, created }; created=false means the idempotency
  * constraint short-circuited a re-run.
  */
 export async function generateDailyReport(
@@ -265,11 +265,11 @@ export async function generateDailyReport(
 
   // Refuse to persist a contentless report. Generation is idempotent, so an
   // empty row written because the candle window did not reach that date would
-  // be permanent and un-regenerable — a blank day in the archive forever.
+  // be permanent and un-regenerable; a blank day in the archive forever.
   // Failing instead lets the next scheduled run (or a manual --date) fill it.
   if (!inputs.day) {
     throw new Error(
-      `no daily candle available for ${symbol} on ${date}; refusing to persist an empty report — retry once the venue serves that range`
+      `no daily candle available for ${symbol} on ${date}; refusing to persist an empty report; retry once the venue serves that range`
     );
   }
 

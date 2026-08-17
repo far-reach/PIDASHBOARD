@@ -2,7 +2,7 @@
 
 /**
  * Cumulative R equity curve as a baseline chart: above 0 in the up color,
- * below 0 in the down color — drawdowns are visually impossible to hide
+ * below 0 in the down color; drawdowns are visually impossible to hide
  * (brief §3.5). Full history, always; no timeframe cherry-picking controls.
  */
 import { useEffect, useRef } from "react";

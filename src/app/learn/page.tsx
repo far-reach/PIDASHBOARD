@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Learn — Cyberekt Market" };
+export const metadata: Metadata = { title: "Learn · Cyberekt Market" };
 
 /**
  * Educational content: how to read the market data this app reports.
  *
  * Scoped deliberately. It explains what the numbers on screen mean and how
- * they can mislead — it does not teach a strategy, name levels, or suggest
+ * they can mislead; it does not teach a strategy, name levels, or suggest
  * what anyone should do. See COMPLIANCE.md.
  */
 export default function LearnPage() {
@@ -21,14 +21,14 @@ export default function LearnPage() {
         </CardHeader>
         <CardContent className="text-sm leading-relaxed space-y-2">
           <p>
-            Every price here is reported by a public exchange — OKX first, MEXC as a backup —
+            Every price here is reported by a public exchange, OKX first with MEXC as backup,
             and is shown with its source and the time it was observed. Nothing is our own
             estimate of what anything is worth. We report; we do not appraise.
           </p>
           <p>
             Exchanges disagree. Prices differ between venues at the same instant because each
             has its own order book and its own participants. A price is always &quot;the price
-            at this venue, at this moment&quot; — never a single universal number.
+            at this venue, at this moment&quot;, never a single universal number.
           </p>
         </CardContent>
       </Card>
@@ -44,15 +44,15 @@ export default function LearnPage() {
           </p>
           <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
             <li>
-              <strong className="text-foreground">Stale</strong> — the last observation is more
+              <strong className="text-foreground">Stale</strong>: the last observation is more
               than 60 seconds old. The number on screen is history, not the market now.
             </li>
             <li>
-              <strong className="text-foreground">Failover</strong> — the primary exchange is
+              <strong className="text-foreground">Failover</strong>: the primary exchange is
               unreachable and prices are coming from the backup venue.
             </li>
             <li>
-              <strong className="text-foreground">Offline · last known</strong> — your device
+              <strong className="text-foreground">Offline · last known</strong>: your device
               lost connection and you are looking at cached data.
             </li>
           </ul>
@@ -74,7 +74,7 @@ export default function LearnPage() {
                 ["Ask", "The lowest price a seller is currently willing to accept."],
                 [
                   "Spread",
-                  "The gap between bid and ask. A wide spread usually means thin liquidity — trades move the price more easily.",
+                  "The gap between bid and ask. A wide spread usually means thin liquidity, so trades move the price more easily.",
                 ],
                 [
                   "24h volume",
@@ -82,7 +82,7 @@ export default function LearnPage() {
                 ],
                 [
                   "OHLC",
-                  "Open, high, low and close — the four prices that summarise a period. Each candle on the chart is one period.",
+                  "Open, high, low and close: the four prices that summarise a period. Each candle on the chart is one period.",
                 ],
                 [
                   "Funding rate",
@@ -119,8 +119,8 @@ export default function LearnPage() {
             only what already happened, and contains no forecast.
           </p>
           <p>
-            Published reports are never edited or deleted afterwards — including the dull ones
-            from quiet days. An archive you can only trust when it flatters us would be worth
+            Published reports are never edited or deleted afterwards, and that includes the dull
+            ones from quiet days. An archive you can only trust when it flatters us would be worth
             nothing.
           </p>
         </CardContent>

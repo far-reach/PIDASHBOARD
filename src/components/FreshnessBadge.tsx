@@ -25,7 +25,7 @@ export function FreshnessBadge({
 }) {
   if (fromCache) {
     return (
-      <Badge tone="warn" title="No network — showing the last data this device saw">
+      <Badge tone="warn" title="No network. Showing the last data this device saw">
         ● offline · last known {ts ? `(${fmtUtcTime(ts)})` : ""}
       </Badge>
     );
@@ -33,7 +33,7 @@ export function FreshnessBadge({
   return (
     <span className="inline-flex flex-wrap items-center gap-1">
       <Badge tone={isStale ? "warn" : "neutral"}>
-        {source ?? "—"} · as of {fmtUtcTime(ts)}
+        {source ?? "n/a"} · as of {fmtUtcTime(ts)}
         {isStale ? " · STALE" : ""}
       </Badge>
       {isFailover ? (

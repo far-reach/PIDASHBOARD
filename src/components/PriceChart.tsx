@@ -20,7 +20,7 @@ const TF_OPTIONS = [
 
 type Tf = (typeof TF_OPTIONS)[number]["value"];
 
-// CVD-validated pair (deutan ΔE 11.6 vs this surface) — equal weight up/down.
+// CVD-validated pair (deutan ΔE 11.6 vs this surface); equal weight up/down.
 const UP = "#26a69a";
 const DOWN = "#ef5350";
 

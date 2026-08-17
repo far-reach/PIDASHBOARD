@@ -7,7 +7,7 @@ import { manualCloseSchema, MANUAL_CLOSE_TOLERANCE_PCT } from "@/lib/signals/sch
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/signals/{id}/events — the ONLY write available on a published
+ * POST /api/signals/{id}/events; the ONLY write available on a published
  * signal, and it only appends: an operator manual_close with a mandatory
  * reason (brief §8: a bad signal is never deleted; it is closed with the
  * loss booked). The DB's unique terminal index rejects a second close.
@@ -45,7 +45,7 @@ export async function POST(
   }
 
   // The close price is taken from the live market. An operator-supplied price
-  // is accepted only as a tie-break within a tight band of it — otherwise
+  // is accepted only as a tie-break within a tight band of it; otherwise
   // "close early at a price of my choosing" would be a direct dial on the
   // published win rate, which is exactly what the immutable log exists to
   // prevent.
@@ -74,20 +74,20 @@ export async function POST(
     // The feed is down. Refusing outright would leave the operator unable to
     // close a position during exactly the conditions where closing matters
     // most. Instead the close is allowed with an explicit price, and the
-    // record permanently states that this exit was never market-verified —
+    // record permanently states that this exit was never market-verified;
     // the immutable log is what makes that disclosure trustworthy.
     const supplied = parsed.data.price;
     if (supplied === undefined) {
       return NextResponse.json(
         {
           error:
-            "no live price available — supply an explicit close price; it will be recorded as operator-supplied and unverified",
+            "no live price available; supply an explicit close price; it will be recorded as operator-supplied and unverified",
         },
         { status: 503 }
       );
     }
     price = supplied;
-    priceSource = "operator-supplied (UNVERIFIED — no market feed at close time)";
+    priceSource = "operator-supplied (UNVERIFIED; no market feed at close time)";
   }
 
   try {

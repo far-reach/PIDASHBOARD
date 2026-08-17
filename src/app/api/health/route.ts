@@ -16,7 +16,7 @@ interface Subsystem {
 }
 
 /**
- * GET /api/health — brief §4 Monitoring: DB reachable, cache reachable,
+ * GET /api/health; brief §4 Monitoring: DB reachable, cache reachable,
  * exchange feed fresh, latest report present.
  */
 /**
@@ -46,7 +46,7 @@ export async function GET(): Promise<NextResponse> {
   }
 
   // Cache. The Redis adapter deliberately swallows errors so a cache outage
-  // never breaks a request path — which means "set() did not throw" proves
+  // never breaks a request path; which means "set() did not throw" proves
   // nothing. Probe with a round-trip instead, so an unreachable Redis is
   // reported as degraded rather than silently green.
   try {

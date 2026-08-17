@@ -23,7 +23,7 @@ const STATUS_META: Record<
 
 export function SignalCard({ signal }: { signal: SignalDTO }) {
   const meta = STATUS_META[signal.status];
-  // A closed signal that never filled has no R at all — it was never a
+  // A closed signal that never filled has no R at all; it was never a
   // position. Showing an unrealized number there would imply a trade existed.
   const notFilled = signal.filled === false;
   const r = signal.status === "open" ? (notFilled ? null : signal.unrealized_r) : signal.r;
@@ -44,7 +44,7 @@ export function SignalCard({ signal }: { signal: SignalDTO }) {
             {notFilled ? (
               <Badge
                 tone="neutral"
-                title="The entry level never traded, so no position was ever taken — this signal is excluded from performance statistics."
+                title="The entry level never traded, so no position was ever taken. This signal is excluded from performance statistics."
               >
                 NOT FILLED · UNSCORED
               </Badge>
@@ -86,7 +86,7 @@ export function SignalCard({ signal }: { signal: SignalDTO }) {
               {STATUS_META[signal.status].label.toLowerCase()} at {fmtPrice(closeEvent.price)}
               {closeEvent.price_source ? ` (${closeEvent.price_source})` : ""} ·{" "}
               {fmtUtcDateTime(closeEvent.occurred_at)}
-              {closeEvent.note ? ` — ${closeEvent.note}` : ""}
+              {closeEvent.note ? `: ${closeEvent.note}` : ""}
             </div>
           ) : signal.expires_at ? (
             <div>Expires {fmtUtcDateTime(signal.expires_at)}</div>

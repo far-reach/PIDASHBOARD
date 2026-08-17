@@ -8,7 +8,7 @@ import { signInWithPi } from "@/lib/pi/client";
 /**
  * Sign-in entry point. Inside Pi Browser it runs the full Pi auth flow;
  * in a normal browser it explains the graceful fallback (free tier works
- * everywhere — brief §Phase 4.1).
+ * everywhere; brief §Phase 4.1).
  */
 export function PiAuthButton() {
   const { data, refetch } = useMe();
@@ -37,7 +37,7 @@ export function PiAuthButton() {
           signInWithPi()
             .then((user) => {
               if (user === null) {
-                setNotice("Open in Pi Browser to sign in — browsing works without it.");
+                setNotice("Open in Pi Browser to sign in. Browsing works without it.");
               } else {
                 void refetch();
               }

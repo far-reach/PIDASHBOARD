@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { SupportContact } from "@/components/SupportContact";
 
-export const metadata: Metadata = { title: "Terms of Use — Cyberekt Market" };
+export const metadata: Metadata = { title: "Terms of Use · Cyberekt Market" };
 
 export default function TermsPage() {
   return (
     <article className="max-w-2xl pb-4 text-sm leading-relaxed space-y-3">
       <h1 className="text-lg font-semibold">Terms of Use</h1>
       <p className="text-xs text-muted-foreground">
-        Draft template — to be reviewed by qualified counsel before App Directory submission.
+        Draft template. To be reviewed by qualified counsel before App Directory submission.
       </p>
       <ol className="list-decimal pl-5 space-y-2">
         <li>
@@ -35,7 +35,7 @@ export default function TermsPage() {
         </li>
         <li>
           <strong>Integrity of the record.</strong> Published daily reports are append-only. We do
-          not edit history — and you agree not to attempt to.
+          not edit history, and you agree not to attempt to.
         </li>
         <li>
           <strong>Intellectual property.</strong> App content and code are protected. Exchange

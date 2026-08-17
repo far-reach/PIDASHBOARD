@@ -3,8 +3,8 @@
  *
  * The privacy policy promises a way to reach the operator (deletion requests),
  * and app-directory reviewers look for one. It is configured rather than
- * hardcoded so the operator picks the channel they actually monitor — a Pi
- * username, an email, a chat handle — without editing code.
+ * hardcoded so the operator picks the channel they actually monitor; a Pi
+ * username, an email, a chat handle; without editing code.
  *
  * Note the direction of travel: this publishes OUR address to users. It never
  * collects theirs, which §3.10 forbids.

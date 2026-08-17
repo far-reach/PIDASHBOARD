@@ -63,7 +63,7 @@ export default function HomePage() {
             ) : (
               <EmptyState
                 title="No signals published yet."
-                hint="Every signal that is ever published stays in the record — wins and losses alike."
+                hint="Every signal that is ever published stays in the record, wins and losses alike."
               />
             )}
           </CardContent>
@@ -71,7 +71,7 @@ export default function HomePage() {
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>What this app does — and does not do</CardTitle>
+            <CardTitle>What this app does, and what it does not</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm leading-relaxed">
             <p>

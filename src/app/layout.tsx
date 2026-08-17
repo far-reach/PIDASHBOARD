@@ -6,9 +6,9 @@ import { RiskBanner } from "@/components/RiskBanner";
 import { DisclaimerFooter } from "@/components/DisclaimerFooter";
 
 export const metadata: Metadata = {
-  title: "Cyberekt Market — PIUSDT Dashboard",
+  title: "Cyberekt Market · PIUSDT Dashboard",
   description:
-    "Live PIUSDT prices reported by public exchanges, with automatic daily market summaries and a permanent report archive. Informational and educational — no forecasts, no recommendations, not financial advice.",
+    "Live PIUSDT prices reported by public exchanges, with automatic daily market summaries and a permanent report archive. Informational and educational; no forecasts, no recommendations, not financial advice.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [

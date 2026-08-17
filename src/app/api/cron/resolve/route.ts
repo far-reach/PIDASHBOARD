@@ -14,7 +14,7 @@ export const maxDuration = 60;
  * price can cross a stop or target and revert between invocations, so a
  * signal may resolve at a later, worse price than a continuously-running
  * worker would record. The recorded price is always the real observed one,
- * so the record stays honest — but for production the always-on ingest
+ * so the record stays honest; but for production the always-on ingest
  * worker (npm run worker:ingest) is the recommended deployment.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {

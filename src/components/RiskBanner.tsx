@@ -19,7 +19,7 @@ export function RiskBanner() {
       data-testid="risk-banner"
     >
       <p className="text-xs text-warn leading-relaxed">
-        Educational information only — not financial advice. Crypto markets are volatile and you
+        Educational information only; not financial advice. Crypto markets are volatile and you
         can lose what you commit. Prices are reported by third-party exchanges and may be delayed.
       </p>
       <button

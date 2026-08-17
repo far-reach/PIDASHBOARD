@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Voluntary tipping — the "send the developer Pi directly" surface.
+ * Voluntary tipping; the "send the developer Pi directly" surface.
  *
  * Deliberately unlike the paywall: it unlocks nothing, gates nothing, and says
  * so out loud. It renders in both `free` and `freemium` mode, because the point
@@ -44,8 +44,8 @@ export function SupportCard() {
       <Card data-testid="support-thanks">
         <CardContent className="pt-4">
           <p className="text-sm text-up">
-            Thank you — your Pi arrived. It goes straight into keeping the data feed and the
-            daily reports running.
+            Thank you. Your Pi arrived, and it goes straight into keeping the data feed and
+            the daily reports running.
           </p>
         </CardContent>
       </Card>
@@ -60,7 +60,7 @@ export function SupportCard() {
       <CardContent className="space-y-3">
         <p className="text-sm leading-relaxed">
           Cyberekt Market is free and stays free. If it is useful to you, you can send the developer
-          Pi directly — it pays for the exchange data feed and hosting. It unlocks nothing,
+          Pi directly. It pays for the exchange data feed and hosting. It unlocks nothing,
           and nothing here is hidden behind it.
         </p>
 

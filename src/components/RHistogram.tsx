@@ -2,7 +2,7 @@
 
 /**
  * R-multiple distribution. Loss bins and win bins use the same bar
- * geometry and label treatment — identical visual weight (brief §8).
+ * geometry and label treatment; identical visual weight (brief §8).
  */
 import type { PerformanceResponse } from "@/lib/api-types";
 

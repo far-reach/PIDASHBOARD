@@ -2,7 +2,7 @@
 
 /**
  * Operator console (brief §Phase 3.6). Auth: ADMIN_API_KEY pasted here, kept
- * in sessionStorage, sent as a Bearer token — every action is authorized
+ * in sessionStorage, sent as a Bearer token; every action is authorized
  * server-side. By design there is no edit or delete anywhere: publish and
  * manual-close (append events) are the only verbs.
  */
@@ -101,7 +101,7 @@ export default function AdminPage() {
       });
       const body = (await res.json()) as { error?: string; issues?: { message: string }[] };
       if (res.ok) {
-        setMessage({ tone: "ok", text: "Signal published — it is now permanent." });
+        setMessage({ tone: "ok", text: "Signal published. It is now permanent." });
         setForm({ ...emptyForm, isTest: form.isTest });
         void loadOpen(key);
       } else {
@@ -249,7 +249,7 @@ export default function AdminPage() {
             </label>
           </div>
           <label className="text-xs text-muted-foreground block">
-            Rationale (shown to users verbatim — model-based language only)
+            Rationale (shown to users verbatim; model-based language only)
             <textarea
               value={form.rationale}
               onChange={(e) => setForm({ ...form, rationale: e.target.value })}
@@ -266,7 +266,7 @@ export default function AdminPage() {
             Test signal (hidden from public users; keep checked until launch)
           </label>
           <Button onClick={() => void publish()} disabled={busy}>
-            {busy ? "Publishing…" : "Publish — permanent"}
+            {busy ? "Publishing…" : "Publish (permanent)"}
           </Button>
         </CardContent>
       </Card>

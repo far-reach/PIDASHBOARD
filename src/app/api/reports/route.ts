@@ -5,7 +5,7 @@ import { listReports } from "@/lib/reports/daily";
 
 export const dynamic = "force-dynamic";
 
-/** GET /api/reports?limit=30 — newest first. Reports are public. */
+/** GET /api/reports?limit=30; newest first. Reports are public. */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const rl = rateLimit(`reports:${clientKey(req)}`, { capacity: 60, refillPerSec: 1 });
   if (!rl.allowed) {

@@ -25,7 +25,7 @@ export function PriceHero() {
       <Card>
         <CardContent className="pt-4">
           <p className="text-sm text-muted-foreground">
-            Price feed unavailable right now — all sources unreachable. Retrying automatically.
+            Price feed unavailable right now. All sources are unreachable; retrying automatically.
           </p>
         </CardContent>
       </Card>

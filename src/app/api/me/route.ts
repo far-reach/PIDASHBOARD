@@ -5,7 +5,7 @@ import { SESSION_COOKIE } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
-/** GET /api/me — current session user + server-verified subscription state. */
+/** GET /api/me; current session user + server-verified subscription state. */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const user = getSessionUser(req);
   if (!user) {
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   return NextResponse.json({ user, subscription, monetization: monetizationMode() });
 }
 
-/** DELETE /api/me — sign out (clears the session cookie). */
+/** DELETE /api/me; sign out (clears the session cookie). */
 export async function DELETE(): Promise<NextResponse> {
   const res = NextResponse.json({ ok: true });
   res.cookies.set(SESSION_COOKIE, "", { path: "/", maxAge: 0 });

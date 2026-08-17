@@ -19,7 +19,7 @@ const BASE_TABS = [
  * The directional-call surfaces. Off by default: an app in the Pi ecosystem
  * publishing entry/stop/target calls is making material representations about
  * the valuation of Pi, which the ecosystem guidelines prohibit. See
- * COMPLIANCE.md — do not re-enable without a written answer from Pi.
+ * COMPLIANCE.md; do not re-enable without a written answer from Pi.
  */
 const SIGNAL_TABS = [
   { href: "/signals", label: "Signals", icon: Radio },
@@ -28,7 +28,7 @@ const SIGNAL_TABS = [
 
 const TABS = SIGNALS_ENABLED ? [BASE_TABS[0], ...SIGNAL_TABS, ...BASE_TABS.slice(1)] : BASE_TABS;
 
-/** Top bar (identity + auth) and, on mobile, a bottom tab bar — Pi Browser is mobile-first. */
+/** Top bar (identity + auth) and, on mobile, a bottom tab bar; Pi Browser is mobile-first. */
 export function Nav() {
   const pathname = usePathname();
   const online = useOnline();

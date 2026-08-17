@@ -9,7 +9,7 @@ import { signalsReadDisabled } from "@/lib/signals/gate";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/performance — derived live from the immutable event log on every
+ * GET /api/performance; derived live from the immutable event log on every
  * request (brief §3.2). Public for everyone, always full-history: performance
  * transparency is never behind the paywall (brief §3.8).
  */
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ performance: null, symbol: SYMBOL, signals_enabled: false });
   }
   const includeTest = isAdminRequest(req) && req.nextUrl.searchParams.get("include_test") === "1";
-  // limit: null — performance is computed over the COMPLETE record. Capping it
+  // limit: null; performance is computed over the COMPLETE record. Capping it
   // would quietly drop the oldest signals and flatter the numbers over time.
   const signals = await listSignalsWithOutcomes({ symbol: SYMBOL, includeTest, limit: null });
   const summary = computePerformance(signals);

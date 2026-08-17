@@ -2,7 +2,7 @@
 
 /**
  * Renders a daily report's markdown (headings, one table, paragraphs, hr,
- * emphasis — the exact subset the generator emits). No external markdown
+ * emphasis; the exact subset the generator emits). No external markdown
  * dependency, no HTML injection: everything is built as React nodes.
  */
 import type { ReactNode } from "react";

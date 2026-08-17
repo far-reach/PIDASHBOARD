@@ -13,7 +13,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       })
   );
 
-  // Register the offline service worker (PWA — brief §Phase 2.7).
+  // Register the offline service worker (PWA; brief §Phase 2.7).
   useEffect(() => {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
       navigator.serviceWorker.register("/sw.js").catch(() => {

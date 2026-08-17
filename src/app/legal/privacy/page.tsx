@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { SupportContact } from "@/components/SupportContact";
 
-export const metadata: Metadata = { title: "Privacy Policy — Cyberekt Market" };
+export const metadata: Metadata = { title: "Privacy Policy · Cyberekt Market" };
 
 export default function PrivacyPage() {
   return (
     <article className="max-w-2xl pb-4 text-sm leading-relaxed space-y-3">
       <h1 className="text-lg font-semibold">Privacy Policy</h1>
       <p className="text-xs text-muted-foreground">
-        Draft template — to be reviewed by qualified counsel before App Directory submission.
+        Draft template. To be reviewed by qualified counsel before App Directory submission.
       </p>
       <p>
         <strong>What we collect.</strong> Only what the Pi SDK provides when you choose to sign in:

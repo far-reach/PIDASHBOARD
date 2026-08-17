@@ -7,7 +7,7 @@
  * is the exact pattern this product exists not to be.
  *
  * Rendered only when the server reports freemium mode and the viewer has no
- * active subscription — the gate itself is enforced server-side; this is just
+ * active subscription; the gate itself is enforced server-side; this is just
  * the way to pay.
  */
 import { useState } from "react";
@@ -31,7 +31,7 @@ export function UpgradeCard({ hiddenOpenCount }: { hiddenOpenCount: number }) {
       <Card data-testid="pro-active">
         <CardContent className="pt-4 flex items-center justify-between gap-2 flex-wrap">
           <span className="text-sm">
-            Pro is active — open calls are visible to you.
+            Pro is active. Open calls are visible to you.
           </span>
           <Badge tone="up">until {fmtUtcDate(data.subscription.expiresAt)}</Badge>
         </CardContent>
@@ -42,7 +42,7 @@ export function UpgradeCard({ hiddenOpenCount }: { hiddenOpenCount: number }) {
   return (
     <Card data-testid="upgrade-card">
       <CardHeader>
-        <CardTitle>Pro — see the open calls</CardTitle>
+        <CardTitle>Pro: see the open calls</CardTitle>
         <Badge tone="primary">{price} π / 30 days</Badge>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -51,8 +51,8 @@ export function UpgradeCard({ hiddenOpenCount }: { hiddenOpenCount: number }) {
             ? `${hiddenOpenCount} call${hiddenOpenCount > 1 ? "s are" : " is"} open right now. `
             : ""}
           Pro shows the levels on calls while they are still live. Everything that lets you
-          judge us — every closed call, the full performance record, drawdowns included —
-          stays free for everyone, always.
+          judge us stays free for everyone, always: every closed call and the full
+          performance record, drawdowns included.
         </p>
 
         {!data.user ? (
@@ -60,7 +60,7 @@ export function UpgradeCard({ hiddenOpenCount }: { hiddenOpenCount: number }) {
             Sign in with Pi first (top right). Payment happens in Pi Browser.
           </p>
         ) : done ? (
-          <p className="text-sm text-up">Payment confirmed — Pro is active.</p>
+          <p className="text-sm text-up">Payment confirmed. Pro is active.</p>
         ) : (
           <Button
             disabled={busy}
@@ -76,7 +76,7 @@ export function UpgradeCard({ hiddenOpenCount }: { hiddenOpenCount: number }) {
                 .finally(() => setBusy(false));
             }}
           >
-            {busy ? "Waiting for Pi…" : `Subscribe with Pi — ${price} π`}
+            {busy ? "Waiting for Pi…" : `Subscribe with Pi (${price} π)`}
           </Button>
         )}
 

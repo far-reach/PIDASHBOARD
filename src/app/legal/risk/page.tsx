@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Risk Disclaimer — Cyberekt Market" };
+export const metadata: Metadata = { title: "Risk Disclaimer · Cyberekt Market" };
 
 export default function RiskPage() {
   return (
     <article className="max-w-2xl pb-4 text-sm leading-relaxed space-y-3">
       <h1 className="text-lg font-semibold">Risk Disclaimer</h1>
       <p className="text-xs text-muted-foreground">
-        Draft template — to be reviewed by qualified counsel before App Directory submission.
+        Draft template. To be reviewed by qualified counsel before App Directory submission.
       </p>
       <p>
         Cyberekt Market reports market data published by third-party exchanges and generates

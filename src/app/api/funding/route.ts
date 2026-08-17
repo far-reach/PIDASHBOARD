@@ -7,7 +7,7 @@ import { clientKey, rateLimit } from "@/lib/ratelimit";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/funding — perpetual funding rate for the symbol, when a perp is
+ * GET /api/funding; perpetual funding rate for the symbol, when a perp is
  * listed. Returns { rate: null } rather than an error when there is no perp
  * market or the venue is unreachable: funding is context, never a hard
  * dependency of the dashboard.

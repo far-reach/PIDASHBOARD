@@ -49,8 +49,8 @@ function presentSignal(s: SignalWithOutcome, currentPrice: number | null) {
 }
 
 /**
- * GET /api/signals — the feed.
- * Closed signals + full history: always public (brief §3.8 — honesty is never
+ * GET /api/signals; the feed.
+ * Closed signals + full history: always public (brief §3.8; honesty is never
  * gated). Open signals: gated only in freemium mode. Delayed-publish signals
  * (visible_from in the future) are hidden from non-admins while open.
  */
@@ -110,7 +110,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       symbol: SYMBOL,
       monetization: monetizationMode(),
       open_signals_visible: openVisible,
-      // Never hide THAT open signals exist — only their contents are gated.
+      // Never hide THAT open signals exist; only their contents are gated.
       hidden_open_count: openVisible ? 0 : open.length,
       current_price: currentPrice,
       price_as_of: priceAsOf,
@@ -120,7 +120,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 }
 
 /**
- * POST /api/signals — operator-only publication (brief §Phase 3.1).
+ * POST /api/signals; operator-only publication (brief §Phase 3.1).
  * Writes an immutable signal + its `published` event. There is deliberately
  * no PATCH/PUT/DELETE anywhere under /api/signals.
  */

@@ -38,6 +38,20 @@ function walk(dir: string): string[] {
   return out;
 }
 
+describe("copy style: text reads as human-written", () => {
+  // Operator rule (2026-08-17, permanent): no em-dashes anywhere users read.
+  // The " — " construction is a tell of machine-written prose; sentences are
+  // reworded with a period, comma, colon or parenthesis instead. Enforced as
+  // a bright line over the whole user-facing tree, comments included, so it
+  // cannot creep back through any future edit.
+  const files = [...walk("src/app"), ...walk("src/components"), ...walk("src/lib/reports")];
+
+  it("no em-dash characters anywhere in user-facing sources", () => {
+    const offenders = files.filter((f) => readFileSync(f, "utf8").includes("—"));
+    expect(offenders).toEqual([]);
+  });
+});
+
 describe("no financial-advice language in user-facing sources", () => {
   const files = [...walk("src/app"), ...walk("src/components"), ...walk("src/lib/reports")];
 
