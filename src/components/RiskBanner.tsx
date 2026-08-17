@@ -7,7 +7,7 @@ export function RiskBanner() {
   const [dismissed, setDismissed] = useState(true); // avoid SSR flash; resolve on mount
 
   useEffect(() => {
-    setDismissed(sessionStorage.getItem("cybrekt:risk-banner") === "dismissed");
+    setDismissed(sessionStorage.getItem("cyberekt:risk-banner") === "dismissed");
   }, []);
 
   if (dismissed) return null;
@@ -19,14 +19,14 @@ export function RiskBanner() {
       data-testid="risk-banner"
     >
       <p className="text-xs text-warn leading-relaxed">
-        Educational information only — not financial advice. Trading involves substantial risk of
-        loss. Signals reflect our model&apos;s analysis and can be wrong.
+        Educational information only — not financial advice. Crypto markets are volatile and you
+        can lose what you commit. Prices are reported by third-party exchanges and may be delayed.
       </p>
       <button
         aria-label="Dismiss risk banner for this session"
         className="text-warn/80 hover:text-warn text-lg leading-none px-1"
         onClick={() => {
-          sessionStorage.setItem("cybrekt:risk-banner", "dismissed");
+          sessionStorage.setItem("cyberekt:risk-banner", "dismissed");
           setDismissed(true);
         }}
       >

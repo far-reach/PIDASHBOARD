@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Risk Disclaimer — Cybrekt Market" };
+export const metadata: Metadata = { title: "Risk Disclaimer — Cyberekt Market" };
 
 export default function RiskPage() {
   return (
@@ -10,20 +10,23 @@ export default function RiskPage() {
         Draft template — to be reviewed by qualified counsel before App Directory submission.
       </p>
       <p>
-        Cybrekt Market provides market data, automatically generated reports, and model-based trading
-        signals for educational and informational purposes only. Nothing in this app constitutes
-        financial, investment, legal, or tax advice, an offer or solicitation to buy or sell any
-        asset, or a recommendation tailored to any person.
+        Cyberekt Market reports market data published by third-party exchanges and generates
+        automatic factual summaries of it, for educational and informational purposes only.
+        Nothing in this app constitutes financial, investment, legal, or tax advice, an offer or
+        solicitation to buy or sell any asset, or a recommendation tailored to any person.
+      </p>
+      <p>
+        The app does not forecast prices, does not state what any asset is or will be worth, does
+        not recommend buying or selling, and does not set levels to trade against. A record of
+        what a market did in the past is not a guide to what it will do next.
       </p>
       <p>
         Trading cryptocurrencies, including the PIUSDT pair, involves substantial risk of loss and
         is not suitable for every person. Prices are volatile; liquidity can vanish; exchanges can
-        fail. You can lose the entire amount you commit. Signals published in this app reflect the
-        output of an analytical model; they are frequently wrong, and their historical performance
-        — which we display in full, including losses — does not indicate future results.
+        fail. You can lose the entire amount you commit.
       </p>
       <p>
-        Cybrekt Market does not execute trades, does not custody funds, and does not access your exchange
+        Cyberekt Market does not execute trades, does not custody funds, and does not access your exchange
         accounts or wallets. Any trading decision you make, on any venue, is yours alone. Before
         making financial decisions, consider your circumstances and consult a licensed professional
         in your jurisdiction.

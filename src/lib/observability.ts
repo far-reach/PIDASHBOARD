@@ -36,11 +36,11 @@ export const log = {
 
 export type ErrorReporter = (err: unknown, context: Record<string, unknown>) => void;
 
-const globalForReporter = globalThis as unknown as { __cybrektReporter?: ErrorReporter };
+const globalForReporter = globalThis as unknown as { __cyberektReporter?: ErrorReporter };
 
 /** Attach an external error reporter (see the Sentry recipe above). */
 export function setErrorReporter(reporter: ErrorReporter): void {
-  globalForReporter.__cybrektReporter = reporter;
+  globalForReporter.__cyberektReporter = reporter;
 }
 
 /**
@@ -56,7 +56,7 @@ export function reportError(msg: string, err: unknown, extra: Record<string, unk
     stack: err instanceof Error ? err.stack : undefined,
   });
   try {
-    globalForReporter.__cybrektReporter?.(err, { msg, ...extra });
+    globalForReporter.__cyberektReporter?.(err, { msg, ...extra });
   } catch {
     // A broken reporter must never escalate into a request failure.
   }

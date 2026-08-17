@@ -17,7 +17,7 @@ import type {
   SignalsResponse,
 } from "@/lib/api-types";
 
-const LS_PREFIX = "cybrekt:last:";
+const LS_PREFIX = "cyberekt:last:";
 
 function readCache<T>(key: string): { value: T; storedAt: string } | null {
   if (typeof window === "undefined") return null;

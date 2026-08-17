@@ -1,4 +1,4 @@
-# Cybrekt Market — PIUSDT Dashboard for the Pi Network ecosystem
+# Cyberekt Market — PIUSDT Dashboard for the Pi Network ecosystem
 
 A mobile-first web app, built to ship in the **Pi Network App Directory**, that gives Pioneers
 an honest view of the PIUSDT market:
@@ -30,7 +30,7 @@ data-source failover — implemented and covered by tests.
 
 ## Deploy it
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffar-reach%2FPIDASHBOARD&env=DATABASE_URL,ADMIN_API_KEY,SESSION_SECRET,CRON_SECRET,MONETIZATION_MODE,NEXT_PUBLIC_PI_SANDBOX,NEXT_PUBLIC_SYMBOL&envDescription=DATABASE_URL%20from%20Neon%3B%20generate%20the%20three%20secrets%20with%20openssl%20rand%20-hex%2032%3B%20set%20MONETIZATION_MODE%3Dfree%2C%20NEXT_PUBLIC_PI_SANDBOX%3Dtrue%2C%20NEXT_PUBLIC_SYMBOL%3DPIUSDT&envLink=https%3A%2F%2Fgithub.com%2Ffar-reach%2FPIDASHBOARD%2Fblob%2Fmain%2F.env.example&project-name=cybrekt&repository-name=cybrekt)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffar-reach%2FPIDASHBOARD&env=DATABASE_URL,ADMIN_API_KEY,SESSION_SECRET,CRON_SECRET,MONETIZATION_MODE,NEXT_PUBLIC_PI_SANDBOX,NEXT_PUBLIC_SYMBOL&envDescription=DATABASE_URL%20from%20Neon%3B%20generate%20the%20three%20secrets%20with%20openssl%20rand%20-hex%2032%3B%20set%20MONETIZATION_MODE%3Dfree%2C%20NEXT_PUBLIC_PI_SANDBOX%3Dtrue%2C%20NEXT_PUBLIC_SYMBOL%3DPIUSDT&envLink=https%3A%2F%2Fgithub.com%2Ffar-reach%2FPIDASHBOARD%2Fblob%2Fmain%2F.env.example&project-name=cyberekt&repository-name=cyberekt)
 
 Create a [Neon](https://neon.tech) Postgres database first and have its connection string
 ready — the deploy runs migrations as part of the build. Generate the three secrets with

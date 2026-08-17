@@ -1,8 +1,8 @@
 {
-  "name": "cybrekt",
+  "name": "cyberekt",
   "version": "0.1.0",
   "private": true,
-  "description": "Cybrekt Market — PIUSDT trading dashboard for the Pi Network app ecosystem: live multi-exchange price data, automated daily reports, and an immutable, honestly-tracked trading-calls feed.",
+  "description": "Cyberekt Market — PIUSDT trading dashboard for the Pi Network app ecosystem: live multi-exchange price data, automated daily reports, and an immutable, honestly-tracked trading-calls feed.",
   "license": "MIT",
   "engines": {
     "node": ">=22"

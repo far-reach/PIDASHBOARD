@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getCache } from "@/lib/cache";
 import { kvGet } from "@/lib/kv";
-import { KV_FEED_LATEST } from "@/lib/feed";
+import { getLatestPrice, KV_FEED_LATEST } from "@/lib/feed";
 import { monetizationMode, STALE_AFTER_S, SYMBOL } from "@/lib/env";
 import type { FeedSnapshotKv } from "@/lib/feed";
 
@@ -75,9 +75,17 @@ export async function GET(): Promise<NextResponse> {
         detail: `source=${kv.value.tick.source} age=${ageS}s failover=${kv.value.isFailover}`,
       };
     } else {
+      // No worker state. That is the NORMAL shape of a serverless-only
+      // deployment, not a fault: the web app fetches on demand. Reporting it as
+      // degraded forever would train the operator to ignore this endpoint, so
+      // prove the on-demand path instead and judge it on the same freshness
+      // rule the worker path uses.
+      const latest = await getLatestPrice(SYMBOL);
       subsystems.feed = {
-        status: "degraded",
-        detail: "no ingest worker state; web serves prices on-demand",
+        status: latest.isStale ? "degraded" : "ok",
+        detail:
+          `on-demand (no ingest worker) source=${latest.source} ` +
+          `age=${latest.stalenessS}s failover=${latest.isFailover}`,
       };
     }
   } catch (err) {

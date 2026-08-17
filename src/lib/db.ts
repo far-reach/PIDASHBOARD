@@ -133,7 +133,7 @@ export async function createDb(opts: CreateDbOptions = {}): Promise<Db> {
 }
 
 // Singleton for the app / workers. Survives Next.js dev hot-reload via globalThis.
-const globalForDb = globalThis as unknown as { __cybrektDb?: Promise<Db> };
+const globalForDb = globalThis as unknown as { __cyberektDb?: Promise<Db> };
 
 /**
  * Shared connection. A FAILED connect must not be memoized: caching the
@@ -143,13 +143,13 @@ const globalForDb = globalThis as unknown as { __cybrektDb?: Promise<Db> };
  * redeploy. On rejection the slot is cleared so the next caller retries.
  */
 export function getDb(): Promise<Db> {
-  if (!globalForDb.__cybrektDb) {
-    globalForDb.__cybrektDb = createDb().catch((err) => {
-      globalForDb.__cybrektDb = undefined;
+  if (!globalForDb.__cyberektDb) {
+    globalForDb.__cyberektDb = createDb().catch((err) => {
+      globalForDb.__cyberektDb = undefined;
       throw err;
     });
   }
-  return globalForDb.__cybrektDb;
+  return globalForDb.__cyberektDb;
 }
 
 // ── Row coercion helpers ────────────────────────────────────────────────────

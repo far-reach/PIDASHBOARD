@@ -26,7 +26,7 @@ Keep this file updated as you fill it in — it doubles as the record of what yo
 
 ## 2. App identity
 
-- **App name:** `Cybrekt Market`
+- **App name:** `Cyberekt Market`
   (Letters, numbers and spaces only — the portal rejects special characters.)
 - **Category:** Finance · **Secondary:** Education
 - **Audience:** Pioneers who follow the PI market.
@@ -39,7 +39,7 @@ Keep this file updated as you fill it in — it doubles as the record of what yo
 
 ## 4. Long description (paste as-is)
 
-> Cybrekt Market gives Pioneers a clear, honest view of what the PI/USDT market actually
+> Cyberekt Market gives Pioneers a clear, honest view of what the PI/USDT market actually
 > did.
 >
 > • Live price aggregated from public exchanges (OKX and MEXC), with automatic failover
@@ -53,7 +53,7 @@ Keep this file updated as you fill it in — it doubles as the record of what yo
 > • Educational content explaining how to read market data, what the figures mean, and a
 >   glossary of terms.
 >
-> What Cybrekt Market deliberately does not do: it publishes no price forecasts, no
+> What Cyberekt Market deliberately does not do: it publishes no price forecasts, no
 > valuation claims, no buy or sell recommendations and no trading levels. It never
 > executes trades, never holds your funds, and never asks for exchange or wallet keys.
 >
@@ -90,7 +90,7 @@ Portrait, full screen, no debug overlays, no `/admin` screen in any shot.
 ## 7. Answers to the questions reviewers ask
 
 **Does the app give financial advice?**
-> No. Cybrekt Market reports market data published by public exchanges and generates a
+> No. Cyberekt Market reports market data published by public exchanges and generates a
 > factual daily summary of it. It publishes no forecasts, no valuation claims, no buy or
 > sell recommendations and no trading levels. A disclaimer appears in the footer of every
 > screen, a risk banner appears on first visit each session, and a dedicated risk page is

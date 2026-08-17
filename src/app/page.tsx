@@ -75,7 +75,7 @@ export default function HomePage() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm leading-relaxed">
             <p>
-              Cybrekt Market reports what the PIUSDT market <em>did</em>: prices as published by
+              Cyberekt Market reports what the PIUSDT market <em>did</em>: prices as published by
               public exchanges, with the source and timestamp shown, and an automatic daily
               summary of the session.
             </p>

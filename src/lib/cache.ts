@@ -58,7 +58,7 @@ class RedisCache implements Cache {
   }
 }
 
-const globalForCache = globalThis as unknown as { __cybrektCache?: Promise<Cache> };
+const globalForCache = globalThis as unknown as { __cyberektCache?: Promise<Cache> };
 
 async function build(): Promise<Cache> {
   const url = process.env.REDIS_URL;
@@ -78,8 +78,8 @@ async function build(): Promise<Cache> {
 }
 
 export function getCache(): Promise<Cache> {
-  if (!globalForCache.__cybrektCache) {
-    globalForCache.__cybrektCache = build();
+  if (!globalForCache.__cyberektCache) {
+    globalForCache.__cyberektCache = build();
   }
-  return globalForCache.__cybrektCache;
+  return globalForCache.__cyberektCache;
 }

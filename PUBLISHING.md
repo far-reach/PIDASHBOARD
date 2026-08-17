@@ -1,4 +1,4 @@
-# Publishing Cybrekt Market to the Pi App Directory — step by step
+# Publishing Cyberekt Market to the Pi App Directory — step by step
 
 Every step is ordered; each one has a check you can run before moving on. Steps marked
 **[you]** need a human (a Pi account, a card, a legal review); the rest are commands.
@@ -25,7 +25,7 @@ Developer Portal's domain verification exactly like a purchased domain would.
 
 ### Where a `.pi` domain fits (read this if you have one)
 
-A `.pi` name such as `cybrekt.pi` is a **PiNet address, not hosting**. It does not run
+A `.pi` name such as `cyberekt.pi` is a **PiNet address, not hosting**. It does not run
 your code and it cannot serve files by itself — it is the address Pioneers type inside Pi
 Browser, which resolves to an app hosted on ordinary HTTPS infrastructure. So the order is:
 
@@ -136,7 +136,7 @@ All of this is inside **Pi Browser** on your phone.
    screen; on newer builds the portal is at `develop.pinet.com` — either entry point
    lands in the same Developer Portal).
 2. Tap **New App**. Fill the three required fields:
-   - **App Name:** `Cybrekt Market` — use only letters, numbers and spaces; no special characters.
+   - **App Name:** `Cyberekt Market` — use only letters, numbers and spaces; no special characters.
    - **App Network:** ⚠️ **This cannot be changed after registration, and one app connects
      to exactly one network.** Register a **Testnet** app first for sandbox testing, then a
      separate **Mainnet** app for the real listing. Do not try to reuse one for both.
@@ -148,7 +148,7 @@ All of this is inside **Pi Browser** on your phone.
 ## Stage 6 — Verify domain ownership
 
 The portal shows a **validation key** in a grey box. It must be served at
-`<your app URL>/validation-key.txt` — e.g. `https://cybrekt.vercel.app/validation-key.txt`.
+`<your app URL>/validation-key.txt` — e.g. `https://cyberekt.vercel.app/validation-key.txt`.
 A `*.vercel.app` URL verifies exactly like a purchased domain.
 
 This app serves it from an environment variable, so **you do not need to edit code**:
@@ -197,11 +197,11 @@ Two things to expect, so neither is a surprise:
   it prevents domain squatting and impersonation. It is not a misconfiguration and there
   is no setting to remove it.
 - **Plain, unsuffixed PiNet URLs are granted by the Pi Core Team at their discretion** to
-  well-performing apps. That is also the route by which a `.pi` domain like `cybrekt.pi`
+  well-performing apps. That is also the route by which a `.pi` domain like `cyberekt.pi`
   becomes the app's public address: `.pi` domains are reserved for apps that have completed
   PiNet migration and meet the Ecosystem listing guidelines.
 
-In other words, `cybrekt.pi` is earned at the end of this process, not configured at the
+In other words, `cyberekt.pi` is earned at the end of this process, not configured at the
 start. Stages 11-13 — a real track record, then listing — are the path to it.
 
 **Check:** opening the PiNet URL in Pi Browser loads the dashboard, and **Sign in with Pi**
@@ -217,7 +217,7 @@ arrives there before you rely on it. Two ways to get paid:
 
 | | How it works | Needs |
 | --- | --- | --- |
-| **Tips** | "Support Cybrekt Market" card on the home screen. Any amount from `MIN_TIP_PI` to `MAX_TIP_PI`. Unlocks nothing. | On by default — nothing to switch on |
+| **Tips** | "Support Cyberekt Market" card on the home screen. Any amount from `MIN_TIP_PI` to `MAX_TIP_PI`. Unlocks nothing. | On by default — nothing to switch on |
 | **Pro subscription** | Gates *currently-open* signals for 30 days at `PRO_PRICE_PI`. Closed history and performance stay free. | `MONETIZATION_MODE=freemium` |
 
 Recommended: **launch with tips only** and leave `MONETIZATION_MODE=free`. Flip to
@@ -261,7 +261,7 @@ Learn screens on a real phone.
 
 **Long description (paste-ready):**
 
-> Cybrekt Market gives Pioneers a clear, honest view of the PIUSDT market.
+> Cyberekt Market gives Pioneers a clear, honest view of the PIUSDT market.
 >
 > • Live price aggregated from OKX and MEXC, with automatic failover and a visible badge
 >   whenever data is stale or coming from the backup source.
@@ -276,7 +276,7 @@ Learn screens on a real phone.
 > • Educational content explaining how to read the signals, what R multiples mean, and a
 >   glossary.
 >
-> Cybrekt Market never executes trades, never holds your funds, and never asks for exchange or
+> Cyberekt Market never executes trades, never holds your funds, and never asks for exchange or
 > wallet keys. It is an independent community app, not affiliated with the Pi Core Team.
 > Trading involves risk of loss; nothing in the app is financial advice.
 

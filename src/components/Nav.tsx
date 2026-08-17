@@ -41,7 +41,7 @@ export function Nav() {
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary text-sm font-bold">
               π
             </span>
-            <span className="font-semibold tracking-tight">Cybrekt Market</span>
+            <span className="font-semibold tracking-tight">Cyberekt Market</span>
             <span className="text-[11px] text-muted-foreground hidden sm:inline">PIUSDT dashboard</span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">

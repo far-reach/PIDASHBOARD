@@ -21,14 +21,14 @@ Also: using "Pi" in an app name at all requires an executed **Trademark Licensin
 Agreement**, and *"your app's URL/domain must not start with 'pi'"*
 ([Mainnet Listing Requirements](https://pi-apps.github.io/community-developer-guide/docs/gettingStarted/mainnetListingRequirements/)).
 
-**Decision:** the app is named **Cybrekt Market** — no "Pi" in the name, so no trademark
+**Decision:** the app is named **Cyberekt Market** — no "Pi" in the name, so no trademark
 agreement is needed and the domain rule is satisfied automatically. It was previously
 "PiPulse", which was in the prohibited form.
 
 Pinned by `test/compliance.test.ts`.
 
 **Consequence for hosting:** the deployment URL must not start with `pi`. Use
-`cybrekt-market.vercel.app` or similar — never `pipulse.vercel.app`.
+`cyberekt-market.vercel.app` or similar — never `pipulse.vercel.app`.
 
 ## 2. No claims about the value or valuation of Pi ⚠️
 
