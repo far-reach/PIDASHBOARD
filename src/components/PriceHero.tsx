@@ -2,7 +2,7 @@
 
 import { Card, CardContent, Skeleton } from "@/components/ui";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
-import { fmtCompact, fmtPct, fmtPrice } from "@/lib/format";
+import { fmtPct, fmtPrice } from "@/lib/format";
 import { useLatestPrice } from "@/lib/hooks";
 import { clsx } from "clsx";
 
@@ -52,10 +52,6 @@ export function PriceHero() {
             </div>
             <div className="text-5xl font-bold font-tabular tracking-tight mt-0.5">
               {fmtPrice(data.price)}
-            </div>
-            <div className="text-xs text-muted-foreground mt-1 font-tabular">
-              24h range {fmtPrice(data.low_24h)} – {fmtPrice(data.high_24h)} · vol $
-              {fmtCompact(data.volume_24h)}
             </div>
           </div>
           <FreshnessBadge

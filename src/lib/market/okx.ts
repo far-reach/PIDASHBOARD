@@ -28,6 +28,7 @@ interface OkxTicker {
 
 export const okx: ExchangeClient & {
   fetchFunding(symbol: string): Promise<FundingInfo | null>;
+  fetchFundingHistory(symbol: string, limit?: number): Promise<{ rate: number; ts: number }[]>;
 } = {
   id: "okx",
 
@@ -87,6 +88,25 @@ export const okx: ExchangeClient & {
       };
     } catch {
       return null; // no perp listed / endpoint down → funding context simply absent
+    }
+  },
+
+  /** Settled funding rates, oldest first. Empty when no perp is listed. */
+  async fetchFundingHistory(symbol: string, limit = 24): Promise<{ rate: number; ts: number }[]> {
+    try {
+      const res = await fetchJson<{
+        code: string;
+        data: { fundingRate: string; fundingTime: string }[];
+      }>(
+        `${BASE}/api/v5/public/funding-rate-history?instId=${instId(symbol)}-SWAP&limit=${Math.min(limit, 100)}`
+      );
+      if (res.code !== "0" || !Array.isArray(res.data)) return [];
+      return res.data
+        .map((f) => ({ rate: Number(f.fundingRate), ts: Number(f.fundingTime) }))
+        .filter((f) => Number.isFinite(f.rate) && Number.isFinite(f.ts))
+        .reverse();
+    } catch {
+      return [];
     }
   },
 };

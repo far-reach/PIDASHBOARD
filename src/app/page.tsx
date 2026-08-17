@@ -5,7 +5,9 @@ import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
 import { PriceHero } from "@/components/PriceHero";
 import { PriceChart } from "@/components/PriceChart";
-import { StatsGrid } from "@/components/StatsGrid";
+import { SessionStrip } from "@/components/SessionStrip";
+import { ContextPanel } from "@/components/ContextPanel";
+import { VenuesPanel } from "@/components/VenuesPanel";
 import { PiNetworkPanel } from "@/components/PiNetworkPanel";
 import { ReportView } from "@/components/ReportView";
 import { SignalCard } from "@/components/SignalCard";
@@ -26,7 +28,9 @@ export default function HomePage() {
   const recentSignals = SIGNALS_ENABLED ? (signals?.signals.slice(0, 3) ?? []) : [];
 
   const sections: Record<SectionId, React.ReactNode> = {
-    stats: <StatsGrid key="stats" />,
+    stats: <SessionStrip key="stats" />,
+    context: <ContextPanel key="context" />,
+    venues: <VenuesPanel key="venues" />,
     network: <PiNetworkPanel key="network" />,
     chart: <PriceChart key="chart" />,
     report: (

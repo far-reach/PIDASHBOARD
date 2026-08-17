@@ -101,6 +101,25 @@ export const useReports = () =>
 
 export const useMe = () => useCachedQuery<MeResponse>("me", "/api/me", false);
 
+export interface MicrostructureResponse {
+  symbol: string;
+  venues: {
+    source: string;
+    price: number;
+    bid: number | null;
+    ask: number | null;
+    spread_pct: number | null;
+    volume_24h: number | null;
+    ts: number;
+  }[];
+  divergence_pct: number | null;
+  funding_history: { rate: number; ts: number }[];
+  as_of: string;
+}
+
+export const useMicrostructure = () =>
+  useCachedQuery<MicrostructureResponse>("micro", "/api/microstructure", 60_000);
+
 export const useFunding = () =>
   useCachedQuery<{
     symbol: string;
