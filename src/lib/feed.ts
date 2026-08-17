@@ -72,7 +72,12 @@ export async function getLatestPrice(symbol: string = SYMBOL): Promise<LatestPri
   const cacheKey = `ondemand:${symbol}`;
   const cached = await cache.get<LatestPrice>(cacheKey);
   if (cached && Date.now() - new Date(cached.ts).getTime() < 3000) {
-    return { ...cached, stalenessS: Math.max(0, Math.round((Date.now() - new Date(cached.ts).getTime()) / 1000)) };
+    // Recompute staleness AND the flag derived from it. Ageing `stalenessS`
+    // while serving the cached `isStale` lets a tick cross the staleness
+    // threshold inside the cache window and still be presented as live — the
+    // one thing the price surface promises never to do.
+    const stalenessS = Math.max(0, Math.round((Date.now() - new Date(cached.ts).getTime()) / 1000));
+    return { ...cached, stalenessS, isStale: stalenessS > STALE_AFTER_S };
   }
 
   const agg = getAggregator();

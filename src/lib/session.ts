@@ -42,7 +42,13 @@ export function verifySessionToken(token: string | undefined | null, now = Date.
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
   try {
     const payload = JSON.parse(unb64u(data)) as SessionPayload;
-    if (typeof payload.uid !== "string" || typeof payload.exp !== "number") return null;
+    if (
+      typeof payload.uid !== "string" ||
+      typeof payload.username !== "string" ||
+      typeof payload.exp !== "number"
+    ) {
+      return null;
+    }
     if (payload.exp * 1000 < now) return null;
     return payload;
   } catch {

@@ -19,6 +19,7 @@ Keep this file updated as you fill it in — it doubles as the record of what yo
 | Server API key (Testnet) | *password manager* | Portal → never commit this |
 | Server API key (Mainnet) | *password manager* | Portal → never commit this |
 | App wallet address | `________________` | Portal → this is where your Pi arrives |
+| Payout destination (operator's own wallet) | `GAPJLHE2JTILKBPAYH57PO6RBSYMRAERDORIJN26SBU6HKGHHJWI3AB3` | Where funds should end up. If the portal's app wallet is a separate wallet, sweep to this address periodically — never paste its secret phrase anywhere |
 | Support contact | `________________` | Your choice → env `NEXT_PUBLIC_SUPPORT_CONTACT` |
 
 ---

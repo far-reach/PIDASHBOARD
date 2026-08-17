@@ -110,6 +110,24 @@ export async function signInWithPi(): Promise<{ uid: string; username: string } 
  * completion — client-side success alone never unlocks anything, and the
  * server re-reads the payment from the Pi platform to decide what it was for.
  */
+/**
+ * Surface the server's own explanation for a failed payment leg. The API
+ * returns actionable messages ("tip of 0.05 π is below the 0.1 π minimum");
+ * collapsing them to an HTTP status turns every rejection into a support
+ * question.
+ */
+async function paymentError(res: Response, fallback: string): Promise<Error> {
+  try {
+    const body = (await res.json()) as { error?: unknown };
+    if (typeof body.error === "string" && body.error.length > 0) {
+      return new Error(body.error);
+    }
+  } catch {
+    // Non-JSON body — fall through to the generic message.
+  }
+  return new Error(`${fallback} (${res.status})`);
+}
+
 function payWithPi(args: {
   amountPi: number;
   memo: string;
@@ -134,8 +152,8 @@ function payWithPi(args: {
               method: "POST",
               headers: { "content-type": "application/json" },
               body: JSON.stringify({ paymentId }),
-            }).then((res) => {
-              if (!res.ok) reject(new Error(`server approval failed (${res.status})`));
+            }).then(async (res) => {
+              if (!res.ok) reject(await paymentError(res, "server approval failed"));
             });
           },
           onReadyForServerCompletion: (paymentId, txid) => {
@@ -143,9 +161,9 @@ function payWithPi(args: {
               method: "POST",
               headers: { "content-type": "application/json" },
               body: JSON.stringify({ paymentId, txid }),
-            }).then((res) => {
+            }).then(async (res) => {
               if (res.ok) resolve();
-              else reject(new Error(`server completion failed (${res.status})`));
+              else reject(await paymentError(res, "server completion failed"));
             });
           },
           onCancel: () => reject(new Error("payment cancelled")),
