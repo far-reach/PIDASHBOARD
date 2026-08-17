@@ -12,6 +12,7 @@ import { PiNetworkPanel } from "@/components/PiNetworkPanel";
 import { ReportView } from "@/components/ReportView";
 import { SignalCard } from "@/components/SignalCard";
 import { CustomizePanel } from "@/components/CustomizePanel";
+import { CollapsibleCard } from "@/components/CollapsibleCard";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/components/ui";
 import { useReports, useSignals } from "@/lib/hooks";
 import { timeAgo } from "@/lib/format";
@@ -34,10 +35,12 @@ export default function HomePage() {
     network: <PiNetworkPanel key="network" />,
     chart: <PriceChart key="chart" />,
     report: (
-      <Card key="report">
-        <CardHeader>
-          <CardTitle>Daily report</CardTitle>
-          <span className="inline-flex items-center gap-1.5">
+      <CollapsibleCard
+        key="report"
+        storageKey="report"
+        title={<CardTitle>Daily report</CardTitle>}
+        headerRight={
+          <>
             {reportsFromCache ? <Badge tone="warn">offline · last known</Badge> : null}
             {latestReport ? (
               <Badge tone="neutral">generated {timeAgo(latestReport.generated_at)}</Badge>
@@ -45,19 +48,18 @@ export default function HomePage() {
             <Link href="/reports" className="text-xs text-primary hover:underline">
               archive →
             </Link>
-          </span>
-        </CardHeader>
-        <CardContent>
-          {latestReport ? (
-            <ReportView markdown={latestReport.content_md} />
-          ) : (
-            <EmptyState
-              title="No daily report yet."
-              hint="Reports generate automatically at 00:05 UTC once the report worker is running."
-            />
-          )}
-        </CardContent>
-      </Card>
+          </>
+        }
+      >
+        {latestReport ? (
+          <ReportView markdown={latestReport.content_md} />
+        ) : (
+          <EmptyState
+            title="No daily report yet."
+            hint="Reports generate automatically at 00:05 UTC once the report worker is running."
+          />
+        )}
+      </CollapsibleCard>
     ),
   };
 

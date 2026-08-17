@@ -26,7 +26,7 @@ export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingEle
   return (
     <h2
       className={clsx(
-        "flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground",
+        "flex items-center gap-2 text-base font-bold uppercase tracking-wide text-foreground",
         "before:h-4 before:w-1 before:shrink-0 before:rounded-full before:bg-gradient-to-b before:from-primary before:to-up before:content-['']",
         className
       )}
