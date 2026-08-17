@@ -27,11 +27,11 @@ describe("Pi domain-validation endpoint", () => {
     expect(await res.text()).toBe("abc123validationkey");
   });
 
-  it("404s with an actionable message when unset, rather than serving an empty file", async () => {
+  it("falls back to the committed portal key when the env var is unset", async () => {
     vi.stubEnv("PI_VALIDATION_KEY", "");
     const res = validationKeyGet();
-    expect(res.status).toBe(404);
-    expect(await res.text()).toContain("PI_VALIDATION_KEY");
+    expect(res.status).toBe(200);
+    expect((await res.text()).startsWith("543ca58a6b5ede6870c9140ef12767f3")).toBe(true);
   });
 });
 
