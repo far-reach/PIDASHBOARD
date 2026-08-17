@@ -175,11 +175,11 @@ export class Aggregator {
 }
 
 // Per-process singleton (web app on-demand path + workers).
-const globalForAgg = globalThis as unknown as { __pipulseAgg?: Aggregator };
+const globalForAgg = globalThis as unknown as { __cybrektAgg?: Aggregator };
 
 export function getAggregator(): Aggregator {
-  if (!globalForAgg.__pipulseAgg) {
-    globalForAgg.__pipulseAgg = new Aggregator();
+  if (!globalForAgg.__cybrektAgg) {
+    globalForAgg.__cybrektAgg = new Aggregator();
   }
-  return globalForAgg.__pipulseAgg;
+  return globalForAgg.__cybrektAgg;
 }

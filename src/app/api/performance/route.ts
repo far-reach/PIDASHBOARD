@@ -4,6 +4,7 @@ import { clientKey, rateLimit } from "@/lib/ratelimit";
 import { listSignalsWithOutcomes } from "@/lib/signals/repo";
 import { computePerformance } from "@/lib/signals/performance";
 import { isAdminRequest } from "@/lib/auth";
+import { signalsReadDisabled } from "@/lib/signals/gate";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const rl = rateLimit(`perf:${clientKey(req)}`, { capacity: 60, refillPerSec: 1 });
   if (!rl.allowed) {
     return NextResponse.json({ error: "rate limited" }, { status: 429 });
+  }
+  if (signalsReadDisabled()) {
+    return NextResponse.json({ performance: null, symbol: SYMBOL, signals_enabled: false });
   }
   const includeTest = isAdminRequest(req) && req.nextUrl.searchParams.get("include_test") === "1";
   // limit: null — performance is computed over the COMPLETE record. Capping it

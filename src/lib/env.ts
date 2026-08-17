@@ -5,9 +5,26 @@
 
 export const SYMBOL = process.env.NEXT_PUBLIC_SYMBOL ?? "PIUSDT";
 
+/**
+ * Directional trading calls (entry / stop-loss / target) and the performance
+ * record derived from them. **Off by default.**
+ *
+ * The Pi ecosystem guidelines prohibit "material discussions, representations
+ * or misrepresentations regarding the value or valuation of Pi", and publishing
+ * buy/sell calls on PI is squarely that. The engine is retained — it is correct,
+ * tested, and the honest-record design is worth keeping — but it does not ship
+ * enabled. See COMPLIANCE.md before changing this.
+ *
+ * NEXT_PUBLIC_ so the client nav and the server agree on a single value.
+ */
+export const SIGNALS_ENABLED = process.env.NEXT_PUBLIC_SIGNALS_ENABLED === "true";
+
 export type MonetizationMode = "free" | "freemium";
 
 export function monetizationMode(): MonetizationMode {
+  // Freemium gates only open signals. With signals off there is nothing to
+  // gate, so the subscription cannot be sold into an empty product.
+  if (!SIGNALS_ENABLED) return "free";
   return process.env.MONETIZATION_MODE === "freemium" ? "freemium" : "free";
 }
 

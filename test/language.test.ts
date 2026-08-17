@@ -15,6 +15,17 @@ const FORBIDDEN: RegExp[] = [
   /\bsure thing\b/i,
   /\bto the moon\b/i,
   /\bwill (pump|moon|explode|10x)\b/i,
+
+  // Pi ecosystem guidelines prohibit "material discussions, representations or
+  // misrepresentations regarding the value or valuation of Pi". Asserting or
+  // forecasting what Pi is worth is the exact shape of claim that gets an app
+  // pulled — and repeat offences reach the developer's account, not just the
+  // app. These patterns keep that class of copy out of the product.
+  /\bprice (prediction|forecast|target)s?\b/i,
+  /\b(pi|π) (is|will be) worth\b/i,
+  /\b(fair|true|real|global consensus) value of (pi|π)\b/i,
+  /\bwe (predict|forecast|expect) (pi|π|the price)\b/i,
+  /\bgcv\b/i,
 ];
 
 function walk(dir: string): string[] {

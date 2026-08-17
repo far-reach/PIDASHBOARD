@@ -7,14 +7,26 @@ import { BarChart3, BookOpen, FileText, Home, Radio } from "lucide-react";
 import { PiAuthButton } from "@/components/PiAuthButton";
 import { useOnline } from "@/lib/hooks";
 import { Badge } from "@/components/ui";
+import { SIGNALS_ENABLED } from "@/lib/env";
 
-const TABS = [
+const BASE_TABS = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/signals", label: "Signals", icon: Radio },
-  { href: "/performance", label: "Performance", icon: BarChart3 },
   { href: "/reports", label: "Reports", icon: FileText },
   { href: "/learn", label: "Learn", icon: BookOpen },
 ] as const;
+
+/**
+ * The directional-call surfaces. Off by default: an app in the Pi ecosystem
+ * publishing entry/stop/target calls is making material representations about
+ * the valuation of Pi, which the ecosystem guidelines prohibit. See
+ * COMPLIANCE.md — do not re-enable without a written answer from Pi.
+ */
+const SIGNAL_TABS = [
+  { href: "/signals", label: "Signals", icon: Radio },
+  { href: "/performance", label: "Performance", icon: BarChart3 },
+] as const;
+
+const TABS = SIGNALS_ENABLED ? [BASE_TABS[0], ...SIGNAL_TABS, ...BASE_TABS.slice(1)] : BASE_TABS;
 
 /** Top bar (identity + auth) and, on mobile, a bottom tab bar — Pi Browser is mobile-first. */
 export function Nav() {
@@ -29,7 +41,7 @@ export function Nav() {
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary text-sm font-bold">
               π
             </span>
-            <span className="font-semibold tracking-tight">PiPulse</span>
+            <span className="font-semibold tracking-tight">Cybrekt Market</span>
             <span className="text-[11px] text-muted-foreground hidden sm:inline">PIUSDT dashboard</span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">

@@ -6,7 +6,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { sessionSecret } from "@/lib/env";
 
-export const SESSION_COOKIE = "pipulse_session";
+export const SESSION_COOKIE = "cybrekt_session";
 const SESSION_TTL_S = 30 * 24 * 3600;
 
 interface SessionPayload {

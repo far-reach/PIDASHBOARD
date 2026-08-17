@@ -2,9 +2,9 @@
  * What a Pi payment is *for*, and whether it is acceptable.
  *
  * Two products exist:
- *   - `pipulse-pro-30d` — the 30-day Pro subscription (a fixed price; buying it
+ *   - `cybrekt-pro-30d` — the 30-day Pro subscription (a fixed price; buying it
  *     grants an entitlement).
- *   - `pipulse-tip`     — a voluntary tip to the developer. Any amount inside
+ *   - `cybrekt-tip`     — a voluntary tip to the developer. Any amount inside
  *     the configured bounds is accepted and it grants **nothing**. That is the
  *     point: a tip must never be a cheaper back door into Pro.
  *
@@ -16,8 +16,8 @@
  * product cannot silently inherit another one's rules.
  */
 
-export const PRODUCT_PRO = "pipulse-pro-30d";
-export const PRODUCT_TIP = "pipulse-tip";
+export const PRODUCT_PRO = "cybrekt-pro-30d";
+export const PRODUCT_TIP = "cybrekt-tip";
 
 export type PaymentKind = "pro" | "tip";
 

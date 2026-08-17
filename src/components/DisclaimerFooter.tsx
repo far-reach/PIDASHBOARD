@@ -9,7 +9,7 @@ export function DisclaimerFooter() {
         of loss; past performance does not indicate future results. All content is educational
         information generated from market data and our model&apos;s analysis. Signals are published
         with immutable history — including every losing one. Prices shown &quot;as of&quot; their
-        stated UTC timestamps and may differ between exchanges. PiPulse is an independent community
+        stated UTC timestamps and may differ between exchanges. Cybrekt Market is an independent community
         app and is not affiliated with or endorsed by the Pi Core Team.
       </p>
       <nav className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[11px] text-muted-foreground">

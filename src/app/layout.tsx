@@ -6,7 +6,7 @@ import { RiskBanner } from "@/components/RiskBanner";
 import { DisclaimerFooter } from "@/components/DisclaimerFooter";
 
 export const metadata: Metadata = {
-  title: "PiPulse — PIUSDT Dashboard",
+  title: "Cybrekt Market — PIUSDT Dashboard",
   description:
     "Live PIUSDT price from multiple exchanges, automated daily market reports, and a transparent, immutable trading-signals record. Educational information — not financial advice.",
   manifest: "/manifest.webmanifest",
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
-  applicationName: "PiPulse",
-  appleWebApp: { capable: true, title: "PiPulse", statusBarStyle: "black-translucent" },
+  applicationName: "Cybrekt Market",
+  appleWebApp: { capable: true, title: "Cybrekt Market", statusBarStyle: "black-translucent" },
   formatDetection: { telephone: false },
 };
 

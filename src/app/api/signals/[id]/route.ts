@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { canSeeOpenSignals, isAdminRequest } from "@/lib/auth";
 import { getSignalWithOutcome } from "@/lib/signals/repo";
+import { signalsReadDisabled } from "@/lib/signals/gate";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,9 @@ export async function GET(
   req: NextRequest,
   ctx: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
+  if (signalsReadDisabled()) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
   const { id } = await ctx.params;
   const signal = await getSignalWithOutcome(id);
   if (!signal || (signal.isTest && !isAdminRequest(req))) {

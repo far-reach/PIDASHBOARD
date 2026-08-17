@@ -7,7 +7,7 @@ export function RiskBanner() {
   const [dismissed, setDismissed] = useState(true); // avoid SSR flash; resolve on mount
 
   useEffect(() => {
-    setDismissed(sessionStorage.getItem("pipulse:risk-banner") === "dismissed");
+    setDismissed(sessionStorage.getItem("cybrekt:risk-banner") === "dismissed");
   }, []);
 
   if (dismissed) return null;
@@ -26,7 +26,7 @@ export function RiskBanner() {
         aria-label="Dismiss risk banner for this session"
         className="text-warn/80 hover:text-warn text-lg leading-none px-1"
         onClick={() => {
-          sessionStorage.setItem("pipulse:risk-banner", "dismissed");
+          sessionStorage.setItem("cybrekt:risk-banner", "dismissed");
           setDismissed(true);
         }}
       >

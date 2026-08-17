@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SupportContact } from "@/components/SupportContact";
 
-export const metadata: Metadata = { title: "Privacy Policy — PiPulse" };
+export const metadata: Metadata = { title: "Privacy Policy — Cybrekt Market" };
 
 export default function PrivacyPage() {
   return (

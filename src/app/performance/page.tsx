@@ -5,10 +5,14 @@ import { RHistogram } from "@/components/RHistogram";
 import { Badge, Card, CardContent, CardHeader, CardTitle, Skeleton, Stat } from "@/components/ui";
 import { usePerformance } from "@/lib/hooks";
 import { fmtR, fmtUtcTime } from "@/lib/format";
+import { SIGNALS_ENABLED } from "@/lib/env";
+import { SignalsDisabledNotice } from "@/components/SignalsDisabledNotice";
 
 export default function PerformancePage() {
   const { data, fromCache, isLoading } = usePerformance();
   const perf = data?.performance;
+
+  if (!SIGNALS_ENABLED) return <SignalsDisabledNotice />;
 
   return (
     <div className="space-y-3 pb-4">

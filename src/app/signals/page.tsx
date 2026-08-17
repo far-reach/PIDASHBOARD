@@ -6,12 +6,16 @@ import { Badge, EmptyState, SegmentedControl, Skeleton } from "@/components/ui";
 import { UpgradeCard } from "@/components/UpgradeCard";
 import { useSignals } from "@/lib/hooks";
 import { fmtUtcTime } from "@/lib/format";
+import { SIGNALS_ENABLED } from "@/lib/env";
+import { SignalsDisabledNotice } from "@/components/SignalsDisabledNotice";
 
 type Filter = "all" | "open" | "closed";
 
 export default function SignalsPage() {
   const { data, fromCache, isLoading } = useSignals();
   const [filter, setFilter] = useState<Filter>("all");
+
+  if (!SIGNALS_ENABLED) return <SignalsDisabledNotice />;
 
   const signals = data?.signals ?? [];
   const filtered = signals.filter((s) =>

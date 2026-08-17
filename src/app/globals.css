@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /*
- * PiPulse commits to a single dark trading look; every surface is painted
+ * Cybrekt Market commits to a single dark trading look; every surface is painted
  * explicitly so no host webview theme can invert it. Win/loss colors
  * (--up / --down) are a CVD-validated pair (ΔE deutan 11.6 on this surface)
  * and are ALWAYS accompanied by a text label — color never carries meaning

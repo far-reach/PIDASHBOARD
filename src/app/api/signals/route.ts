@@ -5,6 +5,7 @@ import { getLatestPrice } from "@/lib/feed";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
 import { createSignal, listSignalsWithOutcomes } from "@/lib/signals/repo";
 import { newSignalSchema } from "@/lib/signals/schema";
+import { signalsReadDisabled, signalsWriteBlocked } from "@/lib/signals/gate";
 import { unrealizedR } from "@/lib/signals/outcome";
 import type { SignalWithOutcome } from "@/lib/signals/types";
 
@@ -59,6 +60,22 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "rate limited" }, { status: 429 });
   }
 
+  if (signalsReadDisabled()) {
+    return NextResponse.json({
+      signals: [],
+      meta: {
+        symbol: SYMBOL,
+        monetization: monetizationMode(),
+        signals_enabled: false,
+        open_signals_visible: true,
+        hidden_open_count: 0,
+        current_price: null,
+        price_as_of: null,
+        as_of: new Date().toISOString(),
+      },
+    });
+  }
+
   const admin = isAdminRequest(req);
   const includeTest = admin && req.nextUrl.searchParams.get("include_test") === "1";
   const all = await listSignalsWithOutcomes({ symbol: SYMBOL, includeTest, limit: 200 });
@@ -111,6 +128,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+  const blocked = signalsWriteBlocked();
+  if (blocked) return blocked;
   let body: unknown;
   try {
     body = await req.json();

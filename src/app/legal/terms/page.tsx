@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SupportContact } from "@/components/SupportContact";
 
-export const metadata: Metadata = { title: "Terms of Use — PiPulse" };
+export const metadata: Metadata = { title: "Terms of Use — Cybrekt Market" };
 
 export default function TermsPage() {
   return (
@@ -12,7 +12,7 @@ export default function TermsPage() {
       </p>
       <ol className="list-decimal pl-5 space-y-2">
         <li>
-          <strong>Service.</strong> PiPulse is an informational dashboard for the PIUSDT market:
+          <strong>Service.</strong> Cybrekt Market is an informational dashboard for the PIUSDT market:
           aggregated prices, automated daily reports, an immutable signal record, and educational
           content. The service is provided &quot;as is&quot; without warranties of any kind.
         </li>
@@ -41,7 +41,7 @@ export default function TermsPage() {
           data belongs to its originating venues and is redistributed for display only.
         </li>
         <li>
-          <strong>Liability.</strong> To the maximum extent permitted by law, PiPulse and its
+          <strong>Liability.</strong> To the maximum extent permitted by law, Cybrekt Market and its
           operator are not liable for trading losses, data inaccuracies, downtime, or any indirect
           or consequential damages arising from use of the service.
         </li>
@@ -57,7 +57,7 @@ export default function TermsPage() {
       </ol>
       <SupportContact />
       <p className="text-xs text-muted-foreground">
-        PiPulse is an independent community application and is not affiliated with, endorsed by, or
+        Cybrekt Market is an independent community application and is not affiliated with, endorsed by, or
         sponsored by the Pi Core Team or Pi Network.
       </p>
     </article>

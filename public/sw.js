@@ -4,7 +4,7 @@
  * app layer shows localStorage last-known data with an offline badge
  * instead of silently serving stale API responses).
  */
-const CACHE = "pipulse-shell-v1";
+const CACHE = "cybrekt-shell-v1";
 const SHELL = ["/", "/signals", "/performance", "/reports", "/learn", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {

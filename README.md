@@ -1,4 +1,4 @@
-# PiPulse — PIUSDT Dashboard for the Pi Network ecosystem
+# Cybrekt Market — PIUSDT Dashboard for the Pi Network ecosystem
 
 A mobile-first web app, built to ship in the **Pi Network App Directory**, that gives Pioneers
 an honest view of the PIUSDT market:
@@ -8,17 +8,21 @@ an honest view of the PIUSDT market:
 - **Candlestick chart** (1m / 5m / 1h / 1d) with volume
 - **Automated daily reports** — OHLC, notable hourly moves, key levels, volume anomalies,
   funding context; generated idempotently once per UTC day, archived for 30 days
-- **Trading-signals feed** with an **immutable, append-only history**: entries, stops,
-  targets and outcomes can never be edited or deleted — enforced by database triggers,
-  not just missing API endpoints
-- **Honest performance page** — win rate, average R, max drawdown, streaks, full-history
-  equity curve and R distribution, all derived live from the event log with no override
-- **Pi SDK integration** — Pi identity sign-in, Pi payment flow for an optional Pro tier,
-  graceful fallback in normal browsers (the free tier works everywhere)
+- **Immutable report archive** — a published report is never edited or deleted, enforced
+  by append-only database triggers, not just by missing API endpoints
+- **Pi SDK integration** — Pi identity sign-in and the official Pi payment flow for
+  voluntary tips, with graceful fallback in normal browsers (everything works without Pi)
 - **PWA** — installable, offline-tolerant (last-known data shown with an explicit badge)
 
-> **Not financial advice.** Every screen carries disclaimers; the app never executes
-> trades, never holds funds, and never asks for exchange or wallet keys.
+> **Not financial advice.** The app reports market data published by third-party exchanges
+> and summarises it. It publishes no forecasts, no valuation claims, no buy or sell
+> recommendations and no trading levels. Every screen carries disclaimers; it never
+> executes trades, never holds funds, and never asks for exchange or wallet keys.
+
+> **Trading signals are disabled.** The engine exists, is tested, and is gated off by
+> `NEXT_PUBLIC_SIGNALS_ENABLED`. Read **[COMPLIANCE.md](./COMPLIANCE.md)** before changing
+> that — Pi's ecosystem guidelines prohibit material representations about the valuation of
+> Pi, and enforcement can reach the developer's account.
 
 Built against the specification in `CLAUDE_CODER_BRIEF.md` (see repo history) with its
 non-negotiables — signal immutability, loss transparency, no-custody, disclaimer coverage,
@@ -26,7 +30,7 @@ data-source failover — implemented and covered by tests.
 
 ## Deploy it
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffar-reach%2FPIDASHBOARD&env=DATABASE_URL,ADMIN_API_KEY,SESSION_SECRET,CRON_SECRET,MONETIZATION_MODE,NEXT_PUBLIC_PI_SANDBOX,NEXT_PUBLIC_SYMBOL&envDescription=DATABASE_URL%20from%20Neon%3B%20generate%20the%20three%20secrets%20with%20openssl%20rand%20-hex%2032%3B%20set%20MONETIZATION_MODE%3Dfree%2C%20NEXT_PUBLIC_PI_SANDBOX%3Dtrue%2C%20NEXT_PUBLIC_SYMBOL%3DPIUSDT&envLink=https%3A%2F%2Fgithub.com%2Ffar-reach%2FPIDASHBOARD%2Fblob%2Fmain%2F.env.example&project-name=pipulse&repository-name=pipulse)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffar-reach%2FPIDASHBOARD&env=DATABASE_URL,ADMIN_API_KEY,SESSION_SECRET,CRON_SECRET,MONETIZATION_MODE,NEXT_PUBLIC_PI_SANDBOX,NEXT_PUBLIC_SYMBOL&envDescription=DATABASE_URL%20from%20Neon%3B%20generate%20the%20three%20secrets%20with%20openssl%20rand%20-hex%2032%3B%20set%20MONETIZATION_MODE%3Dfree%2C%20NEXT_PUBLIC_PI_SANDBOX%3Dtrue%2C%20NEXT_PUBLIC_SYMBOL%3DPIUSDT&envLink=https%3A%2F%2Fgithub.com%2Ffar-reach%2FPIDASHBOARD%2Fblob%2Fmain%2F.env.example&project-name=cybrekt&repository-name=cybrekt)
 
 Create a [Neon](https://neon.tech) Postgres database first and have its connection string
 ready — the deploy runs migrations as part of the build. Generate the three secrets with

@@ -11,7 +11,7 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@/compo
 import { fmtPrice, fmtUtcDateTime } from "@/lib/format";
 import type { SignalDTO, SignalsResponse } from "@/lib/api-types";
 
-const KEY_STORAGE = "pipulse:admin-key";
+const KEY_STORAGE = "cybrekt:admin-key";
 
 interface FormState {
   direction: "long" | "short";

@@ -1,8 +1,8 @@
 {
-  "name": "pipulse",
+  "name": "cybrekt",
   "version": "0.1.0",
   "private": true,
-  "description": "PiPulse — PIUSDT trading dashboard for the Pi Network app ecosystem: live multi-exchange price data, automated daily reports, and an immutable, honestly-tracked trading-calls feed.",
+  "description": "Cybrekt Market — PIUSDT trading dashboard for the Pi Network app ecosystem: live multi-exchange price data, automated daily reports, and an immutable, honestly-tracked trading-calls feed.",
   "license": "MIT",
   "engines": {
     "node": ">=22"
@@ -16,7 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "e2e:server": "PGLITE_DIR=.data/e2e-pglite ADMIN_API_KEY=test-admin-key-e2e MONETIZATION_MODE=free next dev -p 3100",
+    "e2e:server": "PGLITE_DIR=.data/e2e-pglite ADMIN_API_KEY=test-admin-key-e2e MONETIZATION_MODE=free NEXT_PUBLIC_SIGNALS_ENABLED=true next dev -p 3100",
     "worker:ingest": "tsx workers/ingest.ts",
     "worker:report": "tsx workers/report.ts",
     "worker:resolve": "tsx workers/resolve.ts",

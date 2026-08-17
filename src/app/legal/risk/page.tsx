@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Risk Disclaimer — PiPulse" };
+export const metadata: Metadata = { title: "Risk Disclaimer — Cybrekt Market" };
 
 export default function RiskPage() {
   return (
@@ -10,7 +10,7 @@ export default function RiskPage() {
         Draft template — to be reviewed by qualified counsel before App Directory submission.
       </p>
       <p>
-        PiPulse provides market data, automatically generated reports, and model-based trading
+        Cybrekt Market provides market data, automatically generated reports, and model-based trading
         signals for educational and informational purposes only. Nothing in this app constitutes
         financial, investment, legal, or tax advice, an offer or solicitation to buy or sell any
         asset, or a recommendation tailored to any person.
@@ -23,7 +23,7 @@ export default function RiskPage() {
         — which we display in full, including losses — does not indicate future results.
       </p>
       <p>
-        PiPulse does not execute trades, does not custody funds, and does not access your exchange
+        Cybrekt Market does not execute trades, does not custody funds, and does not access your exchange
         accounts or wallets. Any trading decision you make, on any venue, is yours alone. Before
         making financial decisions, consider your circumstances and consult a licensed professional
         in your jurisdiction.

@@ -1,4 +1,4 @@
-# Publishing PiPulse to the Pi App Directory — step by step
+# Publishing Cybrekt Market to the Pi App Directory — step by step
 
 Every step is ordered; each one has a check you can run before moving on. Steps marked
 **[you]** need a human (a Pi account, a card, a legal review); the rest are commands.
@@ -136,7 +136,7 @@ All of this is inside **Pi Browser** on your phone.
    screen; on newer builds the portal is at `develop.pinet.com` — either entry point
    lands in the same Developer Portal).
 2. Tap **New App**. Fill the three required fields:
-   - **App Name:** `PiPulse` — use only letters, numbers and spaces; no special characters.
+   - **App Name:** `Cybrekt Market` — use only letters, numbers and spaces; no special characters.
    - **App Network:** ⚠️ **This cannot be changed after registration, and one app connects
      to exactly one network.** Register a **Testnet** app first for sandbox testing, then a
      separate **Mainnet** app for the real listing. Do not try to reuse one for both.
@@ -148,7 +148,7 @@ All of this is inside **Pi Browser** on your phone.
 ## Stage 6 — Verify domain ownership
 
 The portal shows a **validation key** in a grey box. It must be served at
-`<your app URL>/validation-key.txt` — e.g. `https://pipulse.vercel.app/validation-key.txt`.
+`<your app URL>/validation-key.txt` — e.g. `https://cybrekt.vercel.app/validation-key.txt`.
 A `*.vercel.app` URL verifies exactly like a purchased domain.
 
 This app serves it from an environment variable, so **you do not need to edit code**:
@@ -217,7 +217,7 @@ arrives there before you rely on it. Two ways to get paid:
 
 | | How it works | Needs |
 | --- | --- | --- |
-| **Tips** | "Support PiPulse" card on the home screen. Any amount from `MIN_TIP_PI` to `MAX_TIP_PI`. Unlocks nothing. | On by default — nothing to switch on |
+| **Tips** | "Support Cybrekt Market" card on the home screen. Any amount from `MIN_TIP_PI` to `MAX_TIP_PI`. Unlocks nothing. | On by default — nothing to switch on |
 | **Pro subscription** | Gates *currently-open* signals for 30 days at `PRO_PRICE_PI`. Closed history and performance stay free. | `MONETIZATION_MODE=freemium` |
 
 Recommended: **launch with tips only** and leave `MONETIZATION_MODE=free`. Flip to
@@ -261,7 +261,7 @@ Learn screens on a real phone.
 
 **Long description (paste-ready):**
 
-> PiPulse gives Pioneers a clear, honest view of the PIUSDT market.
+> Cybrekt Market gives Pioneers a clear, honest view of the PIUSDT market.
 >
 > • Live price aggregated from OKX and MEXC, with automatic failover and a visible badge
 >   whenever data is stale or coming from the backup source.
@@ -276,7 +276,7 @@ Learn screens on a real phone.
 > • Educational content explaining how to read the signals, what R multiples mean, and a
 >   glossary.
 >
-> PiPulse never executes trades, never holds your funds, and never asks for exchange or
+> Cybrekt Market never executes trades, never holds your funds, and never asks for exchange or
 > wallet keys. It is an independent community app, not affiliated with the Pi Core Team.
 > Trading involves risk of loss; nothing in the app is financial advice.
 
@@ -296,18 +296,24 @@ Learn screens on a real phone.
 ## Stage 11 — Build a real track record *before* submitting
 
 This is the step people skip, and it is the one that decides whether the app survives
-contact with users. Do not submit an app whose signal history and report archive are empty.
+contact with users. Do not submit an app whose report archive is empty — a market data app
+with no history is indistinguishable from an abandoned one.
 
 Run publicly for **at least one month**, and during that time:
 
-- Publish signals through `/admin` (uncheck **Test signal** for real ones).
 - Confirm the daily report appears each morning and the archive fills up.
 - Watch `/api/health` daily; investigate any `degraded`.
-- Let the performance page accumulate honestly. **Do not** delete a bad call. If you must
-  exit early, use "Close early" and state the reason — that is what the button is for.
+- Check that prices are attributed to the right source venue, and that the staleness badge
+  appears when you would expect it to.
+- **Do not** edit or delete a published report, even a thin one from a quiet day. The
+  unbroken archive is the product.
 
-**Check before submitting:** `/performance` shows ≥ 20 closed signals, `/reports` has ~30
-days of entries, and no feed gap longer than 5 minutes in your logs over a 7-day window.
+**Check before submitting:** `/reports` has ~30 days of entries, no feed gap longer than
+5 minutes in your logs over a 7-day window, and `/api/health` reporting `ok` for a week.
+
+> Trading signals are disabled — see `COMPLIANCE.md`. Do **not** re-enable them to "build
+> a track record" for the listing. That is precisely the thing that puts your Pi account
+> at risk, and no listing is worth it.
 
 ---
 

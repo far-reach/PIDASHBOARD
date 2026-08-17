@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Learn — PiPulse" };
+export const metadata: Metadata = { title: "Learn — Cybrekt Market" };
 
 /** Educational content (brief §1): how to read the signals, glossary, risk. */
 export default function LearnPage() {
   return (
     <div className="space-y-3 pb-4 max-w-2xl">
-      <h1 className="text-lg font-semibold">How to read PiPulse</h1>
+      <h1 className="text-lg font-semibold">How to read Cybrekt Market</h1>
 
       <Card>
         <CardHeader>
@@ -87,7 +87,7 @@ export default function LearnPage() {
             professional before making financial decisions.
           </p>
           <p>
-            PiPulse never executes trades, never holds funds, and never asks for exchange API keys
+            Cybrekt Market never executes trades, never holds funds, and never asks for exchange API keys
             or wallet keys. Anyone claiming otherwise in our name is a scam.
           </p>
         </CardContent>
