@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { LearnSectionNav } from "@/components/LearnSectionNav";
 
 export const metadata: Metadata = { title: "Learn · Cyberekt" };
 
@@ -10,12 +11,46 @@ export const metadata: Metadata = { title: "Learn · Cyberekt" };
  * they can mislead; it does not teach a strategy, name levels, or suggest
  * what anyone should do. See COMPLIANCE.md.
  */
+
+const SECTIONS = [
+  { id: "about-app", label: "What this app does" },
+  { id: "sources", label: "Where the numbers come from" },
+  { id: "distrust", label: "When to distrust the data" },
+  { id: "glossary", label: "Glossary" },
+  { id: "daily-report", label: "The daily report" },
+  { id: "risk", label: "Risk, plainly" },
+] as const;
+
+// Anchored sections scroll to just below the sticky rows (header + title bar).
+const SECTION_ANCHOR = "scroll-mt-32";
+
 export default function LearnPage() {
   return (
     <div className="space-y-3 pb-4 max-w-2xl">
-      <h1 className="text-lg font-semibold">How to read Cyberekt</h1>
+      <div className="sticky top-16 z-30 -mx-4 flex items-center justify-between gap-2 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
+        <h1 className="text-lg font-semibold">How to read Cyberekt</h1>
+        <LearnSectionNav sections={[...SECTIONS]} />
+      </div>
 
-      <Card>
+      <Card id="about-app" className={SECTION_ANCHOR}>
+        <CardHeader>
+          <CardTitle>What this app does, and what it does not</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm leading-relaxed">
+          <p>
+            Cyberekt reports what the PIUSDT market <em>did</em>: prices as published by
+            public exchanges, with the source and timestamp shown, and an automatic daily
+            summary of the session.
+          </p>
+          <p className="text-muted-foreground">
+            It does not forecast prices, assert what any asset is worth, recommend buying or
+            selling, or set levels to trade against. It is a record of observed market data,
+            for informational and educational use only.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card id="sources" className={SECTION_ANCHOR}>
         <CardHeader>
           <CardTitle>Where these numbers come from</CardTitle>
         </CardHeader>
@@ -33,7 +68,7 @@ export default function LearnPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card id="distrust" className={SECTION_ANCHOR}>
         <CardHeader>
           <CardTitle>When to distrust what you see</CardTitle>
         </CardHeader>
@@ -62,7 +97,7 @@ export default function LearnPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card id="glossary" className={SECTION_ANCHOR}>
         <CardHeader>
           <CardTitle>Glossary</CardTitle>
         </CardHeader>
@@ -107,7 +142,7 @@ export default function LearnPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card id="daily-report" className={SECTION_ANCHOR}>
         <CardHeader>
           <CardTitle>What the daily report is</CardTitle>
         </CardHeader>
@@ -126,7 +161,7 @@ export default function LearnPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card id="risk" className={SECTION_ANCHOR}>
         <CardHeader>
           <CardTitle>Risk, plainly</CardTitle>
         </CardHeader>

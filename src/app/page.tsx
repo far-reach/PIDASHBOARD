@@ -55,28 +55,6 @@ export default function HomePage() {
         </CardContent>
       </Card>
     ),
-    about: (
-      <Card key="about">
-        <CardHeader>
-          <CardTitle>What this app does, and what it does not</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm leading-relaxed">
-          <p>
-            Cyberekt reports what the PIUSDT market <em>did</em>: prices as published by
-            public exchanges, with the source and timestamp shown, and an automatic daily
-            summary of the session.
-          </p>
-          <p className="text-muted-foreground">
-            It does not forecast prices, assert what any asset is worth, recommend buying or
-            selling, or set levels to trade against. It is a record of observed market data,
-            for informational and educational use only.{" "}
-            <Link href="/learn" className="text-primary hover:underline">
-              How to read this data →
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
-    ),
   };
 
   return (
