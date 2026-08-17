@@ -90,7 +90,7 @@ export function piApiBase(): string {
 }
 
 export function isPiSandbox(): boolean {
-  return process.env.NEXT_PUBLIC_PI_SANDBOX !== "false";
+  return process.env.NEXT_PUBLIC_PI_SANDBOX === "true";
 }
 
 /** Data considered stale after this many seconds (brief §3.7: badge at >60s). */

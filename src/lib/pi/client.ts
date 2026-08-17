@@ -57,9 +57,13 @@ export function loadPiSdk(): Promise<PiSdk | null> {
     script.onload = () => {
       clearTimeout(timeout);
       try {
+        // Sandbox mode pairs with the desktop sandbox (sandbox.minepi.com) and
+        // makes authenticate() hang forever inside the real Pi Browser, so it
+        // is never enabled there regardless of configuration.
+        const inPiBrowser = /PiBrowser/i.test(navigator.userAgent);
         window.Pi?.init({
           version: "2.0",
-          sandbox: process.env.NEXT_PUBLIC_PI_SANDBOX !== "false",
+          sandbox: !inPiBrowser && process.env.NEXT_PUBLIC_PI_SANDBOX === "true",
         });
         resolve(window.Pi ?? null);
       } catch {

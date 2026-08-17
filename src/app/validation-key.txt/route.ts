@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
  * ownership. The env var `PI_VALIDATION_KEY` takes precedence so the key can
  * be rotated from the hosting platform without a redeploy; the committed
  * fallback below keeps verification working when no env var is set. The key
- * is not a secret — the whole point is that it is publicly served.
+ * is not a secret; the whole point is that it is publicly served.
  */
 const COMMITTED_VALIDATION_KEY =
   "543ca58a6b5ede6870c9140ef12767f3d9c9f6ccd33dd0e1bc0315b5b558d3a820f0764dcc2d3e261d1c199caa11379128c966c50fe015c4f06ec90cb0e43c2b";
