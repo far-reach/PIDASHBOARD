@@ -43,10 +43,39 @@ declare global {
 
 const SDK_URL = "https://sdk.minepi.com/pi-sdk.js";
 let loadPromise: Promise<PiSdk | null> | null = null;
+let initialised = false;
+
+export function inPiBrowser(): boolean {
+  return typeof navigator !== "undefined" && /PiBrowser/i.test(navigator.userAgent);
+}
+
+/**
+ * init() must run before authenticate(), or the SDK waits for a handshake that
+ * never comes and the promise never settles. It is called from every entry
+ * point, including the one where window.Pi already exists, because the host
+ * browser may inject the object before this module ever loads a script.
+ */
+function initSdk(sdk: PiSdk): void {
+  if (initialised) return;
+  // Sandbox mode pairs with the desktop sandbox (sandbox.minepi.com) and hangs
+  // inside the real Pi Browser, so it is never enabled there.
+  sdk.init({
+    version: "2.0",
+    sandbox: !inPiBrowser() && process.env.NEXT_PUBLIC_PI_SANDBOX === "true",
+  });
+  initialised = true;
+}
 
 export function loadPiSdk(): Promise<PiSdk | null> {
   if (typeof window === "undefined") return Promise.resolve(null);
-  if (window.Pi) return Promise.resolve(window.Pi);
+  if (window.Pi) {
+    try {
+      initSdk(window.Pi);
+    } catch {
+      // An init failure is reported by authenticate(), which has a timeout.
+    }
+    return Promise.resolve(window.Pi);
+  }
   if (loadPromise) return loadPromise;
 
   loadPromise = new Promise<PiSdk | null>((resolve) => {
@@ -57,14 +86,7 @@ export function loadPiSdk(): Promise<PiSdk | null> {
     script.onload = () => {
       clearTimeout(timeout);
       try {
-        // Sandbox mode pairs with the desktop sandbox (sandbox.minepi.com) and
-        // makes authenticate() hang forever inside the real Pi Browser, so it
-        // is never enabled there regardless of configuration.
-        const inPiBrowser = /PiBrowser/i.test(navigator.userAgent);
-        window.Pi?.init({
-          version: "2.0",
-          sandbox: !inPiBrowser && process.env.NEXT_PUBLIC_PI_SANDBOX === "true",
-        });
+        if (window.Pi) initSdk(window.Pi);
         resolve(window.Pi ?? null);
       } catch {
         resolve(null);
@@ -72,11 +94,26 @@ export function loadPiSdk(): Promise<PiSdk | null> {
     };
     script.onerror = () => {
       clearTimeout(timeout);
-      resolve(null); // not in Pi Browser / offline — free tier continues
+      resolve(null); // not in Pi Browser / offline; free tier continues
+      loadPromise = null; // let a retry re-attempt the download
     };
     document.head.appendChild(script);
   });
   return loadPromise;
+}
+
+/**
+ * Pi's authenticate() rejects on a real failure but simply never settles when
+ * the handshake is misconfigured. Racing it against a deadline turns a dead
+ * button into a message the operator can act on.
+ */
+function withDeadline<T>(work: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    work,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} did not respond within ${Math.round(ms / 1000)}s`)), ms)
+    ),
+  ]);
 }
 
 async function reportIncompletePayment(payment: {
@@ -98,13 +135,17 @@ async function reportIncompletePayment(payment: {
 export async function signInWithPi(): Promise<{ uid: string; username: string } | null> {
   const sdk = await loadPiSdk();
   if (!sdk) return null;
-  const auth = await sdk.authenticate(["username", "payments"], (p) => void reportIncompletePayment(p));
+  const auth = await withDeadline(
+    sdk.authenticate(["username", "payments"], (p) => void reportIncompletePayment(p)),
+    90_000,
+    "Pi sign-in"
+  );
   const res = await fetch("/api/pi/verify", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ accessToken: auth.accessToken }),
   });
-  if (!res.ok) throw new Error(`server rejected Pi sign-in (${res.status})`);
+  if (!res.ok) throw await paymentError(res, "server rejected Pi sign-in");
   const data = (await res.json()) as { user: { uid: string; username: string } };
   return data.user;
 }

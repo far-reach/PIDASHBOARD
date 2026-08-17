@@ -26,7 +26,7 @@ export function PiAuthButton() {
 
   return (
     <span className="inline-flex items-center gap-2">
-      {notice ? <span className="text-[11px] text-muted-foreground max-w-[160px]">{notice}</span> : null}
+      {notice ? <span className="text-[11px] text-muted-foreground max-w-[200px] break-words">{notice}</span> : null}
       <Button
         variant="outline"
         className="min-h-[32px] py-1 px-2.5 text-xs"
@@ -42,7 +42,11 @@ export function PiAuthButton() {
                 void refetch();
               }
             })
-            .catch(() => setNotice("Sign-in didn't complete. Try again."))
+            .catch((err: unknown) =>
+              // The real reason, not a generic retry prompt: a silent failure
+              // here is the difference between a fixable report and a dead button.
+              setNotice(err instanceof Error ? err.message : "Sign-in didn't complete. Try again.")
+            )
             .finally(() => setBusy(false));
         }}
       >
