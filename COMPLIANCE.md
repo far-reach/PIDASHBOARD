@@ -120,7 +120,15 @@ Send this through the Developer Portal support channel or the Pi developer commu
 
 Only after §6 question 3 is answered **yes in writing**, and after legal advice:
 
-1. Set `NEXT_PUBLIC_SIGNALS_ENABLED=true`.
+0. Restore the signal-resolution cron. `vercel.json` ships with only the daily
+   report cron, because the `/api/cron/resolve` job exists solely to settle open
+   directional calls — with none published it has nothing to do, and Vercel's
+   Hobby plan permits one run per day anyway. Re-enabling signals means adding
+   back `{"path": "/api/cron/resolve", "schedule": "*/5 * * * *"}` **and** an
+   account that allows sub-daily crons, or the always-on worker
+   (`npm run worker:resolve`). Do not re-enable signals on a daily resolve
+   cadence: a call that hit its stop at 09:00 and is not booked until midnight
+   is a dishonest record, which defeats the point of the engine.
 2. The nav, home screen, `/signals`, `/performance` and the APIs all come back — the
    engine was never deleted and its tests never stopped running (the E2E suite exercises
    the full lifecycle with the flag on).
