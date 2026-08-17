@@ -10,7 +10,10 @@
  */
 import { useSyncExternalStore } from "react";
 
-export const SECTION_IDS = ["stats", "network", "chart", "report", "about", "support"] as const;
+// "support" was a section id here once; tipping moved to the header dialog,
+// and normalize() silently drops the id from any saved layout that still
+// carries it.
+export const SECTION_IDS = ["stats", "network", "chart", "report", "about"] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
 export const SECTION_LABELS: Record<SectionId, string> = {
@@ -19,7 +22,6 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   chart: "Price chart",
   report: "Daily report",
   about: "About this app",
-  support: "Support the app",
 };
 
 export interface LayoutPrefs {

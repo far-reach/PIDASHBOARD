@@ -42,11 +42,36 @@ html.light {
   --glow: 261 60% 45%;
 }
 
+/*
+ * Pi-ecosystem theme: dark-based, on the network's purple-and-gold branding.
+ * Purple carries the surfaces, gold carries the accents (primary), matching
+ * the Pi Browser look. The up/down pair keeps the same CVD-validated hues as
+ * the dark theme; brand color never touches the win/loss encoding.
+ */
+html.pi {
+  --background: 271 44% 9%;
+  --foreground: 270 25% 94%;
+  --card: 270 38% 13%;
+  --card-foreground: 270 25% 94%;
+  --muted: 269 32% 19%;
+  --muted-foreground: 268 16% 68%;
+  --border: 268 30% 24%;
+  --primary: 40 92% 62%;
+  --primary-foreground: 271 50% 12%;
+  --up: 174 63% 42%;
+  --down: 1 83% 65%;
+  --warn: 38 92% 58%;
+  --glow: 286 65% 55%;
+}
+
 html {
   color-scheme: dark;
 }
 html.light {
   color-scheme: light;
+}
+html.pi {
+  color-scheme: dark;
 }
 
 body {

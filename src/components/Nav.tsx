@@ -6,6 +6,7 @@ import { clsx } from "clsx";
 import { BarChart3, BookOpen, FileText, Home, Radio } from "lucide-react";
 import { PiAuthButton } from "@/components/PiAuthButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { TipButton } from "@/components/TipButton";
 import { useOnline } from "@/lib/hooks";
 import { Badge } from "@/components/ui";
 import { SIGNALS_ENABLED } from "@/lib/env";
@@ -37,12 +38,12 @@ export function Nav() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-        <div className="mx-auto max-w-5xl px-4 h-12 flex items-center justify-between gap-2">
-          <Link href="/" className="flex items-center gap-2 min-w-0">
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary text-sm font-bold">
-              π
-            </span>
-            <span className="font-semibold tracking-tight">Cyberekt</span>
+        <div className="mx-auto max-w-5xl px-4 h-16 flex items-center justify-between gap-2">
+          <Link href="/" className="flex items-center gap-2.5 min-w-0">
+            {/* eslint-disable-next-line @next/next/no-img-element -- static
+                same-origin SVG; next/image adds nothing for a vector */}
+            <img src="/icon.svg" alt="" className="h-9 w-9 rounded-xl" />
+            <span className="font-bold text-lg tracking-tight">Cyberekt</span>
             <span className="text-[11px] text-muted-foreground hidden sm:inline">PIUSDT dashboard</span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
@@ -63,8 +64,9 @@ export function Nav() {
           </nav>
           <div className="flex items-center gap-2">
             {!online ? <Badge tone="warn">offline</Badge> : null}
-            <ThemeToggle />
+            <TipButton />
             <PiAuthButton />
+            <ThemeToggle />
           </div>
         </div>
       </header>

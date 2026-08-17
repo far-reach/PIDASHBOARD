@@ -1,33 +1,38 @@
 "use client";
 
 /**
- * Cycles dark, light, device. One small button rather than a settings screen:
- * mobile users get their preference in two taps and it sticks (localStorage,
- * applied before first paint by the head script).
+ * Cycles dark, light, Pi-branded. One small button rather than a settings
+ * screen: mobile users get their preference in taps and it sticks
+ * (localStorage, applied before first paint by the head script).
  */
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { setThemePref, useTheme, type ThemePref } from "@/lib/theme";
 
-const NEXT: Record<ThemePref, ThemePref> = { dark: "light", light: "system", system: "dark" };
+const NEXT: Record<ThemePref, ThemePref> = { dark: "light", light: "pi", pi: "dark" };
 const LABEL: Record<ThemePref, string> = {
   dark: "Dark theme. Tap for light",
-  light: "Light theme. Tap to follow the device",
-  system: "Following the device theme. Tap for dark",
+  light: "Light theme. Tap for the Pi theme",
+  pi: "Pi theme. Tap for dark",
 };
 
 export function ThemeToggle() {
   const { pref } = useTheme();
-  const Icon = pref === "dark" ? Moon : pref === "light" ? Sun : Monitor;
   return (
     <button
       type="button"
       onClick={() => setThemePref(NEXT[pref])}
       title={LABEL[pref]}
       aria-label={LABEL[pref]}
-      className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
       data-testid="theme-toggle"
     >
-      <Icon size={15} />
+      {pref === "dark" ? (
+        <Moon size={15} />
+      ) : pref === "light" ? (
+        <Sun size={15} />
+      ) : (
+        <span className="text-sm font-bold leading-none text-primary">π</span>
+      )}
     </button>
   );
 }

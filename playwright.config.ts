@@ -22,7 +22,11 @@ export default defineConfig({
   },
   webServer: {
     command: "npm run e2e:server",
-    url: "http://127.0.0.1:3100/api/health",
+    // NOT /api/health: it honestly reports 503 while the exchange feed is
+    // unreachable (as in sandboxed CI), and this probe requires a 2xx, so the
+    // suite would never start. Readiness here means "the server answers",
+    // which a static file asserts without an opinion on upstream feeds.
+    url: "http://127.0.0.1:3100/robots.txt",
     timeout: 180_000,
     reuseExistingServer: true,
   },

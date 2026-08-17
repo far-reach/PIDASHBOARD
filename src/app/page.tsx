@@ -9,7 +9,6 @@ import { StatsGrid } from "@/components/StatsGrid";
 import { PiNetworkPanel } from "@/components/PiNetworkPanel";
 import { ReportView } from "@/components/ReportView";
 import { SignalCard } from "@/components/SignalCard";
-import { SupportCard } from "@/components/SupportCard";
 import { CustomizePanel } from "@/components/CustomizePanel";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/components/ui";
 import { useReports, useSignals } from "@/lib/hooks";
@@ -78,7 +77,6 @@ export default function HomePage() {
         </CardContent>
       </Card>
     ),
-    support: <SupportCard key="support" />,
   };
 
   return (

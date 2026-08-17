@@ -93,7 +93,7 @@ Portrait, full screen, no debug overlays, no `/admin` screen in any shot.
 > No. Cyberekt reports market data published by public exchanges and generates a
 > factual daily summary of it. It publishes no forecasts, no valuation claims, no buy or
 > sell recommendations and no trading levels. A disclaimer appears in the footer of every
-> screen, a risk banner appears on first visit each session, and a dedicated risk page is
+> screen, a risk disclosure dialog must be acknowledged on first visit each session, and a dedicated risk page is
 > linked throughout.
 
 **Does the app make claims about the value of Pi?**

@@ -1,4 +1,4 @@
-import { expect, test, type APIRequestContext } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 
 /**
  * E2E smoke against a real `next dev` server backed by an isolated PGlite
@@ -51,7 +51,25 @@ test.describe("disclaimers on every screen (brief §3.3)", () => {
   });
 });
 
+/**
+ * Pre-acknowledge the first-visit risk dialog. It is a modal that locks body
+ * scroll, so measuring layout with it open measures the overlay rather than
+ * the page underneath; these tests want the state a user is in for the rest
+ * of their session.
+ */
+async function skipRiskDialog(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    try {
+      sessionStorage.setItem("cyberekt:risk-banner", "dismissed");
+    } catch {
+      /* storage unavailable: the dialog simply shows */
+    }
+  });
+}
+
 test.describe("mobile viewport integrity (375px — brief §Phase 2.6)", () => {
+  test.beforeEach(async ({ page }) => skipRiskDialog(page));
+
   for (const path of ["/", "/signals", "/performance", "/reports", "/learn"]) {
     test(`no horizontal page scroll on ${path}`, async ({ page }) => {
       // NOT networkidle: the dashboard polls prices continuously by design, so
@@ -67,6 +85,8 @@ test.describe("mobile viewport integrity (375px — brief §Phase 2.6)", () => {
 });
 
 test.describe("signal lifecycle: publish → feed → immutable → close → performance", () => {
+  test.beforeEach(async ({ page }) => skipRiskDialog(page));
+
   test("full flow", async ({ page, request }) => {
     const id = await publishSignal(request);
 

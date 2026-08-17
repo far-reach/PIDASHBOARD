@@ -1,15 +1,19 @@
 "use client";
 
 /**
- * Theme state: dark (default), light, or follow the device. The chosen value
- * lives in localStorage; an inline script in the document head applies it
- * before first paint so there is no flash. This module is the runtime side:
- * a tiny external store components subscribe to, so a change in one place
- * (the nav toggle) restyles everything, charts included.
+ * Theme state: dark (default), light, or "pi" — a Pi-ecosystem look built on
+ * the network's purple-and-gold branding. The chosen value lives in
+ * localStorage; an inline script in the document head applies it before first
+ * paint so there is no flash. This module is the runtime side: a tiny
+ * external store components subscribe to, so a change in one place (the nav
+ * toggle) restyles everything, charts included.
+ *
+ * A legacy stored value of "system" (from the retired follow-the-device
+ * option) falls back to dark.
  */
 import { useSyncExternalStore } from "react";
 
-export type ThemePref = "dark" | "light" | "system";
+export type ThemePref = "dark" | "light" | "pi";
 
 export const THEME_KEY = "cyberekt:theme";
 
@@ -18,22 +22,20 @@ let listeners: (() => void)[] = [];
 export function getThemePref(): ThemePref {
   if (typeof window === "undefined") return "dark";
   const raw = window.localStorage.getItem(THEME_KEY);
-  return raw === "light" || raw === "system" ? raw : "dark";
+  return raw === "light" || raw === "pi" ? raw : "dark";
 }
 
-/** The theme actually in effect after resolving "system". */
+/**
+ * The dark/light base a theme renders on, for consumers that need a binary
+ * (chart styling). The pi theme is dark-based.
+ */
 export function resolvedTheme(pref: ThemePref = getThemePref()): "dark" | "light" {
-  if (pref === "system") {
-    return typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: light)").matches
-      ? "light"
-      : "dark";
-  }
-  return pref;
+  return pref === "light" ? "light" : "dark";
 }
 
 export function applyTheme(pref: ThemePref): void {
-  const target = resolvedTheme(pref);
-  document.documentElement.classList.toggle("light", target === "light");
+  document.documentElement.classList.toggle("light", pref === "light");
+  document.documentElement.classList.toggle("pi", pref === "pi");
 }
 
 export function setThemePref(pref: ThemePref): void {
@@ -50,17 +52,8 @@ export function useTheme(): { pref: ThemePref; resolved: "dark" | "light" } {
   const pref = useSyncExternalStore(
     (cb) => {
       listeners.push(cb);
-      const mq = window.matchMedia("(prefers-color-scheme: light)");
-      const onMq = () => {
-        if (getThemePref() === "system") {
-          applyTheme("system");
-          cb();
-        }
-      };
-      mq.addEventListener("change", onMq);
       return () => {
         listeners = listeners.filter((l) => l !== cb);
-        mq.removeEventListener("change", onMq);
       };
     },
     getThemePref,
@@ -73,4 +66,6 @@ export function useTheme(): { pref: ThemePref; resolved: "dark" | "light" } {
  * Runs before first paint, inlined in the document head. Kept here so the
  * layout imports a constant instead of embedding a string nobody re-reads.
  */
-export const THEME_INIT_SCRIPT = `try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)});var l=t==="light"||(t==="system"&&matchMedia("(prefers-color-scheme: light)").matches);if(l)document.documentElement.classList.add("light")}catch(e){}`;
+export const THEME_INIT_SCRIPT = `try{var t=localStorage.getItem(${JSON.stringify(
+  THEME_KEY
+)});var c=document.documentElement.classList;if(t==="light")c.add("light");else if(t==="pi")c.add("pi")}catch(e){}`;
