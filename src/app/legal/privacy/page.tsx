@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SupportContact } from "@/components/SupportContact";
 
 export const metadata: Metadata = { title: "Privacy Policy — PiPulse" };
 
@@ -32,9 +33,10 @@ export default function PrivacyPage() {
       </p>
       <p>
         <strong>Retention & deletion.</strong> Account records are kept while your account is
-        active. Contact the operator through the app&apos;s support channel to request deletion;
-        anonymized aggregate statistics (e.g. subscriber counts) may be retained.
+        active. Contact the operator using the details below to request deletion; anonymized
+        aggregate statistics (e.g. subscriber counts) may be retained.
       </p>
+      <SupportContact />
       <p>
         <strong>Changes.</strong> Material changes to this policy will be announced in-app before
         they take effect.

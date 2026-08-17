@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SupportContact } from "@/components/SupportContact";
 
 export const metadata: Metadata = { title: "Terms of Use — PiPulse" };
 
@@ -45,10 +46,16 @@ export default function TermsPage() {
           or consequential damages arising from use of the service.
         </li>
         <li>
+          <strong>Tips.</strong> Tips are voluntary payments in Pi that support the running costs
+          of the app. They purchase no product, grant no access, entitle you to no advice, and are
+          non-refundable.
+        </li>
+        <li>
           <strong>Changes.</strong> We may update these terms; continued use after an update is
           acceptance. Material changes will be announced in-app.
         </li>
       </ol>
+      <SupportContact />
       <p className="text-xs text-muted-foreground">
         PiPulse is an independent community application and is not affiliated with, endorsed by, or
         sponsored by the Pi Core Team or Pi Network.

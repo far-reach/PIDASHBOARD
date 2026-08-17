@@ -20,7 +20,10 @@ export function GET(): NextResponse {
       { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } }
     );
   }
-  return new NextResponse(key.trim() + "\n", {
+  // Byte-exact: no trailing newline, no wrapper. The portal compares the body
+  // against the key it issued, and a verifier that does not trim would fail on
+  // a stray "\n" — an opaque debugging session at the worst possible moment.
+  return new NextResponse(key.trim(), {
     status: 200,
     headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" },
   });

@@ -20,6 +20,13 @@ describe("Pi domain-validation endpoint", () => {
     expect((await res.text()).trim()).toBe("abc123validationkey");
   });
 
+  it("serves the key BYTE-EXACT — no trailing newline for a strict verifier", async () => {
+    vi.stubEnv("PI_VALIDATION_KEY", "  abc123validationkey\n");
+    const res = validationKeyGet();
+    // Not .trim()ed on the way out: the portal may compare the raw body.
+    expect(await res.text()).toBe("abc123validationkey");
+  });
+
   it("404s with an actionable message when unset, rather than serving an empty file", async () => {
     vi.stubEnv("PI_VALIDATION_KEY", "");
     const res = validationKeyGet();
