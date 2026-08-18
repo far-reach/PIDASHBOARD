@@ -1,14 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getSessionUser } from "@/lib/auth";
-import { approvePayment, getPayment, PiPlatformError } from "@/lib/pi/server";
+import { approvePayment, getPaymentSoonAfterCreation, PiPlatformError } from "@/lib/pi/server";
 import { recordPayment } from "@/lib/users";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
 import { maxTipPi, minTipPi, proPricePi, tipsEnabled } from "@/lib/env";
 import { classifyPayment } from "@/lib/pi/products";
 import { reportError } from "@/lib/observability";
+import { recordTrail } from "@/lib/pi/diagnostics";
 
 export const dynamic = "force-dynamic";
+// The wallet allows 45s; a cold start plus the platform round trips must fit
+// inside the function budget, which defaults lower than that.
+export const maxDuration = 30;
 
 const bodySchema = z.object({ paymentId: z.string().min(1).max(200) });
 
@@ -41,27 +45,67 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "paymentId required" }, { status: 422 });
   }
 
+  const paymentId = parsed.data.paymentId;
   try {
-    const pending = await getPayment(parsed.data.paymentId);
+    /*
+     * Read the payment first so ownership, product and amount can be checked.
+     * If it is not readable yet even after retries, approve anyway rather
+     * than stranding the payment: approval moves no funds and grants nothing,
+     * and the completion leg independently re-checks ownership, platform
+     * verification, product and amount before anything is credited. Refusing
+     * here would turn a transient read into a dead payment.
+     */
+    let pending = null;
+    try {
+      pending = await getPaymentSoonAfterCreation(paymentId);
+    } catch (readErr) {
+      reportError("could not read the payment before approving", readErr, { paymentId });
+      await recordTrail({
+        step: "approve",
+        outcome: "failed",
+        paymentId,
+        detail: `pre-check read failed, approving on the completion leg's checks: ${
+          readErr instanceof Error ? readErr.message : "unknown"
+        }`,
+      });
+    }
 
-    if (pending.user_uid !== user.uid) {
+    if (pending && pending.user_uid !== user.uid) {
+      await recordTrail({
+        step: "approve",
+        outcome: "failed",
+        paymentId,
+        detail: "payment belongs to a different user",
+      });
       return NextResponse.json({ error: "payment belongs to a different user" }, { status: 403 });
     }
 
-    const verdict = classifyPayment(pending.metadata, pending.amount, {
-      proPrice: proPricePi(),
-      minTip: minTipPi(),
-      maxTip: maxTipPi(),
-      tipsEnabled: tipsEnabled(),
-    });
-    if (!verdict.ok) {
-      await recordPayment(pending, "failed", null);
-      return NextResponse.json({ error: verdict.error }, { status: verdict.status });
+    let kind = undefined;
+    if (pending) {
+      const verdict = classifyPayment(pending.metadata, pending.amount, {
+        proPrice: proPricePi(),
+        minTip: minTipPi(),
+        maxTip: maxTipPi(),
+        tipsEnabled: tipsEnabled(),
+      });
+      if (!verdict.ok) {
+        await recordPayment(pending, "failed", null);
+        await recordTrail({ step: "approve", outcome: "failed", paymentId, detail: verdict.error });
+        return NextResponse.json({ error: verdict.error }, { status: verdict.status });
+      }
+      kind = verdict.kind;
     }
 
-    const payment = await approvePayment(pending.identifier);
-    await recordPayment(payment, "approved", null, verdict.kind);
-    return NextResponse.json({ ok: true, paymentId: payment.identifier, kind: verdict.kind });
+    const payment = await approvePayment(paymentId);
+    // The ledger write must never undo an approval the platform has already
+    // accepted, so a database failure here is logged, not propagated.
+    try {
+      await recordPayment(payment, "approved", null, kind);
+    } catch (dbErr) {
+      reportError("approved but could not write the payment row", dbErr, { paymentId });
+    }
+    await recordTrail({ step: "approve", outcome: "ok", paymentId, detail: kind ?? "approved" });
+    return NextResponse.json({ ok: true, paymentId: payment.identifier, kind });
   } catch (err) {
     if (err instanceof PiPlatformError && err.status === 501) {
       return NextResponse.json({ error: "payments are not configured on this deployment" }, { status: 501 });
@@ -74,7 +118,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         { status: 502 }
       );
     }
-    reportError("pi payment approval failed", err, { paymentId: parsed.data.paymentId });
+    reportError("pi payment approval failed", err, { paymentId });
+    await recordTrail({
+      step: "approve",
+      outcome: "failed",
+      paymentId,
+      detail: err instanceof PiPlatformError ? `platform HTTP ${err.status}: ${err.message}` : String(err),
+    });
     return NextResponse.json({ error: "payment approval failed" }, { status: 502 });
   }
 }

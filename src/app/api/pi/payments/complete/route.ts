@@ -7,8 +7,10 @@ import { clientKey, rateLimit } from "@/lib/ratelimit";
 import { maxTipPi, minTipPi, proPricePi, tipsEnabled } from "@/lib/env";
 import { classifyPayment } from "@/lib/pi/products";
 import { reportError } from "@/lib/observability";
+import { recordTrail } from "@/lib/pi/diagnostics";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 const bodySchema = z.object({
   paymentId: z.string().min(1).max(200),
@@ -72,6 +74,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     await recordPayment(payment, "completed", parsed.data.txid, verdict.kind);
+    await recordTrail({
+      step: "complete",
+      outcome: "ok",
+      paymentId: parsed.data.paymentId,
+      detail: `${verdict.kind} ${verdict.amount}`,
+    });
 
     // A tip is thanks, not a purchase: it is banked and acknowledged, and it
     // deliberately does not touch entitlements.
@@ -95,6 +103,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
     reportError("pi payment completion failed", err, { paymentId: parsed.data.paymentId });
+    await recordTrail({
+      step: "complete",
+      outcome: "failed",
+      paymentId: parsed.data.paymentId,
+      detail: err instanceof PiPlatformError ? `platform HTTP ${err.status}: ${err.message}` : String(err),
+    });
     return NextResponse.json({ error: "payment completion failed" }, { status: 502 });
   }
 }

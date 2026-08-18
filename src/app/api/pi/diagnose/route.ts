@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getPayment, PiPlatformError } from "@/lib/pi/server";
 import { isPiSandbox, piApiKey } from "@/lib/env";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
+import { readTrail } from "@/lib/pi/diagnostics";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const base: Record<string, unknown> = {
     apiKeyConfigured: configured,
     sandbox: isPiSandbox(),
+    // The last few payment legs, newest first: which step ran and what it
+    // said. This is the only place the phone can see why an approval that
+    // the wallet reported as "developer failed to approve" actually failed.
+    recentPayments: await readTrail(),
   };
   if (!configured) {
     return NextResponse.json({

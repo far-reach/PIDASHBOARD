@@ -3,7 +3,8 @@
  * production values come from platform-managed secrets (never committed).
  */
 
-export const SYMBOL = process.env.NEXT_PUBLIC_SYMBOL ?? "PIUSDT";
+// Blank counts as unset here too: a cleared dashboard variable is "".
+export const SYMBOL = (process.env.NEXT_PUBLIC_SYMBOL || "PIUSDT").trim();
 
 /**
  * Directional trading calls (entry / stop-loss / target) and the performance
@@ -81,12 +82,29 @@ export function maxTipPi(): number {
   return positiveNumber(process.env.MAX_TIP_PI, 1000);
 }
 
+/**
+ * TRIMMED, always. The key is pasted into a hosting dashboard by hand, and a
+ * trailing newline or space rides along more often than not. It then travels
+ * in an Authorization header, where a stray newline is either rejected by the
+ * platform as a bad key or refused outright by fetch as an invalid header
+ * value: a payment that can never be approved, with nothing on screen to say
+ * why.
+ */
 export function piApiKey(): string {
-  return process.env.PI_API_KEY ?? "";
+  return (process.env.PI_API_KEY ?? "").trim();
 }
 
+/**
+ * Trailing slashes are stripped so path joins cannot produce `//payments`.
+ *
+ * A BLANK variable counts as unset. `??` alone keeps an empty string, and a
+ * variable someone created and then cleared in a hosting dashboard is empty,
+ * not absent: that pointed every platform call at a relative URL, so no
+ * payment could be approved.
+ */
 export function piApiBase(): string {
-  return process.env.PI_API_BASE ?? "https://api.minepi.com/v2";
+  const base = (process.env.PI_API_BASE ?? "").trim();
+  return (base || "https://api.minepi.com/v2").replace(/\/+$/, "");
 }
 
 export function isPiSandbox(): boolean {

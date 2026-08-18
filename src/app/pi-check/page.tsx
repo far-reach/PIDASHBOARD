@@ -68,7 +68,7 @@ export default function PiCheckPage() {
           onClick={() => {
             say("payments: probing the Pi platform with this deployment's API key");
             fetch("/api/pi/diagnose")
-              .then(async (r) => say(`GET /api/pi/diagnose returned ${r.status}: ${(await r.text()).slice(0, 400)}`))
+              .then(async (r) => say(`GET /api/pi/diagnose returned ${r.status}: ${(await r.text()).slice(0, 2000)}`))
               .catch((e: unknown) => say(`GET /api/pi/diagnose failed: ${e instanceof Error ? e.message : String(e)}`));
           }}
         >

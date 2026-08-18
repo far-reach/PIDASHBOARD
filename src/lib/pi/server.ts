@@ -75,6 +75,35 @@ export function getPayment(paymentId: string): Promise<PiPaymentDTO> {
   return piFetch<PiPaymentDTO>(`/payments/${paymentId}`, { headers: keyHeaders() });
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * getPayment, tolerant of the moment right after creation.
+ *
+ * The SDK fires onReadyForServerApproval the instant it has a payment id,
+ * which can be before that payment is readable from the Platform API: the
+ * first GET comes back 404 for a payment that certainly exists. Treating
+ * that as fatal means never approving, and the wallet then counts down and
+ * reports that the developer failed to approve. Retries are short on purpose;
+ * the whole budget is about two seconds against the wallet's 45.
+ */
+export async function getPaymentSoonAfterCreation(paymentId: string): Promise<PiPaymentDTO> {
+  const delays = [300, 600, 1200];
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= delays.length; attempt++) {
+    try {
+      return await getPayment(paymentId);
+    } catch (err) {
+      lastErr = err;
+      const retriable = err instanceof PiPlatformError && (err.status === 404 || err.status >= 500);
+      const delay = delays[attempt];
+      if (!retriable || delay === undefined) break;
+      await sleep(delay);
+    }
+  }
+  throw lastErr;
+}
+
 export function approvePayment(paymentId: string): Promise<PiPaymentDTO> {
   return piFetch<PiPaymentDTO>(`/payments/${paymentId}/approve`, {
     method: "POST",
