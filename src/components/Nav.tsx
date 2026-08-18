@@ -95,11 +95,14 @@ export function Nav() {
 
       {arranging ? <CustomizePanel onClose={() => setArranging(false)} /> : null}
 
+      {/* The bottom bar sits above the iPhone home indicator via the safe-area
+          inset, and marks the current tab with a tinted pill plus a short
+          accent rule rather than colour alone. */}
       <nav
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
         aria-label="Primary"
       >
-        <div className={clsx("grid", TABS.length === 5 ? "grid-cols-5" : "grid-cols-3")}>
+        <div className={clsx("grid px-2 py-1.5", TABS.length === 5 ? "grid-cols-5" : "grid-cols-3")}>
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = pathname === t.href;
@@ -107,13 +110,39 @@ export function Nav() {
               <Link
                 key={t.href}
                 href={t.href}
-                className={clsx(
-                  "flex flex-col items-center gap-0.5 py-2 text-[10px]",
-                  active ? "text-primary font-medium" : "text-muted-foreground"
-                )}
+                aria-current={active ? "page" : undefined}
+                className="group relative flex flex-col items-center gap-1 rounded-xl px-1 py-1.5"
               >
-                <Icon size={18} strokeWidth={active ? 2.4 : 2} />
-                {t.label}
+                <span
+                  aria-hidden
+                  className={clsx(
+                    "pointer-events-none absolute inset-x-2 inset-y-0 rounded-xl transition-colors",
+                    active ? "bg-primary/10" : "group-active:bg-muted/60"
+                  )}
+                />
+                <span
+                  aria-hidden
+                  className={clsx(
+                    "pointer-events-none absolute -top-[7px] h-[2px] rounded-full bg-primary transition-all",
+                    active ? "w-7 opacity-100" : "w-0 opacity-0"
+                  )}
+                />
+                <Icon
+                  size={18}
+                  strokeWidth={active ? 2.4 : 1.9}
+                  className={clsx(
+                    "relative transition-colors",
+                    active ? "text-primary" : "text-muted-foreground"
+                  )}
+                />
+                <span
+                  className={clsx(
+                    "relative text-[10px] tracking-wide transition-colors",
+                    active ? "font-semibold text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  {t.label}
+                </span>
               </Link>
             );
           })}
