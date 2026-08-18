@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { SlidersHorizontal } from "lucide-react";
 import { PriceHero } from "@/components/PriceHero";
 import { SessionStrip } from "@/components/SessionStrip";
 import { ContextPanel } from "@/components/ContextPanel";
@@ -64,24 +63,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-3 pb-4">
-      {/* Arranging is a nice-to-have most visitors never touch, so it costs
-          no layout: a small tab tucked against the right edge, inside the
-          thumb's natural arc and above the bottom tab bar. It stays out of
-          the way while scrolling and disappears while the panel is open. */}
-      {!editing ? (
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          aria-label="Arrange dashboard sections"
-          title="Arrange dashboard"
-          className="fixed right-0 bottom-24 z-30 inline-flex h-11 w-9 items-center justify-center rounded-l-xl border border-r-0 border-border bg-card/85 text-muted-foreground shadow-lg backdrop-blur transition-colors hover:bg-card hover:text-foreground active:bg-card md:bottom-10"
-          data-testid="customize-open"
-        >
-          <SlidersHorizontal size={16} />
-        </button>
-      ) : null}
-
-      <PriceHero />
+      <PriceHero onArrange={() => setEditing(true)} />
 
       {SIGNALS_ENABLED ? (
         <Card>
@@ -104,11 +86,12 @@ export default function HomePage() {
         </Card>
       ) : null}
 
-      {editing ? (
-        <CustomizePanel onClose={() => setEditing(false)} />
-      ) : (
-        prefs.order.filter((id) => !prefs.hidden.includes(id)).map((id) => sections[id])
-      )}
+      {/* Sections always render, including while the layout editor is open:
+          the editor floats over the left of the page so hiding and
+          reordering can be watched happening. */}
+      {prefs.order.filter((id) => !prefs.hidden.includes(id)).map((id) => sections[id])}
+
+      {editing ? <CustomizePanel onClose={() => setEditing(false)} /> : null}
 
     </div>
   );
