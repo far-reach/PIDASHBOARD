@@ -90,11 +90,18 @@ export function PiNetworkPanel() {
           <>
             <section className="space-y-2">
               <GroupLabel>Supply</GroupLabel>
-              <Figure
-                label="Circulating"
-                value={`${compactNumber(stats.circulatingSupply)} π`}
-                note={stats.maxSupply ? `of ${compactNumber(stats.maxSupply)} maximum` : undefined}
-              />
+              <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+                <Figure
+                  label="Circulating"
+                  value={`${compactNumber(stats.circulatingSupply)} π`}
+                  note={stats.maxSupply ? `of ${compactNumber(stats.maxSupply)} maximum` : undefined}
+                />
+                <Figure
+                  label="Issued so far"
+                  value={`${compactNumber(stats.totalSupply)} π`}
+                  note="total supply, mined or locked"
+                />
+              </div>
               {pct !== null ? (
                 <div className="pt-0.5">
                   <div
@@ -129,12 +136,18 @@ export function PiNetworkPanel() {
                 <Figure
                   label="Fully diluted"
                   value={`$${compactNumber(stats.fdvUsd)}`}
-                  note={dilutionX ? `${dilutionX.toFixed(2)}× the market cap` : "at max supply"}
+                  note={
+                    stats.totalSupply
+                      ? `at ${compactNumber(stats.totalSupply)} issued${dilutionX ? `, ${dilutionX.toFixed(2)}× the cap` : ""}`
+                      : dilutionX
+                        ? `${dilutionX.toFixed(2)}× the market cap`
+                        : undefined
+                  }
                 />
                 <Figure
-                  label="24h volume"
+                  label="Global 24h volume"
                   value={`$${compactNumber(stats.volume24hUsd)}`}
-                  note="all venues"
+                  note="every venue and pair"
                 />
                 <Figure
                   label="Daily turnover"

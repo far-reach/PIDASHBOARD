@@ -1,14 +1,21 @@
 "use client";
 
 /**
- * "Today in context": how the current UTC day compares with the last ~30
- * days of the same venue's daily candles. Each row states one concrete
- * comparison in plain words, with a meter as the visual echo. Strictly
- * descriptive; the wording never grades or predicts. The reasoning behind
- * these comparisons is explained on /learn.
+ * "Today in context": how the current UTC day compares with recent days.
+ *
+ * The first two rows compare LIKE FOR LIKE, against the same hours of prior
+ * days (see lib/intraday-context): comparing a young day against completed
+ * days made every morning read as unusually quiet, which was arithmetic
+ * rather than market behaviour. The third row needs no such treatment,
+ * because a price's position inside a 30-day band does not depend on how
+ * far into today we are.
+ *
+ * Strictly descriptive: each row states what the recorded data shows and
+ * names its own window. Nothing projects or forecasts.
  */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { computeContextStats } from "@/lib/context-stats";
+import { computeIntradayContext, hoursLabel } from "@/lib/intraday-context";
 import { fmtPrice } from "@/lib/format";
 import { useCandles, useLatestPrice } from "@/lib/hooks";
 
@@ -40,54 +47,68 @@ function Row({
   );
 }
 
+/** "narrower than every one" reads better than "narrower than 100% of". */
+function comparisonPhrase(percentile: number, days: number): string {
+  const rounded = Math.round(percentile);
+  if (rounded === 0) return `the narrowest of the last ${days}`;
+  if (rounded === 100) return `the widest of the last ${days}`;
+  return rounded >= 50
+    ? `wider than ${rounded}% of the last ${days}`
+    : `narrower than ${100 - rounded}% of the last ${days}`;
+}
+
 export function ContextPanel() {
   const { data: daily } = useCandles("1d");
+  const { data: hourly } = useCandles("1h");
   const { data: price } = useLatestPrice();
 
-  const stats = daily?.candles?.length
+  const intraday = hourly?.candles?.length ? computeIntradayContext(hourly.candles) : null;
+  const band = daily?.candles?.length
     ? computeContextStats(daily.candles, price?.price ?? null)
     : null;
-  if (!stats) return null;
+  if (!intraday && !band) return null;
 
-  // Plain-word framing, derived from the percentile. "Typical" covers the
-  // middle band where neither "quiet" nor "lively" would be honest.
-  const p = stats.rangePercentile;
-  const moveWord = p >= 60 ? "a livelier day than most" : p <= 40 ? "a quieter day than most" : "about a typical day";
-  const moveValue =
-    p >= 50 ? `wider than ${Math.round(p)}% of days` : `narrower than ${Math.round(100 - p)}% of days`;
-
-  const volRatio = stats.volumeVsMedian;
-  const volPct = volRatio !== null ? Math.min(100, volRatio * 50) : null; // 2x median fills the meter
+  const volPct =
+    intraday?.volumeVsTypical != null ? Math.min(100, intraday.volumeVsTypical * 50) : null;
+  const window = intraday ? hoursLabel(intraday.elapsedHours) : "";
 
   return (
     <Card data-testid="context-panel">
       <CardHeader>
         <CardTitle>Today in context</CardTitle>
-        <span className="text-[11px] text-muted-foreground">
-          vs the last {stats.historyDays} days · {daily!.source}
-        </span>
+        <span className="text-[11px] text-muted-foreground">{daily?.source ?? hourly?.source}</span>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Row
-          pct={p}
-          label="Price movement"
-          value={`${stats.todayRangePct.toFixed(1)}% low to high`}
-          detail={`Today's swing so far is ${moveValue} in the last ${stats.historyDays}: ${moveWord} so far.`}
-        />
-        {volRatio !== null && volPct !== null ? (
+        {intraday ? (
+          <>
+            <Row
+              pct={intraday.rangePercentile}
+              label="Price movement"
+              value={`${intraday.todayRangePct.toFixed(1)}% low to high`}
+              detail={`Measured over the first ${window} of the UTC day, and against the same ${window} of the previous ${intraday.comparableDays} days: ${comparisonPhrase(intraday.rangePercentile, intraday.comparableDays)}.`}
+            />
+            {intraday.volumeVsTypical != null && volPct != null ? (
+              <Row
+                pct={volPct}
+                label="Trading activity"
+                value={`${intraday.volumeVsTypical.toFixed(2)}× typical`}
+                detail={`Volume in the first ${window} of the UTC day, against the median of the same ${window} on the previous ${intraday.comparableDays} days.`}
+              />
+            ) : null}
+          </>
+        ) : (
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            The UTC day is too young to compare against previous days yet. Comparisons appear
+            once its first full hour has completed.
+          </p>
+        )}
+
+        {band?.pricePositionPct != null ? (
           <Row
-            pct={volPct}
-            label="Trading activity"
-            value={`${volRatio.toFixed(2)}× the usual day`}
-            detail={`Volume so far equals ${Math.round(volRatio * 100)}% of a typical full day (the ${stats.historyDays}-day median), with ${Math.round(stats.dayElapsedPct)}% of the UTC day elapsed.`}
-          />
-        ) : null}
-        {stats.pricePositionPct !== null ? (
-          <Row
-            pct={stats.pricePositionPct}
+            pct={band.pricePositionPct}
             label="Where price sits"
-            value={`${Math.round(stats.pricePositionPct)}% up the band`}
-            detail={`Over the last ${stats.historyDays} days this venue traded between ${fmtPrice(stats.bandLow)} and ${fmtPrice(stats.bandHigh)}; the current price is ${Math.round(stats.pricePositionPct)}% of the way up that band.`}
+            value={`${Math.round(band.pricePositionPct)}% up the band`}
+            detail={`Over the last ${band.historyDays} days this venue traded between ${fmtPrice(band.bandLow)} and ${fmtPrice(band.bandHigh)}; the current price is ${Math.round(band.pricePositionPct)}% of the way up that band.`}
           />
         ) : null}
       </CardContent>

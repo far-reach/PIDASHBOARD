@@ -37,7 +37,7 @@ export function SessionStrip() {
         {posPct !== null ? (
           <div>
             <div className="flex items-baseline justify-between text-[11px] uppercase tracking-wider text-muted-foreground">
-              <span>24h range</span>
+              <span>Rolling 24h range</span>
               <span className="font-tabular normal-case tracking-normal">
                 {fmtPrice(lo)} – {fmtPrice(hi)}
               </span>
@@ -70,10 +70,12 @@ export function SessionStrip() {
           </div>
           <div className="min-w-0">
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
-              24h volume
+              Venue volume
             </div>
             <div className="font-tabular truncate">${fmtCompact(data.volume_24h)}</div>
-            <div className="text-[11px] text-muted-foreground">quote (USDT)</div>
+            <div className="text-[11px] text-muted-foreground truncate">
+              {data.source} · 24h USDT
+            </div>
           </div>
           <div className="min-w-0">
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">

@@ -114,6 +114,26 @@ describe("session summary line", () => {
     expect(line).not.toMatch(/venue/);
   });
 
+  it("prefers the like-for-like intraday comparison when it is available", () => {
+    const line = buildBehaviorLine({
+      symbol: "PIUSDT",
+      daily: [...base, candle(0.08, 0.0801, 20_000)], // whole-day view: 'quiet'
+      intraday: {
+        elapsedHours: 3,
+        comparableDays: 9,
+        todayRangePct: 2.4,
+        rangePercentile: 90, // but busy FOR THIS HOUR
+        volumeVsTypical: 1.8,
+      },
+      now: midday,
+    })!;
+    expect(line).toContain("first 3 hours of the UTC day");
+    expect(line).toContain("unusually wide");
+    expect(line).toContain("heavier trading than usual for this point in the day");
+    // The whole-day framing must not leak through.
+    expect(line).not.toMatch(/^So far today/);
+  });
+
   it("returns null rather than a made-up line when there is no candle", () => {
     expect(buildBehaviorLine({ symbol: "PIUSDT", daily: [] })).toBeNull();
     expect(buildBehaviorLine({ symbol: "PIUSDT", daily: [candle(0, 0, 0)] })).toBeNull();

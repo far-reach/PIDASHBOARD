@@ -12,11 +12,19 @@
  * "over the past 24 hours" wording did at 00:05 on a few minutes of data.
  */
 import type { Candle } from "@/lib/market/types";
+import type { IntradayContext } from "@/lib/intraday-context";
+import { hoursLabel } from "@/lib/intraday-context";
 
 export interface BehaviorInputs {
   symbol: string;
   /** Trailing daily candles, oldest first, including the current day. */
   daily: Candle[];
+  /**
+   * Like-for-like comparison against the same hours of prior days. When
+   * present it is preferred over the whole-day comparison below, which
+   * makes a young day look quiet as a matter of arithmetic.
+   */
+  intraday?: IntradayContext | null;
   /** Widest gap between venues right now, in percent, when known. */
   divergencePct?: number | null;
   /** How many venues that gap was measured across. */
@@ -39,12 +47,38 @@ function median(xs: number[]): number | null {
 }
 
 export function buildBehaviorLine(inp: BehaviorInputs): string | null {
-  const { daily, divergencePct = null, venueCount = 0, now = new Date() } = inp;
+  const { daily, intraday = null, divergencePct = null, venueCount = 0, now = new Date() } = inp;
   const day = daily[daily.length - 1];
   if (!day || day.low <= 0 || day.high < day.low) return null;
 
   const asset = inp.symbol.replace("USDT", "");
   const elapsed = dayElapsedFraction(now);
+
+  // Preferred path: compare the day so far against the same hours of prior
+  // days, so "quiet" means quiet rather than early.
+  if (intraday) {
+    const window = hoursLabel(intraday.elapsedHours);
+    const p = intraday.rangePercentile;
+    const rangeWord =
+      p >= 75 ? "an unusually wide" : p <= 25 ? "a narrower than usual" : "a typical";
+    const ratio = intraday.volumeVsTypical;
+    const volumePart =
+      ratio === null
+        ? ""
+        : ratio >= 1.5
+          ? " on heavier trading than usual for this point in the day"
+          : ratio >= 1.15
+            ? " on busier trading than usual for this point in the day"
+            : ratio <= 0.5
+              ? " on much lighter trading than usual for this point in the day"
+              : ratio <= 0.85
+                ? " on lighter trading than usual for this point in the day"
+                : " on ordinary trading volume for this point in the day";
+    const sentence =
+      `In the first ${window} of the UTC day ${asset} has held ${rangeWord} ` +
+      `${intraday.todayRangePct.toFixed(1)}% band${volumePart}.`;
+    return withVenues(sentence, divergencePct, venueCount);
+  }
 
   // Under ~1 hour of data the day says nothing yet, and a confident sentence
   // about a handful of minutes would be worse than no sentence.
@@ -93,14 +127,15 @@ export function buildBehaviorLine(inp: BehaviorInputs): string | null {
   }
 
   const sentence = `${period} ${asset} ${rangeWord} ${bandPct.toFixed(1)}% band${volumePart}.`;
+  return withVenues(sentence, divergencePct, venueCount);
+}
 
-  // Venue agreement is the one fact no other panel states in words.
-  if (divergencePct !== null && venueCount >= 2) {
-    const agreement =
-      divergencePct < 0.25
-        ? `The ${venueCount} venues tracked agree to within ${divergencePct.toFixed(2)}%.`
-        : `The ${venueCount} venues tracked differ by up to ${divergencePct.toFixed(2)}%, so the price depends on where you look.`;
-    return `${sentence} ${agreement}`;
-  }
-  return sentence;
+/** Venue agreement is the one fact no other panel states in words. */
+function withVenues(sentence: string, divergencePct: number | null, venueCount: number): string {
+  if (divergencePct === null || venueCount < 2) return sentence;
+  const agreement =
+    divergencePct < 0.25
+      ? `The ${venueCount} venues tracked agree to within ${divergencePct.toFixed(2)}%.`
+      : `The ${venueCount} venues tracked differ by up to ${divergencePct.toFixed(2)}%, so the price depends on where you look.`;
+  return `${sentence} ${agreement}`;
 }

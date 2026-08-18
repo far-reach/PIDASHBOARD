@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getPiStats } from "@/lib/pistats";
 import { getAggregator } from "@/lib/market/aggregator";
 import { buildBehaviorLine } from "@/lib/behavior";
+import { computeIntradayContext } from "@/lib/intraday-context";
 import { SYMBOL } from "@/lib/env";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
 
@@ -27,6 +28,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const agg = getAggregator();
     const { candles } = await agg.collectCandles(SYMBOL, "1d", 30);
+    // Hourly candles power the like-for-like comparison against the same
+    // hours of prior days; 300 covers roughly twelve of them. If they are
+    // unavailable the line falls back to the whole-day comparison.
+    let intraday = null;
+    try {
+      const { candles: hourly } = await agg.collectCandles(SYMBOL, "1h", 300);
+      intraday = computeIntradayContext(hourly);
+    } catch {
+      // Fall back silently; the daily path still produces a sentence.
+    }
     // Venue agreement comes from the aggregator's own cross-check, which is
     // only meaningful when at least two venues answered recently; the line
     // omits the clause rather than inventing a comparison.
@@ -35,6 +46,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     behavior = buildBehaviorLine({
       symbol: SYMBOL,
       daily: candles,
+      intraday,
       divergencePct: status.divergencePct,
       venueCount: freshVenues,
     });
