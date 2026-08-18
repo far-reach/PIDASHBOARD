@@ -3,12 +3,14 @@
 /**
  * "Today in context": how the current UTC day compares with recent days.
  *
- * The first two rows compare LIKE FOR LIKE, against the same hours of prior
- * days (see lib/intraday-context): comparing a young day against completed
- * days made every morning read as unusually quiet, which was arithmetic
- * rather than market behaviour. The third row needs no such treatment,
- * because a price's position inside a 30-day band does not depend on how
- * far into today we are.
+ * Position inside the recent band leads: it is what most readers come to
+ * find, and unlike the rows beneath it, it does not depend on how far into
+ * today we are.
+ *
+ * The two rows below it compare LIKE FOR LIKE, against the same hours of
+ * prior days (see lib/intraday-context): comparing a young day against
+ * completed days made every morning read as unusually quiet, which was
+ * arithmetic rather than market behaviour.
  *
  * Each row's value and bar are the finding; the explanatory sentence beneath
  * mostly restates it in words, so it starts collapsed and expands on tap
@@ -87,6 +89,12 @@ export function ContextPanel() {
     : null;
   if (!intraday && !band) return null;
 
+  // Minutes, not seconds: this panel is derived from candles that refresh on
+  // a minute-ish cadence, and the longer stamp pushed the title onto two
+  // lines at 375px.
+  const asOf = hourly?.as_of ?? daily?.as_of ?? null;
+  const stamp = asOf ? `${new Date(asOf).toISOString().slice(11, 16)} UTC` : null;
+
   const volPct =
     intraday?.volumeVsTypical != null ? Math.min(100, intraday.volumeVsTypical * 50) : null;
   const window = intraday ? hoursLabel(intraday.elapsedHours) : "";
@@ -95,9 +103,21 @@ export function ContextPanel() {
     <Card data-testid="context-panel">
       <CardHeader>
         <CardTitle>Today in context</CardTitle>
-        <span className="text-[11px] text-muted-foreground">{daily?.source ?? hourly?.source}</span>
+        <span className="shrink-0 text-[11px] text-muted-foreground">
+          {daily?.source ?? hourly?.source}
+          {stamp ? ` · ${stamp}` : ""}
+        </span>
       </CardHeader>
       <CardContent className="space-y-4">
+        {band?.pricePositionPct != null ? (
+          <Row
+            pct={band.pricePositionPct}
+            label="Where price sits"
+            value={`${Math.round(band.pricePositionPct)}% up the band`}
+            detail={`Over the last ${band.historyDays} days this venue traded between ${fmtPrice(band.bandLow)} and ${fmtPrice(band.bandHigh)}; the current price is ${Math.round(band.pricePositionPct)}% of the way up that band.`}
+          />
+        ) : null}
+
         {intraday ? (
           <>
             <Row
@@ -121,15 +141,6 @@ export function ContextPanel() {
             once its first full hour has completed.
           </p>
         )}
-
-        {band?.pricePositionPct != null ? (
-          <Row
-            pct={band.pricePositionPct}
-            label="Where price sits"
-            value={`${Math.round(band.pricePositionPct)}% up the band`}
-            detail={`Over the last ${band.historyDays} days this venue traded between ${fmtPrice(band.bandLow)} and ${fmtPrice(band.bandHigh)}; the current price is ${Math.round(band.pricePositionPct)}% of the way up that band.`}
-          />
-        ) : null}
       </CardContent>
     </Card>
   );

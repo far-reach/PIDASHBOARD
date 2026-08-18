@@ -152,7 +152,7 @@ export function PiNetworkPanel() {
                 <Figure
                   label="Daily turnover"
                   value={turnoverPct !== null ? `${turnoverPct.toFixed(2)}%` : "n/a"}
-                  note="of market cap traded"
+                  note="of market cap traded in 24h"
                 />
               </div>
             </section>
