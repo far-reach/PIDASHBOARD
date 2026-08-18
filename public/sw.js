@@ -15,7 +15,7 @@
  * every older cache, which is what flushes stale HTML cached before the
  * network-first switch.
  */
-const CACHE = "cyberekt-shell-v2";
+const CACHE = "cyberekt-shell-v3";
 const SHELL = ["/", "/signals", "/performance", "/reports", "/learn", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {

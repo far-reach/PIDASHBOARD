@@ -20,6 +20,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // shipped" on real phones.
   useEffect(() => {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
+      // When an UPDATED worker takes control, the page on screen was served
+      // by the old one and is stale by definition: reload once so the fresh
+      // build appears without the user having to know to reload twice.
+      // `hadController` distinguishes an update from the very first install
+      // (claim() fires controllerchange there too), so first-time visitors
+      // never see a spurious reload.
+      const hadController = !!navigator.serviceWorker.controller;
+      let reloaded = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (!hadController || reloaded) return;
+        reloaded = true;
+        window.location.reload();
+      });
       navigator.serviceWorker
         .register("/sw.js", { updateViaCache: "none" })
         .then((reg) => {
