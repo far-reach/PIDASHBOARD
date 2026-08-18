@@ -201,23 +201,30 @@ function payWithPi(args: {
         },
         {
           onReadyForServerApproval: (paymentId) => {
-            void fetch("/api/pi/payments/approve", {
+            // Both legs carry a .catch: a network-level failure used to leave
+            // this promise pending forever, which the UI showed as an eternal
+            // "Waiting for Pi" while the wallet counted down and expired.
+            fetch("/api/pi/payments/approve", {
               method: "POST",
               headers: { "content-type": "application/json", ...sessionHeaders() },
               body: JSON.stringify({ paymentId }),
-            }).then(async (res) => {
-              if (!res.ok) reject(await paymentError(res, "server approval failed"));
-            });
+            })
+              .then(async (res) => {
+                if (!res.ok) reject(await paymentError(res, "server approval failed"));
+              })
+              .catch(() => reject(new Error("could not reach the server to approve the payment")));
           },
           onReadyForServerCompletion: (paymentId, txid) => {
-            void fetch("/api/pi/payments/complete", {
+            fetch("/api/pi/payments/complete", {
               method: "POST",
               headers: { "content-type": "application/json", ...sessionHeaders() },
               body: JSON.stringify({ paymentId, txid }),
-            }).then(async (res) => {
-              if (res.ok) resolve();
-              else reject(await paymentError(res, "server completion failed"));
-            });
+            })
+              .then(async (res) => {
+                if (res.ok) resolve();
+                else reject(await paymentError(res, "server completion failed"));
+              })
+              .catch(() => reject(new Error("could not reach the server to complete the payment")));
           },
           onCancel: () => reject(new Error("payment cancelled")),
           onError: (error) => reject(error),

@@ -66,6 +66,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (err instanceof PiPlatformError && err.status === 501) {
       return NextResponse.json({ error: "payments are not configured on this deployment" }, { status: 501 });
     }
+    if (err instanceof PiPlatformError && err.status === 401) {
+      // The PLATFORM rejected our key, not the user's session: the classic
+      // cause is a Testnet API key on a Mainnet app (or vice versa).
+      return NextResponse.json(
+        { error: "the Pi platform rejected this app's API key; PI_API_KEY likely belongs to the wrong network" },
+        { status: 502 }
+      );
+    }
     reportError("pi payment approval failed", err, { paymentId: parsed.data.paymentId });
     return NextResponse.json({ error: "payment approval failed" }, { status: 502 });
   }

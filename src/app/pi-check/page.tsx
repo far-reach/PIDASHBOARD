@@ -63,6 +63,17 @@ export default function PiCheckPage() {
         >
           Check session
         </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            say("payments: probing the Pi platform with this deployment's API key");
+            fetch("/api/pi/diagnose")
+              .then(async (r) => say(`GET /api/pi/diagnose returned ${r.status}: ${(await r.text()).slice(0, 400)}`))
+              .catch((e: unknown) => say(`GET /api/pi/diagnose failed: ${e instanceof Error ? e.message : String(e)}`));
+          }}
+        >
+          Check payments config
+        </Button>
       </div>
 
       <section className="space-y-1">
