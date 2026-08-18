@@ -48,11 +48,17 @@ export function ChartOverlay({
   }, [fullscreen]);
 
   // Viewport dimensions drive both the rotation decision and chart sizing.
+  // Rounded to whole pixels: a rotated layer positioned on a fractional
+  // pixel is resampled by the compositor, which is what made the landscape
+  // chart look soft and smeared.
   const [dims, setDims] = useState(() =>
-    typeof window === "undefined" ? { w: 375, h: 700 } : { w: window.innerWidth, h: window.innerHeight }
+    typeof window === "undefined"
+      ? { w: 375, h: 700 }
+      : { w: Math.round(window.innerWidth), h: Math.round(window.innerHeight) }
   );
   useEffect(() => {
-    const update = () => setDims({ w: window.innerWidth, h: window.innerHeight });
+    const update = () =>
+      setDims({ w: Math.round(window.innerWidth), h: Math.round(window.innerHeight) });
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
@@ -167,14 +173,17 @@ export function ChartOverlay({
       {fullscreen ? (
         rotated ? (
           // Landscape by construction: a wrapper sized to the rotated
-          // viewport (its width is the device height), turned 90°.
+          // viewport (its width is the device height), turned -90° so the
+          // header lands on the left and the chart reads left-to-right the
+          // way it would if the phone were turned clockwise.
           <div
-            className="flex flex-col overflow-hidden"
+            className="flex flex-col overflow-hidden bg-background"
             style={{
               width: dims.h,
               height: dims.w,
-              transform: "rotate(90deg) translateY(-100%)",
+              transform: "rotate(-90deg) translateX(-100%)",
               transformOrigin: "top left",
+              backfaceVisibility: "hidden",
             }}
             data-testid="chart-rotated"
           >
