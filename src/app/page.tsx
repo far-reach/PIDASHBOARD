@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { SlidersHorizontal } from "lucide-react";
 import { PriceHero } from "@/components/PriceHero";
 import { SessionStrip } from "@/components/SessionStrip";
 import { ContextPanel } from "@/components/ContextPanel";
@@ -10,7 +8,6 @@ import { VenuesPanel } from "@/components/VenuesPanel";
 import { PiNetworkPanel } from "@/components/PiNetworkPanel";
 import { ReportView } from "@/components/ReportView";
 import { SignalCard } from "@/components/SignalCard";
-import { CustomizePanel } from "@/components/CustomizePanel";
 import { CollapsibleCard } from "@/components/CollapsibleCard";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/components/ui";
 import { useReports, useSignals } from "@/lib/hooks";
@@ -22,7 +19,6 @@ export default function HomePage() {
   const { data: reports, fromCache: reportsFromCache } = useReports();
   const { data: signals } = useSignals();
   const prefs = useLayoutPrefs();
-  const [editing, setEditing] = useState(false);
 
   const latestReport = reports?.reports[0] ?? null;
   const recentSignals = SIGNALS_ENABLED ? (signals?.signals.slice(0, 3) ?? []) : [];
@@ -64,21 +60,6 @@ export default function HomePage() {
 
   return (
     <div className="space-y-3 pb-4">
-      {/* Sits at the very top of the content, right under the app header,
-          and scrolls away with the page rather than following the viewport. */}
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          aria-label="Arrange dashboard sections"
-          title="Arrange dashboard"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
-          data-testid="customize-open"
-        >
-          <SlidersHorizontal size={14} />
-        </button>
-      </div>
-
       <PriceHero />
 
       {SIGNALS_ENABLED ? (
@@ -106,8 +87,6 @@ export default function HomePage() {
           the editor floats over the left of the page so hiding and
           reordering can be watched happening. */}
       {prefs.order.filter((id) => !prefs.hidden.includes(id)).map((id) => sections[id])}
-
-      {editing ? <CustomizePanel onClose={() => setEditing(false)} /> : null}
 
     </div>
   );

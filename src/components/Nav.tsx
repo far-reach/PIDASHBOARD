@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { BarChart3, BookOpen, FileText, Home, Radio } from "lucide-react";
+import { BarChart3, BookOpen, FileText, Home, Radio, SlidersHorizontal } from "lucide-react";
+import { CustomizePanel } from "@/components/CustomizePanel";
 import { PiAuthButton } from "@/components/PiAuthButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TipButton } from "@/components/TipButton";
@@ -34,16 +36,21 @@ const TABS = SIGNALS_ENABLED ? [BASE_TABS[0], ...SIGNAL_TABS, ...BASE_TABS.slice
 export function Nav() {
   const pathname = usePathname();
   const online = useOnline();
+  // Arranging only means anything on the dashboard, so the control appears
+  // there and nowhere else. The header owns the state because the panel is
+  // portaled to the body anyway and needs no page context.
+  const [arranging, setArranging] = useState(false);
+  const onDashboard = pathname === "/";
 
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto max-w-5xl px-4 h-14 flex items-center justify-between gap-2">
-          <Link href="/" className="flex items-center gap-2.5 min-w-0">
+          <Link href="/" className="flex min-w-0 shrink items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element -- static
                 same-origin SVG; next/image adds nothing for a vector */}
             <img src="/icon.svg" alt="" className="h-8 w-8 rounded-lg" />
-            <span className="font-bold text-lg tracking-tight">Cyberekt</span>
+            <span className="truncate font-bold text-lg tracking-tight">Cyberekt</span>
             <span className="text-[11px] text-muted-foreground hidden sm:inline">PIUSDT dashboard</span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
@@ -62,14 +69,31 @@ export function Nav() {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-2">
+          {/* Ordered outward from "how this page looks" to "who I am":
+              arrange and theme shape the view, tipping and identity are
+              personal, and sign-in keeps the far-right anchor slot. */}
+          <div className="flex shrink-0 items-center gap-1.5">
             {!online ? <Badge tone="warn">offline</Badge> : null}
+            {onDashboard ? (
+              <button
+                type="button"
+                onClick={() => setArranging(true)}
+                aria-label="Arrange dashboard sections"
+                title="Arrange dashboard"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+                data-testid="customize-open"
+              >
+                <SlidersHorizontal size={15} />
+              </button>
+            ) : null}
             <ThemeToggle />
             <TipButton />
             <PiAuthButton />
           </div>
         </div>
       </header>
+
+      {arranging ? <CustomizePanel onClose={() => setArranging(false)} /> : null}
 
       <nav
         className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur"

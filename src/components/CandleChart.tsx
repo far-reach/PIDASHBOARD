@@ -71,7 +71,9 @@ export function CandleChart({
         borderVisible: false,
         timeVisible: true,
         secondsVisible: false,
-        rightOffset: 3,
+        // Just enough breathing room past the newest candle for its price
+        // label; more than this leaves a dead strip on the right.
+        rightOffset: 1,
         minBarSpacing: 0.5,
       },
       // A flick keeps gliding and eases to a stop instead of halting dead.
@@ -171,6 +173,10 @@ export function CandleChart({
         const t = Math.min(1, (now - start) / dur);
         // …and settle onto the target with a slight overshoot.
         ts.applyOptions({ barSpacing: from + (targetSpacing - from) * easeOutBack(t) });
+        // Re-anchor every frame: the bars widen as this runs, so a single
+        // anchor at the start would let the series drift left and leave a
+        // dead strip against the price scale.
+        ts.scrollToRealTime();
         if (t < 1) rafRef.current = requestAnimationFrame(step);
       };
       rafRef.current = requestAnimationFrame(step);
@@ -179,10 +185,7 @@ export function CandleChart({
 
     // Double-tap (dblclick fires for double-taps in mobile webviews too)
     // brings the wandered view home, animated.
-    const resetView = () => {
-      settleIn();
-      ts.scrollToPosition(3, true);
-    };
+    const resetView = () => settleIn();
     el.addEventListener("dblclick", resetView);
 
     const ro = new ResizeObserver(() => {

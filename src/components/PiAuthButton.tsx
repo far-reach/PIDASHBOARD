@@ -50,7 +50,15 @@ export function PiAuthButton() {
             .finally(() => setBusy(false));
         }}
       >
-        {busy ? "Connecting…" : "Sign in with Pi"}
+        {busy ? (
+          "Connecting…"
+        ) : (
+          <>
+            {/* The header carries four controls on the dashboard; the full
+                label only fits once there is room for it. */}
+            Sign in<span className="hidden sm:inline"> with Pi</span>
+          </>
+        )}
       </Button>
     </span>
   );
