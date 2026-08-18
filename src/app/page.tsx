@@ -64,20 +64,21 @@ export default function HomePage() {
 
   return (
     <div className="space-y-3 pb-4">
-      {/* The arrange control lives at the top-right of the content it
-          arranges: visible before scrolling, out of the app header's way. */}
+      {/* Arranging is a nice-to-have most visitors never touch, so it costs
+          no layout: a small tab tucked against the right edge, inside the
+          thumb's natural arc and above the bottom tab bar. It stays out of
+          the way while scrolling and disappears while the panel is open. */}
       {!editing ? (
-        <div className="flex justify-end -mb-1.5">
-          <button
-            type="button"
-            onClick={() => setEditing(true)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
-            data-testid="customize-open"
-          >
-            <SlidersHorizontal size={13} />
-            Arrange
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          aria-label="Arrange dashboard sections"
+          title="Arrange dashboard"
+          className="fixed right-0 bottom-24 z-30 inline-flex h-11 w-9 items-center justify-center rounded-l-xl border border-r-0 border-border bg-card/85 text-muted-foreground shadow-lg backdrop-blur transition-colors hover:bg-card hover:text-foreground active:bg-card md:bottom-10"
+          data-testid="customize-open"
+        >
+          <SlidersHorizontal size={16} />
+        </button>
       ) : null}
 
       <PriceHero />
