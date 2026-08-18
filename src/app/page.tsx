@@ -66,6 +66,22 @@ export default function HomePage() {
 
   return (
     <div className="space-y-3 pb-4">
+      {/* The arrange control lives at the top-right of the content it
+          arranges: visible before scrolling, out of the app header's way. */}
+      {!editing ? (
+        <div className="flex justify-end -mb-1.5">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+            data-testid="customize-open"
+          >
+            <SlidersHorizontal size={13} />
+            Arrange
+          </button>
+        </div>
+      ) : null}
+
       <PriceHero />
 
       {SIGNALS_ENABLED ? (
@@ -95,19 +111,6 @@ export default function HomePage() {
         prefs.order.filter((id) => !prefs.hidden.includes(id)).map((id) => sections[id])
       )}
 
-      {!editing ? (
-        <div className="flex justify-center pt-1">
-          <button
-            type="button"
-            onClick={() => setEditing(true)}
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-2 px-3"
-            data-testid="customize-open"
-          >
-            <SlidersHorizontal size={13} />
-            Arrange dashboard
-          </button>
-        </div>
-      ) : null}
     </div>
   );
 }
