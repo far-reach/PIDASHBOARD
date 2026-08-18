@@ -5,10 +5,16 @@
  * the expanded overlay. Purely presentational: callers fetch the candles
  * and pass them in.
  *
- * Visual choices, deliberate: no vertical grid (time is already labeled on
- * the axis; the vertical lines only added noise), a whisper of horizontal
- * grid, soft-toned candles slightly translucent on the down side of volume,
- * and a dashed neutral crosshair. Optional Bollinger Bands (20, 2) render
+ * Feel, deliberate:
+ * - The default view is a balanced recent window (~50 bars), never the whole
+ *   series squeezed into one screen; history is a swipe away.
+ * - Kinetic scrolling on touch and mouse, so a flick glides and settles.
+ * - On load and on timeframe change the view settles in with a slight
+ *   overshoot, which reads as alive without getting in the way.
+ * - Double-tap (or double-click) returns to the default view, animated.
+ *
+ * Visual choices: no vertical grid, a whisper of horizontal grid, soft
+ * volume, dashed neutral crosshair. Optional Bollinger Bands (20, 2) render
  * as a translucent envelope, used by the fullscreen view.
  */
 import { useEffect, useRef } from "react";
@@ -20,6 +26,13 @@ import { useTheme } from "@/lib/theme";
 // CVD-validated pair (deutan ΔE 11.6 vs this surface); equal weight up/down.
 const UP = "#26a69a";
 const DOWN = "#ef5350";
+
+/** Ease with a small overshoot: the "settle" that makes the view feel alive. */
+function easeOutBack(t: number): number {
+  const c1 = 1.1;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+}
 
 export function CandleChart({
   candles,
@@ -33,6 +46,7 @@ export function CandleChart({
   const { resolved } = useTheme();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
+  const rafRef = useRef(0);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -60,8 +74,11 @@ export function CandleChart({
         borderVisible: false,
         timeVisible: true,
         secondsVisible: false,
-        rightOffset: 2,
+        rightOffset: 3,
+        minBarSpacing: 0.5,
       },
+      // A flick keeps gliding and eases to a stop instead of halting dead.
+      kineticScroll: { touch: true, mouse: true },
       crosshair: {
         horzLine: {
           style: LineStyle.Dashed,
@@ -132,7 +149,44 @@ export function CandleChart({
       }
     }
 
-    chart.timeScale().fitContent();
+    /*
+     * The balanced default: roughly the last 50 bars at a comfortable
+     * spacing, never the entire series squeezed into one screen. Sparse
+     * series still fit-to-content, since there is nothing to trim.
+     */
+    const ts = chart.timeScale();
+    const width = el.clientWidth || 340;
+    const targetSpacing = Math.min(14, Math.max(5, width / 50));
+    const visibleAtTarget = width / targetSpacing;
+
+    const settleIn = () => {
+      cancelAnimationFrame(rafRef.current);
+      if (candles.length <= visibleAtTarget) {
+        ts.fitContent();
+        return;
+      }
+      const from = targetSpacing * 0.7; // start a touch zoomed-out…
+      ts.applyOptions({ barSpacing: from });
+      ts.scrollToRealTime();
+      const start = performance.now();
+      const dur = 420;
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / dur);
+        // …and settle onto the target with a slight overshoot.
+        ts.applyOptions({ barSpacing: from + (targetSpacing - from) * easeOutBack(t) });
+        if (t < 1) rafRef.current = requestAnimationFrame(step);
+      };
+      rafRef.current = requestAnimationFrame(step);
+    };
+    settleIn();
+
+    // Double-tap (dblclick fires for double-taps in mobile webviews too)
+    // brings the wandered view home, animated.
+    const resetView = () => {
+      settleIn();
+      ts.scrollToPosition(3, true);
+    };
+    el.addEventListener("dblclick", resetView);
 
     const ro = new ResizeObserver(() => {
       chart.applyOptions({ width: el.clientWidth });
@@ -140,6 +194,8 @@ export function CandleChart({
     ro.observe(el);
 
     return () => {
+      cancelAnimationFrame(rafRef.current);
+      el.removeEventListener("dblclick", resetView);
       ro.disconnect();
       chart.remove();
       chartRef.current = null;

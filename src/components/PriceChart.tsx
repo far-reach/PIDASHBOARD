@@ -10,6 +10,9 @@ import { useCandles } from "@/lib/hooks";
 import { TF_OPTIONS, type Tf } from "@/lib/chart-timeframes";
 
 export function PriceChart() {
+  // The card's own timeframe, 1h by default. The fullscreen overlay keeps a
+  // separate timeframe of its own (daily), so studying there never drags
+  // this card away from its default.
   const [tf, setTf] = useState<Tf>("1h");
   const [expanded, setExpanded] = useState(false);
   const { data, fromCache, isLoading } = useCandles(tf);
@@ -47,19 +50,7 @@ export function PriceChart() {
         </CardContent>
       </Card>
 
-      {expanded ? (
-        <ChartOverlay
-          initialFullscreen
-          tf={tf}
-          onTfChange={setTf}
-          candles={data?.candles ?? []}
-          source={data?.source ?? null}
-          asOf={data?.as_of ?? null}
-          isFailover={data?.is_failover}
-          fromCache={fromCache}
-          onClose={() => setExpanded(false)}
-        />
-      ) : null}
+      {expanded ? <ChartOverlay initialFullscreen onClose={() => setExpanded(false)} /> : null}
     </>
   );
 }
