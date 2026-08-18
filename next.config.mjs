@@ -13,6 +13,12 @@ const nextConfig = {
       source: "/api/:path*",
       headers: [{ key: "Cache-Control", value: "no-store" }],
     },
+    {
+      // The worker file itself must never be cached: a cached sw.js pins
+      // users to whichever caching strategy it shipped with.
+      source: "/sw.js",
+      headers: [{ key: "Cache-Control", value: "no-store" }],
+    },
   ],
 };
 
