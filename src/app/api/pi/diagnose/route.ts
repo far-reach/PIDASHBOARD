@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { getPayment, PiPlatformError } from "@/lib/pi/server";
 import { isPiSandbox, piApiKey } from "@/lib/env";
@@ -26,9 +27,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "rate limited" }, { status: 429 });
   }
 
-  const configured = piApiKey().length > 0;
+  const key = piApiKey();
+  const configured = key.length > 0;
   const base: Record<string, unknown> = {
     apiKeyConfigured: configured,
+    // Length and a short hash of the key, never the key. Enough to answer
+    // the question a redeploy always raises: is the running deployment
+    // actually serving the key I just pasted, or the previous one? A
+    // changed fingerprint proves the new value took effect.
+    apiKeyLength: key.length,
+    apiKeyFingerprint: configured ? createHash("sha256").update(key).digest("hex").slice(0, 8) : null,
     sandbox: isPiSandbox(),
     // The last few payment legs, newest first: which step ran and what it
     // said. This is the only place the phone can see why an approval that
