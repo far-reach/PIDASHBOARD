@@ -63,7 +63,9 @@ export function CandleChart({
       },
       rightPriceScale: {
         borderVisible: false,
-        scaleMargins: { top: 0.08, bottom: 0.22 },
+        // Tight: just enough headroom for the price label, and only as much
+        // floor as the volume strip actually occupies.
+        scaleMargins: { top: 0.04, bottom: 0.16 },
       },
       timeScale: {
         borderVisible: false,
@@ -105,7 +107,7 @@ export function CandleChart({
       lastValueVisible: false,
       priceLineVisible: false,
     });
-    chart.priceScale("vol").applyOptions({ scaleMargins: { top: 0.86, bottom: 0 } });
+    chart.priceScale("vol").applyOptions({ scaleMargins: { top: 0.88, bottom: 0 } });
 
     candleSeries.setData(
       candles.map((candle) => ({

@@ -17,7 +17,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Maximize2, Minimize2, X } from "lucide-react";
-import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { CandleChart } from "@/components/CandleChart";
 import { SegmentedControl } from "@/components/ui";
 import { TF_OPTIONS, type Tf } from "@/lib/chart-timeframes";
@@ -34,7 +33,7 @@ export function ChartOverlay({
 }) {
   const [fullscreen, setFullscreen] = useState(initialFullscreen);
   const [tf, setTf] = useState<Tf>(initialFullscreen ? "1d" : "1h");
-  const { data, fromCache } = useCandles(tf);
+  const { data } = useCandles(tf);
 
   // Entering fullscreen (from the medium panel's expand button) switches to
   // daily once per entry; the reader's later choice is respected.
@@ -126,22 +125,16 @@ export function ChartOverlay({
           </button>
         </div>
       </div>
-      {/* Row 2: freshness + timeframe picker, free to wrap. */}
+      {/* Row 2: timeframe picker, with the study-view band label beside it. */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <FreshnessBadge
-          source={data?.source ?? null}
-          ts={data?.as_of ?? null}
-          isFailover={data?.is_failover}
-          fromCache={fromCache}
-        />
-        <div className="flex items-center gap-2">
-          {fullscreen ? (
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Bollinger 20 · 2σ
-            </span>
-          ) : null}
-          <SegmentedControl options={[...TF_OPTIONS]} value={tf} onChange={setTf} />
-        </div>
+        {fullscreen ? (
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Bollinger 20 · 2σ
+          </span>
+        ) : (
+          <span />
+        )}
+        <SegmentedControl options={[...TF_OPTIONS]} value={tf} onChange={setTf} />
       </div>
     </div>
   );

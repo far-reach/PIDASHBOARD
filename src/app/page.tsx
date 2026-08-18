@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { SlidersHorizontal } from "lucide-react";
 import { PriceHero } from "@/components/PriceHero";
 import { SessionStrip } from "@/components/SessionStrip";
 import { ContextPanel } from "@/components/ContextPanel";
@@ -63,7 +64,22 @@ export default function HomePage() {
 
   return (
     <div className="space-y-3 pb-4">
-      <PriceHero onArrange={() => setEditing(true)} />
+      {/* Sits at the very top of the content, right under the app header,
+          and scrolls away with the page rather than following the viewport. */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          aria-label="Arrange dashboard sections"
+          title="Arrange dashboard"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+          data-testid="customize-open"
+        >
+          <SlidersHorizontal size={14} />
+        </button>
+      </div>
+
+      <PriceHero />
 
       {SIGNALS_ENABLED ? (
         <Card>

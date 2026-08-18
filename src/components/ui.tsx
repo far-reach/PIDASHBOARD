@@ -150,7 +150,7 @@ export function SegmentedControl<T extends string>({
           aria-selected={o.value === value}
           onClick={() => onChange(o.value)}
           className={clsx(
-            "shrink-0 px-2 py-1 text-xs font-medium rounded-[5px] min-h-[28px] transition-colors",
+            "shrink-0 px-1.5 py-1 text-[11px] font-medium rounded-[5px] min-h-[28px] transition-colors",
             o.value === value ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
           )}
         >

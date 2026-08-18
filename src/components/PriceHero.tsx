@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LineChart, SlidersHorizontal } from "lucide-react";
+import { LineChart } from "lucide-react";
 import { Card, CardContent, Skeleton } from "@/components/ui";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { DecoSparkline } from "@/components/DecoSparkline";
@@ -10,7 +10,7 @@ import { fmtPct, fmtPrice } from "@/lib/format";
 import { useLatestPrice, usePiStats } from "@/lib/hooks";
 import { clsx } from "clsx";
 
-export function PriceHero({ onArrange }: { onArrange?: () => void }) {
+export function PriceHero() {
   const { data, fromCache, isLoading, isError } = useLatestPrice();
   // The plain-English session summary, served alongside the network stats.
   const { data: stats } = usePiStats();
@@ -49,7 +49,7 @@ export function PriceHero({ onArrange }: { onArrange?: () => void }) {
 
   return (
     <>
-      {chartOpen ? <PriceChart /> : null}
+      {chartOpen ? <PriceChart onClose={() => setChartOpen(false)} /> : null}
 
       <Card data-testid="price-hero" className="relative overflow-hidden">
         <div
@@ -80,38 +80,21 @@ export function PriceHero({ onArrange }: { onArrange?: () => void }) {
                 />
               </div>
             </div>
-            {/* Utility cluster: arranging the dashboard and revealing the
-                chart both belong to the page rather than to the price, and
-                both scroll away with it. */}
-            <div className="flex shrink-0 items-center gap-1.5">
-              {onArrange ? (
-                <button
-                  type="button"
-                  onClick={onArrange}
-                  aria-label="Arrange dashboard sections"
-                  title="Arrange dashboard"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
-                  data-testid="customize-open"
-                >
-                  <SlidersHorizontal size={15} />
-                </button>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => setChartOpen((v) => !v)}
-                aria-expanded={chartOpen}
-                aria-label={chartOpen ? "Hide price chart" : "Show price chart"}
-                className={clsx(
-                  "inline-flex h-8 w-8 items-center justify-center rounded-md border transition-colors",
-                  chartOpen
-                    ? "border-primary/60 bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                )}
-                data-testid="hero-chart-toggle"
-              >
-                <LineChart size={15} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setChartOpen((v) => !v)}
+              aria-expanded={chartOpen}
+              aria-label={chartOpen ? "Hide price chart" : "Show price chart"}
+              className={clsx(
+                "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border transition-colors",
+                chartOpen
+                  ? "border-primary/60 bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+              )}
+              data-testid="hero-chart-toggle"
+            >
+              <LineChart size={15} />
+            </button>
           </div>
           {behavior ? (
             <p
