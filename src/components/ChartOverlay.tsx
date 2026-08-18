@@ -3,11 +3,15 @@
 /**
  * The expanded chart. Two sizes:
  * - medium "vertical mode": a tall portrait panel over the page;
- * - fullscreen: the whole display, and on a portrait phone the view is
- *   rotated 90° so the chart is LANDSCAPE without asking the reader to
- *   flip their device or the browser to support orientation lock (Pi
- *   Browser's iOS webview does not). On a device already wider than tall
- *   it simply fills the screen unrotated.
+ * - fullscreen: the whole display, filling whatever orientation the device
+ *   is actually in. The earlier CSS-rotated "forced landscape" is gone for
+ *   good: rotating a canvas layer made iOS rasterize it soft (unreadable
+ *   axis text) and broke the chart's touch math, since the library reads
+ *   pointer positions in screen space. Instead, fullscreen follows the
+ *   device: where the platform allows it we ask for a landscape orientation
+ *   lock, and where it does not (iOS webviews) a brief hint invites turning
+ *   the phone; the resize listener picks the new orientation up instantly.
+ *   Crisp pixels and native touch behavior in both orientations, always.
  *
  * Fullscreen is the study view: it opens on the daily timeframe with
  * Bollinger Bands (20, 2). The overlay fetches its own candles and keeps
@@ -46,23 +50,67 @@ export function ChartOverlay({
     if (!fullscreen) autoDailyDone.current = false;
   }, [fullscreen]);
 
-  // Viewport dimensions drive both the rotation decision and chart sizing.
-  // Rounded to whole pixels: a rotated layer positioned on a fractional
-  // pixel is resampled by the compositor, which is what made the landscape
-  // chart look soft and smeared.
+  // Viewport dimensions drive chart sizing and the orientation hint.
   const [dims, setDims] = useState(() =>
     typeof window === "undefined"
       ? { w: 375, h: 700 }
-      : { w: Math.round(window.innerWidth), h: Math.round(window.innerHeight) }
+      : { w: window.innerWidth, h: window.innerHeight }
   );
   useEffect(() => {
-    const update = () =>
-      setDims({ w: Math.round(window.innerWidth), h: Math.round(window.innerHeight) });
+    const update = () => setDims({ w: window.innerWidth, h: window.innerHeight });
     update();
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
   }, []);
-  const rotated = fullscreen && dims.h > dims.w;
+  const isPortrait = dims.h > dims.w;
+
+  // Progressive enhancement: platforms that allow it (Android Chrome and
+  // friends, inside the Fullscreen API) get a real landscape lock. Failures
+  // are expected and silent; iOS simply ignores this path.
+  useEffect(() => {
+    if (!fullscreen) return;
+    let locked = false;
+    void (async () => {
+      try {
+        const orientation = screen.orientation as ScreenOrientation & {
+          lock?: (o: string) => Promise<void>;
+        };
+        if (!orientation?.lock) return;
+        await document.documentElement.requestFullscreen?.();
+        await orientation.lock("landscape");
+        locked = true;
+      } catch {
+        /* not supported here: the rotate hint covers it */
+      }
+    })();
+    return () => {
+      if (locked) {
+        try {
+          screen.orientation.unlock();
+        } catch {
+          /* ignore */
+        }
+        void document.exitFullscreen?.().catch(() => undefined);
+      }
+    };
+  }, [fullscreen]);
+
+  // The turn-your-phone hint: shown briefly when fullscreen opens in
+  // portrait, dismissed by time, tap, or actually rotating.
+  const [hintDismissed, setHintDismissed] = useState(false);
+  useEffect(() => {
+    if (!fullscreen) {
+      setHintDismissed(false);
+      return;
+    }
+    const t = setTimeout(() => setHintDismissed(true), 4500);
+    return () => clearTimeout(t);
+  }, [fullscreen]);
+  const showRotateHint = fullscreen && isPortrait && !hintDismissed;
 
   // The header wraps to two rows at narrow widths, so its height is
   // measured, not assumed. offsetHeight is layout height: unaffected by the
@@ -77,9 +125,8 @@ export function ChartOverlay({
     return () => ro.disconnect();
   }, []);
 
-  // In the rotated frame the chart's available height is the device WIDTH.
   const chartHeight = fullscreen
-    ? Math.max(220, (rotated ? dims.w : dims.h) - headerHeight - 8)
+    ? Math.max(220, dims.h - headerHeight - 8)
     : Math.max(280, Math.min(520, Math.round(dims.h * 0.55)));
 
   useEffect(() => {
@@ -142,8 +189,18 @@ export function ChartOverlay({
   const body = (
     <>
       {header}
-      <div className="px-2 pb-2 pt-1">
+      <div className="relative px-2 pb-2 pt-1">
         <CandleChart candles={candles} height={chartHeight} bollinger={fullscreen} />
+        {showRotateHint ? (
+          <button
+            type="button"
+            onClick={() => setHintDismissed(true)}
+            className="absolute left-1/2 top-8 z-10 -translate-x-1/2 rounded-full border border-border bg-card/95 px-4 py-2 text-xs text-muted-foreground shadow-lg backdrop-blur"
+            data-testid="rotate-hint"
+          >
+            Turn your phone sideways for the wide view
+          </button>
+        ) : null}
       </div>
     </>
   );
@@ -164,27 +221,7 @@ export function ChartOverlay({
       }}
     >
       {fullscreen ? (
-        rotated ? (
-          // Landscape by construction: a wrapper sized to the rotated
-          // viewport (its width is the device height), turned -90° so the
-          // header lands on the left and the chart reads left-to-right the
-          // way it would if the phone were turned clockwise.
-          <div
-            className="flex flex-col overflow-hidden bg-background"
-            style={{
-              width: dims.h,
-              height: dims.w,
-              transform: "rotate(-90deg) translateX(-100%)",
-              transformOrigin: "top left",
-              backfaceVisibility: "hidden",
-            }}
-            data-testid="chart-rotated"
-          >
-            {body}
-          </div>
-        ) : (
-          <div className="flex h-full w-full flex-col">{body}</div>
-        )
+        <div className="flex h-full w-full flex-col">{body}</div>
       ) : (
         <div className="flex w-full max-w-lg flex-col rounded-2xl border border-border bg-card shadow-2xl">
           {body}
