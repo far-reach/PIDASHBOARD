@@ -10,19 +10,18 @@
  */
 import { useSyncExternalStore } from "react";
 
-// "support" and "about" were section ids here once; tipping moved to the
-// header dialog and the about card to /learn. normalize() silently drops
-// retired ids from any saved layout that still carries them, and appends
-// newly added ids ("context", "venues") for layouts saved before they
-// existed.
-export const SECTION_IDS = ["stats", "context", "venues", "chart", "network", "report"] as const;
+// "support", "about" and "chart" were section ids here once; tipping moved
+// to the header dialog, the about card to /learn, and the chart into the
+// hero card's own toggle. normalize() silently drops retired ids from any
+// saved layout that still carries them, and appends newly added ids for
+// layouts saved before they existed.
+export const SECTION_IDS = ["stats", "context", "venues", "network", "report"] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
 export const SECTION_LABELS: Record<SectionId, string> = {
   stats: "Session stats",
   context: "Today in context",
   venues: "Across venues",
-  chart: "Price chart",
   network: "Pi network",
   report: "Daily report",
 };

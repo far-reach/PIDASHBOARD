@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
 import { PriceHero } from "@/components/PriceHero";
-import { PriceChart } from "@/components/PriceChart";
 import { SessionStrip } from "@/components/SessionStrip";
 import { ContextPanel } from "@/components/ContextPanel";
 import { VenuesPanel } from "@/components/VenuesPanel";
@@ -33,7 +32,6 @@ export default function HomePage() {
     context: <ContextPanel key="context" />,
     venues: <VenuesPanel key="venues" />,
     network: <PiNetworkPanel key="network" />,
-    chart: <PriceChart key="chart" />,
     report: (
       <CollapsibleCard
         key="report"

@@ -10,7 +10,7 @@ import type { Candle, ExchangeClient, Tick, Timeframe } from "@/lib/market/types
 
 const BASE = process.env.MEXC_API_BASE ?? "https://api.mexc.com";
 
-const TF_MAP: Record<Timeframe, string> = { "1m": "1m", "5m": "5m", "1h": "60m", "1d": "1d" };
+const TF_MAP: Record<Timeframe, string> = { "1m": "1m", "5m": "5m", "15m": "15m", "1h": "60m", "4h": "4h", "1d": "1d", "1w": "1W" };
 
 interface Mexc24h {
   lastPrice: string;

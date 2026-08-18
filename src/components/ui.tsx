@@ -139,7 +139,10 @@ export function SegmentedControl<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="inline-flex rounded-md border border-border bg-muted p-0.5" role="tablist">
+    <div
+      className="inline-flex max-w-full overflow-x-auto rounded-md border border-border bg-muted p-0.5"
+      role="tablist"
+    >
       {options.map((o) => (
         <button
           key={o.value}
@@ -147,7 +150,7 @@ export function SegmentedControl<T extends string>({
           aria-selected={o.value === value}
           onClick={() => onChange(o.value)}
           className={clsx(
-            "px-2.5 py-1 text-xs font-medium rounded-[5px] min-h-[28px] transition-colors",
+            "shrink-0 px-2 py-1 text-xs font-medium rounded-[5px] min-h-[28px] transition-colors",
             o.value === value ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
           )}
         >

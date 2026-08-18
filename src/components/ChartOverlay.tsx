@@ -72,6 +72,19 @@ export function ChartOverlay({
   const [headerHeight, setHeaderHeight] = useState(FALLBACK_HEADER_H);
   const chartHeight = useChartHeight(fullscreen, headerHeight);
 
+  // Fullscreen is the study view: it opens on the daily timeframe with
+  // Bollinger Bands (20, 2). The switch happens once per fullscreen entry;
+  // the reader is free to change timeframe afterwards without being
+  // overridden.
+  const autoDailyDone = useRef(false);
+  useEffect(() => {
+    if (fullscreen && !autoDailyDone.current) {
+      autoDailyDone.current = true;
+      if (tf !== "1d") onTfChange("1d");
+    }
+    if (!fullscreen) autoDailyDone.current = false;
+  }, [fullscreen, tf, onTfChange]);
+
   useEffect(() => {
     const el = headerRef.current;
     if (!el) return;
@@ -155,11 +168,18 @@ export function ChartOverlay({
               collides with the timeframe pills at narrow widths. */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <FreshnessBadge source={source} ts={asOf} isFailover={isFailover} fromCache={fromCache} />
-            <SegmentedControl options={[...TF_OPTIONS]} value={tf} onChange={onTfChange} />
+            <div className="flex items-center gap-2">
+              {fullscreen ? (
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Bollinger 20 · 2σ
+                </span>
+              ) : null}
+              <SegmentedControl options={[...TF_OPTIONS]} value={tf} onChange={onTfChange} />
+            </div>
           </div>
         </div>
         <div className="px-2 pb-2 pt-1">
-          <CandleChart candles={candles} height={chartHeight} />
+          <CandleChart candles={candles} height={chartHeight} bollinger={fullscreen} />
         </div>
       </div>
     </div>,

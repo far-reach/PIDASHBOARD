@@ -8,7 +8,7 @@ import type { Candle, ExchangeClient, Tick, Timeframe } from "@/lib/market/types
 
 const BASE = process.env.BITGET_API_BASE ?? "https://api.bitget.com";
 
-const TF_MAP: Record<Timeframe, string> = { "1m": "1min", "5m": "5min", "1h": "1h", "1d": "1day" };
+const TF_MAP: Record<Timeframe, string> = { "1m": "1min", "5m": "5min", "15m": "15min", "1h": "1h", "4h": "4h", "1d": "1day", "1w": "1week" };
 
 interface BitgetTicker {
   lastPr: string;

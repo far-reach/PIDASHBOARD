@@ -13,7 +13,7 @@ function instId(symbol: string): string {
   return symbol.replace(/USDT$/, "-USDT");
 }
 
-const TF_MAP: Record<Timeframe, string> = { "1m": "1m", "5m": "5m", "1h": "1H", "1d": "1Dutc" };
+const TF_MAP: Record<Timeframe, string> = { "1m": "1m", "5m": "5m", "15m": "15m", "1h": "1H", "4h": "4H", "1d": "1Dutc", "1w": "1Wutc" };
 
 interface OkxTicker {
   last: string;

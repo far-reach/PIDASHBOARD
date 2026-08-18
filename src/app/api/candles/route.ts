@@ -7,8 +7,8 @@ import type { Timeframe } from "@/lib/market/types";
 
 export const dynamic = "force-dynamic";
 
-const TFS: Timeframe[] = ["1m", "5m", "1h", "1d"];
-const CACHE_TTL: Record<Timeframe, number> = { "1m": 15, "5m": 30, "1h": 60, "1d": 300 };
+const TFS: Timeframe[] = ["1m", "5m", "15m", "1h", "4h", "1d", "1w"];
+const CACHE_TTL: Record<Timeframe, number> = { "1m": 15, "5m": 30, "15m": 45, "1h": 60, "4h": 180, "1d": 300, "1w": 900 };
 
 /** GET /api/candles?tf=1m|5m|1h|1d&limit=300 */
 export async function GET(req: NextRequest): Promise<NextResponse> {
