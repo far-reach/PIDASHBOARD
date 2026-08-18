@@ -71,9 +71,9 @@ export function CandleChart({
         borderVisible: false,
         timeVisible: true,
         secondsVisible: false,
-        // Just enough breathing room past the newest candle for its price
-        // label; more than this leaves a dead strip on the right.
-        rightOffset: 1,
+        // A sliver past the newest candle; anything wider reads as a dead
+        // strip between the last bar and the price scale.
+        rightOffset: 0.3,
         minBarSpacing: 0.5,
       },
       // A flick keeps gliding and eases to a stop instead of halting dead.
@@ -161,7 +161,7 @@ export function CandleChart({
     const settleIn = () => {
       cancelAnimationFrame(rafRef.current);
       const width = el.clientWidth || 340;
-      const targetSpacing = Math.min(14, Math.max(5, width / 50));
+      const targetSpacing = Math.min(16, Math.max(6, width / 44));
       const visibleAtTarget = width / targetSpacing;
       if (candles.length <= visibleAtTarget) {
         ts.fitContent();

@@ -52,14 +52,14 @@ export function PriceChart({ onClose }: { onClose?: () => void }) {
             ) : null}
           </div>
           {isLoading && !data ? (
-            <Skeleton className="h-[300px] w-full" />
+            <Skeleton className="h-[340px] w-full" />
           ) : (
-            <CandleChart candles={data?.candles ?? []} height={300} />
+            <CandleChart candles={data?.candles ?? []} height={340} />
           )}
         </CardContent>
       </Card>
 
-      {expanded ? <ChartOverlay initialFullscreen onClose={() => setExpanded(false)} /> : null}
+      {expanded ? <ChartOverlay onClose={() => setExpanded(false)} /> : null}
     </>
   );
 }
