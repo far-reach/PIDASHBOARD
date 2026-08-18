@@ -17,6 +17,13 @@ import { tipWithPi } from "@/lib/pi/client";
 
 const PRESETS = [1, 3.14, 10] as const;
 
+/**
+ * Mirrors the server default (lib/env minTipPi); the server remains the
+ * authority and re-checks every payment. Shown here so a too-small amount
+ * is explained before the wallet ever opens.
+ */
+const MIN_TIP = 0.1;
+
 export function TipButton() {
   const { data } = useMe();
   const [open, setOpen] = useState(false);
@@ -26,8 +33,12 @@ export function TipButton() {
   const [error, setError] = useState<string | null>(null);
   const [thanks, setThanks] = useState(false);
 
-  const amount = choice === "custom" ? Number(custom) : choice;
-  const amountValid = Number.isFinite(amount) && amount > 0;
+  // Decimal-comma keyboards (iOS numeric pad in many locales) offer no dot,
+  // and Number("0,1") is NaN: without the swap, every fractional tip parsed
+  // as invalid and only whole numbers ever enabled the button.
+  const amount = choice === "custom" ? Number(custom.trim().replace(",", ".")) : choice;
+  const amountValid = Number.isFinite(amount) && amount >= MIN_TIP;
+  const belowMin = choice === "custom" && custom.trim() !== "" && Number.isFinite(amount) && amount > 0 && amount < MIN_TIP;
 
   const close = useCallback(() => {
     if (busy) return;
@@ -140,10 +151,13 @@ export function TipButton() {
                       inputMode="decimal"
                       value={custom}
                       onChange={(e) => setCustom(e.target.value)}
-                      placeholder="e.g. 2.5"
+                      placeholder="e.g. 0.5"
                       className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                       data-testid="tip-custom-amount"
                     />
+                    <span className="mt-1 block text-[11px] text-muted-foreground">
+                      {belowMin ? `The minimum tip is ${MIN_TIP} π.` : `Any amount from ${MIN_TIP} π. A comma works as the decimal mark too.`}
+                    </span>
                   </label>
                 ) : null}
 
