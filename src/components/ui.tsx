@@ -27,10 +27,10 @@ export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingEle
   return (
     <h2
       className={clsx(
-        // A matte-orange chip behind the title text separates headers from
-        // the content below them at a glance; the solid bar anchors it.
-        "inline-flex items-center gap-2 rounded-md bg-accent-bar/15 py-1 pl-1.5 pr-2.5",
-        "text-sm font-bold uppercase tracking-wide text-foreground",
+        // Two treatments, not three: the matte-orange bar anchors the header
+        // and uppercase weight marks it as structure. No filled chip; the
+        // bar alone carries the accent.
+        "inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-foreground",
         "before:h-3.5 before:w-1 before:shrink-0 before:rounded-full before:bg-accent-bar before:content-['']",
         className
       )}

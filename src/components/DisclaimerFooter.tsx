@@ -7,11 +7,12 @@ export function DisclaimerFooter() {
       <p className="text-[11px] leading-relaxed text-muted-foreground max-w-2xl">
         <strong className="text-foreground/80">Not financial advice.</strong> Crypto markets carry
         risk of loss; past market behaviour does not indicate future results. All content is
-        informational and educational, generated from market data published by third-party
-        exchanges. This app makes no forecasts, no valuation claims and no recommendations.
-        Prices are shown &quot;as of&quot; their stated UTC timestamps and differ between
-        exchanges. Cyberekt is an independent community app and is not affiliated with or
-        endorsed by the Pi Core Team.
+        informational and educational, generated from market data published by third parties:
+        CoinGecko, OKX and MEXC. Figures are as reported by those sources, never statements of
+        value. This app makes no forecasts, no valuation claims and no recommendations. Prices
+        are shown &quot;as of&quot; their stated UTC timestamps and differ between exchanges.
+        Cyberekt is an independent community app and is not affiliated with or endorsed by the
+        Pi Core Team.
       </p>
       <nav className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[11px] text-muted-foreground">
         <Link href="/legal/risk" className="hover:text-foreground underline underline-offset-2">

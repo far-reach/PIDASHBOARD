@@ -1,14 +1,16 @@
 "use client";
 
 /**
- * Network-level view of PI: the 24h behavior line, supply and market figures,
- * and the app's own supply history once enough daily snapshots exist.
+ * Network-level view of PI: supply and market figures, the share of maximum
+ * supply now circulating, and the app's own supply history once enough daily
+ * snapshots exist.
  *
- * Everything shown is a reported, attributed, timestamped fact. The panel
- * carries the attribution its data sources require, as plain text (no
- * outbound links; the Pi ecosystem rules ask apps not to send users off-site).
+ * Everything shown is a reported, attributed, timestamped fact, or plain
+ * arithmetic on those facts. Source attribution (CoinGecko's free API asks
+ * for it) lives in the site-wide footer, which is public on every screen;
+ * see COMPLIANCE.md §3b.
  */
-import { Badge, Card, CardContent, CardHeader, CardTitle, Skeleton, Stat } from "@/components/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui";
 import { usePiStats } from "@/lib/hooks";
 import { timeAgo } from "@/lib/format";
 
@@ -19,6 +21,27 @@ function compactNumber(n: number | null): string {
   if (n >= 1e6) return `${(n / 1e6).toFixed(2)}M`;
   if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
   return n.toFixed(2);
+}
+
+/** One figure in a group: label above, value below, optional note. */
+function Figure({ label, value, note }: { label: string; value: string; note?: string }) {
+  return (
+    <div className="min-w-0">
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground truncate">
+        {label}
+      </div>
+      <div className="font-tabular text-base font-semibold truncate">{value}</div>
+      {note ? <div className="text-[11px] text-muted-foreground truncate">{note}</div> : null}
+    </div>
+  );
+}
+
+function GroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/70">
+      {children}
+    </div>
+  );
 }
 
 export function PiNetworkPanel() {
@@ -40,6 +63,19 @@ export function PiNetworkPanel() {
   const stats = data?.stats ?? null;
   const pct = stats?.circulatingPctOfMax ?? null;
 
+  // Two comparisons the raw figures do not state on their own, both plain
+  // arithmetic on numbers already shown: how much of the network's value
+  // changed hands today, and how much larger the fully-diluted figure is
+  // than the current one. Descriptive, never projections.
+  const turnoverPct =
+    stats?.volume24hUsd && stats.marketCapUsd && stats.marketCapUsd > 0
+      ? (stats.volume24hUsd / stats.marketCapUsd) * 100
+      : null;
+  const dilutionX =
+    stats?.fdvUsd && stats.marketCapUsd && stats.marketCapUsd > 0
+      ? stats.fdvUsd / stats.marketCapUsd
+      : null;
+
   return (
     <Card data-testid="pi-network-panel">
       <CardHeader>
@@ -49,53 +85,64 @@ export function PiNetworkPanel() {
           {stats ? <Badge tone="neutral">updated {timeAgo(stats.asOf)}</Badge> : null}
         </span>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
         {stats ? (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <Stat
+            <section className="space-y-2">
+              <GroupLabel>Supply</GroupLabel>
+              <Figure
                 label="Circulating"
                 value={`${compactNumber(stats.circulatingSupply)} π`}
-                sub={stats.maxSupply ? `of ${compactNumber(stats.maxSupply)} max` : undefined}
+                note={stats.maxSupply ? `of ${compactNumber(stats.maxSupply)} maximum` : undefined}
               />
-              <Stat label="Market cap" value={`$${compactNumber(stats.marketCapUsd)}`} />
-              <Stat
-                label="Global 24h volume"
-                value={`$${compactNumber(stats.volume24hUsd)}`}
-                sub="all venues"
-              />
-              <Stat
-                label="Fully diluted"
-                value={`$${compactNumber(stats.fdvUsd)}`}
-                sub="at max supply"
-              />
-            </div>
-
-            {pct !== null ? (
-              <div>
-                <div className="flex items-baseline justify-between text-[11px] text-muted-foreground mb-1">
-                  <span className="uppercase tracking-wider">Supply released</span>
-                  <span className="font-tabular">{pct.toFixed(1)}% of max</span>
-                </div>
-                <div
-                  className="h-2 rounded-full bg-muted overflow-hidden"
-                  role="progressbar"
-                  aria-valuenow={Math.round(pct)}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label="Share of the maximum PI supply now circulating"
-                >
+              {pct !== null ? (
+                <div className="pt-0.5">
                   <div
-                    className="h-full rounded-full bg-primary transition-all"
-                    style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
-                  />
+                    className="h-1.5 overflow-hidden rounded-full bg-muted"
+                    role="progressbar"
+                    aria-valuenow={Math.round(pct)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label="Share of the maximum PI supply now circulating"
+                  >
+                    <div
+                      className="h-full rounded-full bg-primary transition-all"
+                      style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+                    />
+                  </div>
+                  <div className="mt-1 flex items-baseline justify-between text-[11px] text-muted-foreground">
+                    <span className="font-tabular">{pct.toFixed(1)}% released</span>
+                    <span className="font-tabular">{(100 - pct).toFixed(1)}% not yet circulating</span>
+                  </div>
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  The rest is not yet circulating. As more unlocks over time, this bar and the
-                  chart below record it happening.
-                </p>
+              ) : null}
+            </section>
+
+            <section className="space-y-2 border-t border-border/60 pt-3">
+              <GroupLabel>Market</GroupLabel>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+                <Figure
+                  label="Market cap"
+                  value={`$${compactNumber(stats.marketCapUsd)}`}
+                  note="circulating supply"
+                />
+                <Figure
+                  label="Fully diluted"
+                  value={`$${compactNumber(stats.fdvUsd)}`}
+                  note={dilutionX ? `${dilutionX.toFixed(2)}× the market cap` : "at max supply"}
+                />
+                <Figure
+                  label="24h volume"
+                  value={`$${compactNumber(stats.volume24hUsd)}`}
+                  note="all venues"
+                />
+                <Figure
+                  label="Daily turnover"
+                  value={turnoverPct !== null ? `${turnoverPct.toFixed(2)}%` : "n/a"}
+                  note="of market cap traded"
+                />
               </div>
-            ) : null}
+            </section>
           </>
         ) : (
           <p className="text-sm text-muted-foreground">
@@ -105,11 +152,6 @@ export function PiNetworkPanel() {
         )}
 
         <SupplyHistory history={data?.history ?? []} />
-
-        <p className="text-[10px] text-muted-foreground">
-          {data?.attribution ?? "Market data: CoinGecko, OKX, MEXC"}. Figures as reported by
-          their sources; not statements of value.
-        </p>
       </CardContent>
     </Card>
   );
@@ -117,8 +159,8 @@ export function PiNetworkPanel() {
 
 /**
  * The app's own daily supply observations, drawn as a simple inline SVG area.
- * Appears once a week of snapshots exists; before that a quiet note explains
- * the chart is building itself, which is true.
+ * Appears only once a week of snapshots exists; before that it renders
+ * nothing rather than explaining its own bookkeeping to the reader.
  */
 function SupplyHistory({
   history,
@@ -129,14 +171,7 @@ function SupplyHistory({
     (h): h is { date: string; circulatingSupply: number } => h.circulatingSupply !== null
   );
 
-  if (points.length < 7) {
-    return (
-      <p className="text-[11px] text-muted-foreground">
-        Supply history: recording one observation per day ({points.length} so far). The growth
-        chart appears after the first week.
-      </p>
-    );
-  }
+  if (points.length < 7) return null;
 
   const w = 320;
   const h = 64;
@@ -152,28 +187,42 @@ function SupplyHistory({
   const area = `${line} L${w},${h} L0,${h} Z`;
   const first = points[0]!;
   const last = points[points.length - 1]!;
+  const growthPct =
+    first.circulatingSupply > 0
+      ? ((last.circulatingSupply - first.circulatingSupply) / first.circulatingSupply) * 100
+      : null;
 
   return (
-    <div data-testid="supply-history">
-      <div className="flex items-baseline justify-between text-[11px] text-muted-foreground mb-1">
-        <span className="uppercase tracking-wider">Circulating supply, observed daily</span>
-        <span className="font-tabular">
-          {first.date} to {last.date}
-        </span>
+    <section className="border-t border-border/60 pt-3" data-testid="supply-history">
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <GroupLabel>Circulating supply, observed daily</GroupLabel>
+        {growthPct !== null ? (
+          <span className="font-tabular text-[11px] text-muted-foreground">
+            {growthPct >= 0 ? "+" : ""}
+            {growthPct.toFixed(2)}% over {points.length} days
+          </span>
+        ) : null}
       </div>
       <svg
         viewBox={`0 0 ${w} ${h}`}
-        className="w-full h-16"
+        className="h-16 w-full"
+        preserveAspectRatio="none"
         role="img"
         aria-label={`Circulating supply from ${compactNumber(first.circulatingSupply)} on ${first.date} to ${compactNumber(last.circulatingSupply)} on ${last.date}`}
       >
         <path d={area} fill="hsl(var(--primary) / 0.12)" />
-        <path d={line} fill="none" stroke="hsl(var(--primary))" strokeWidth="2" />
+        <path
+          d={line}
+          fill="none"
+          stroke="hsl(var(--primary))"
+          strokeWidth="2"
+          vectorEffect="non-scaling-stroke"
+        />
       </svg>
-      <div className="flex justify-between text-[10px] text-muted-foreground font-tabular">
-        <span>{compactNumber(first.circulatingSupply)} π</span>
-        <span>{compactNumber(last.circulatingSupply)} π</span>
+      <div className="flex justify-between font-tabular text-[10px] text-muted-foreground">
+        <span>{first.date}</span>
+        <span>{last.date}</span>
       </div>
-    </div>
+    </section>
   );
 }

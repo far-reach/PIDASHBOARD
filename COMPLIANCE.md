@@ -76,14 +76,25 @@ If you ever add an outbound link, that test fails — that is the intent.
 ## 3b. Third-party data attribution, without outbound links
 
 The network panel uses CoinGecko's free API, whose terms ask for public
-attribution. Attribution is given as plain text in the panel ("Market data:
-CoinGecko, OKX, MEXC") rather than a hyperlink, because rule 3 above weighs
-against sending users off-site. If CoinGecko ever requires a clickable link for
-free-tier use, revisit both constraints together before changing anything.
+attribution. Attribution is given as plain text rather than a hyperlink,
+because rule 3 above weighs against sending users off-site. If CoinGecko ever
+requires a clickable link for free-tier use, revisit both constraints together
+before changing anything.
+
+**Where the attribution lives:** the site-wide footer (`DisclaimerFooter`),
+which renders on every screen and is asserted by the E2E suite. The source
+names sat inside the network panel until that panel was decluttered; moving
+them to the footer is strictly broader coverage, not a reduction. Do not
+remove the source names from the footer without putting them somewhere
+equally public first.
 
 The panel's figures are all observations (supply, market cap, volume) with
-their source and timestamp shown. The 24h behavior line is computed from the
-app's own candle data and states only what happened. Nothing in the panel
+their source and timestamp shown, plus two derived comparisons that are plain
+arithmetic on those same figures: daily turnover (24h volume as a share of
+market cap) and the dilution multiple (fully diluted over current market cap).
+Both describe what the reported numbers already are; neither projects. The
+session summary line is computed from the app's own candle data and states
+only what happened. Nothing in the panel
 projects, targets or values anything; the unlock projections third parties
 publish are deliberately excluded because no dependable free source exists,
 and the app records its own daily supply snapshots instead.
