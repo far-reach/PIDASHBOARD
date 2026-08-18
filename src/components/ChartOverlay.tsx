@@ -50,7 +50,7 @@ export function ChartOverlay({
     if (!fullscreen) autoDailyDone.current = false;
   }, [fullscreen]);
 
-  // Viewport dimensions drive chart sizing and the orientation hint.
+  // Viewport dimensions drive chart sizing.
   const [dims, setDims] = useState(() =>
     typeof window === "undefined"
       ? { w: 375, h: 700 }
@@ -66,7 +66,6 @@ export function ChartOverlay({
       window.removeEventListener("orientationchange", update);
     };
   }, []);
-  const isPortrait = dims.h > dims.w;
 
   // Progressive enhancement: platforms that allow it (Android Chrome and
   // friends, inside the Fullscreen API) get a real landscape lock. Failures
@@ -84,7 +83,7 @@ export function ChartOverlay({
         await orientation.lock("landscape");
         locked = true;
       } catch {
-        /* not supported here: the rotate hint covers it */
+        /* not supported here: turning the phone still works */
       }
     })();
     return () => {
@@ -99,19 +98,6 @@ export function ChartOverlay({
     };
   }, [fullscreen]);
 
-  // The turn-your-phone hint: shown briefly when fullscreen opens in
-  // portrait, dismissed by time, tap, or actually rotating.
-  const [hintDismissed, setHintDismissed] = useState(false);
-  useEffect(() => {
-    if (!fullscreen) {
-      setHintDismissed(false);
-      return;
-    }
-    const t = setTimeout(() => setHintDismissed(true), 4500);
-    return () => clearTimeout(t);
-  }, [fullscreen]);
-  const showRotateHint = fullscreen && isPortrait && !hintDismissed;
-
   // The header wraps to two rows at narrow widths, so its height is
   // measured, not assumed. offsetHeight is layout height: unaffected by the
   // rotation transform, which is exactly what the math needs.
@@ -125,9 +111,12 @@ export function ChartOverlay({
     return () => ro.disconnect();
   }, []);
 
+  // Both sizes subtract the measured header, so the panel can never grow
+  // past the viewport: collapsing out of fullscreen used to leave a panel
+  // taller than the screen with its chart clipped by the bottom edge.
   const chartHeight = fullscreen
     ? Math.max(220, dims.h - headerHeight - 8)
-    : Math.max(280, Math.min(520, Math.round(dims.h * 0.55)));
+    : Math.max(200, Math.min(460, dims.h - headerHeight - 72));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -189,18 +178,8 @@ export function ChartOverlay({
   const body = (
     <>
       {header}
-      <div className="relative px-2 pb-2 pt-1">
+      <div className="px-2 pb-2 pt-1">
         <CandleChart candles={candles} height={chartHeight} bollinger={fullscreen} />
-        {showRotateHint ? (
-          <button
-            type="button"
-            onClick={() => setHintDismissed(true)}
-            className="absolute left-1/2 top-8 z-10 -translate-x-1/2 rounded-full border border-border bg-card/95 px-4 py-2 text-xs text-muted-foreground shadow-lg backdrop-blur"
-            data-testid="rotate-hint"
-          >
-            Turn your phone sideways for the wide view
-          </button>
-        ) : null}
       </div>
     </>
   );
@@ -223,7 +202,7 @@ export function ChartOverlay({
       {fullscreen ? (
         <div className="flex h-full w-full flex-col">{body}</div>
       ) : (
-        <div className="flex w-full max-w-lg flex-col rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
           {body}
         </div>
       )}

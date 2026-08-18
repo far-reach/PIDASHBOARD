@@ -154,12 +154,15 @@ export function CandleChart({
      * series still fit-to-content, since there is nothing to trim.
      */
     const ts = chart.timeScale();
-    const width = el.clientWidth || 340;
-    const targetSpacing = Math.min(14, Math.max(5, width / 50));
-    const visibleAtTarget = width / targetSpacing;
 
+    // Spacing is derived from the CURRENT width every time, so a view that
+    // was laid out for a fullscreen chart is recomputed when it collapses
+    // back into the panel rather than keeping the wide view's bar spacing.
     const settleIn = () => {
       cancelAnimationFrame(rafRef.current);
+      const width = el.clientWidth || 340;
+      const targetSpacing = Math.min(14, Math.max(5, width / 50));
+      const visibleAtTarget = width / targetSpacing;
       if (candles.length <= visibleAtTarget) {
         ts.fitContent();
         return;
@@ -188,8 +191,18 @@ export function CandleChart({
     const resetView = () => settleIn();
     el.addEventListener("dblclick", resetView);
 
+    let lastWidth = el.clientWidth;
     const ro = new ResizeObserver(() => {
-      chart.applyOptions({ width: el.clientWidth });
+      const width = el.clientWidth;
+      if (width <= 0) return;
+      chart.applyOptions({ width });
+      // A material width change means a different container: collapsing out
+      // of fullscreen, or the phone being turned. Re-fit rather than keep a
+      // spacing computed for the old width.
+      if (lastWidth > 0 && Math.abs(width - lastWidth) / lastWidth > 0.08) {
+        settleIn();
+      }
+      lastWidth = width;
     });
     ro.observe(el);
 

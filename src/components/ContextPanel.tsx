@@ -10,9 +10,15 @@
  * because a price's position inside a 30-day band does not depend on how
  * far into today we are.
  *
+ * Each row's value and bar are the finding; the explanatory sentence beneath
+ * mostly restates it in words, so it starts collapsed and expands on tap
+ * rather than running by default on every visit.
+ *
  * Strictly descriptive: each row states what the recorded data shows and
  * names its own window. Nothing projects or forecasts.
  */
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { computeContextStats } from "@/lib/context-stats";
 import { computeIntradayContext, hoursLabel } from "@/lib/intraday-context";
@@ -30,6 +36,7 @@ function Row({
   value: string;
   detail: string;
 }) {
+  const [open, setOpen] = useState(false);
   return (
     <div>
       <div className="flex items-baseline justify-between gap-2">
@@ -42,7 +49,19 @@ function Row({
           style={{ width: `${Math.min(100, Math.max(2, pct))}%` }}
         />
       </div>
-      <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{detail}</p>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground/80 hover:text-muted-foreground"
+      >
+        <ChevronDown
+          size={11}
+          className={open ? "rotate-180 transition-transform" : "transition-transform"}
+        />
+        {open ? "Hide how this is measured" : "How this is measured"}
+      </button>
+      {open ? <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{detail}</p> : null}
     </div>
   );
 }

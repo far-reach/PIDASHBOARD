@@ -62,18 +62,29 @@ export function VenuesPanel() {
           <div>
             <div className="flex items-baseline justify-between">
               <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                Settled funding, last {funding.length} periods
+                Funding · last {funding.length}
               </span>
-              <span className="text-[11px] text-muted-foreground">OKX perp · 8h each</span>
+              <span className="text-[11px] text-muted-foreground">OKX perp</span>
             </div>
-            <div className="mt-1.5 flex h-10 items-center gap-[3px]" aria-hidden>
+            {/* A real baseline chart: one shared zero line, positive bars
+                rising above it and negative bars falling below, each using
+                the full available half-height. The previous version centred
+                every bar inside its own flex cell with no common baseline,
+                which rendered as a dashed line rather than a chart. */}
+            <div className="relative mt-1.5 flex h-12 items-stretch gap-[3px]" aria-hidden>
+              <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-border" />
               {funding.map((f) => {
-                const h = Math.max(8, (Math.abs(f.rate) / maxAbs) * 100);
+                const magnitude = Math.max(6, (Math.abs(f.rate) / maxAbs) * 100);
+                const positive = f.rate >= 0;
                 return (
-                  <div key={f.ts} className="flex h-full flex-1 flex-col justify-center">
+                  <div key={f.ts} className="relative flex-1">
                     <div
-                      className={`w-full rounded-sm ${f.rate >= 0 ? "bg-up/70" : "bg-down/70"}`}
-                      style={{ height: `${h / 2}%` }}
+                      className={`absolute inset-x-0 rounded-sm ${positive ? "bg-up/70" : "bg-down/70"}`}
+                      style={
+                        positive
+                          ? { bottom: "50%", height: `${magnitude / 2}%` }
+                          : { top: "50%", height: `${magnitude / 2}%` }
+                      }
                       title={`${(f.rate * 100).toFixed(4)}% · ${new Date(f.ts).toISOString().slice(0, 13)}:00 UTC`}
                     />
                   </div>
