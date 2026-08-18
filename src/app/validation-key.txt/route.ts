@@ -11,9 +11,14 @@ export const dynamic = "force-dynamic";
  * be rotated from the hosting platform without a redeploy; the committed
  * fallback below keeps verification working when no env var is set. The key
  * is not a secret; the whole point is that it is publicly served.
+ *
+ * The committed key is the MAINNET app's. Testnet and Mainnet are separate
+ * portal registrations with separate keys, and only one can be the committed
+ * fallback: re-verifying the Testnet app means setting PI_VALIDATION_KEY to
+ * its key, which then wins over this constant.
  */
 const COMMITTED_VALIDATION_KEY =
-  "543ca58a6b5ede6870c9140ef12767f3d9c9f6ccd33dd0e1bc0315b5b558d3a820f0764dcc2d3e261d1c199caa11379128c966c50fe015c4f06ec90cb0e43c2b";
+  "b3517d091dd3f9233ca949ae3b04c916ca0ea16a69ab75f00e69efea11955bd8ee68c1c415c54cbc38049be001bd9b08e94d0d92017372620213921f8deb0024";
 
 export function GET(): NextResponse {
   const key = process.env.PI_VALIDATION_KEY || COMMITTED_VALIDATION_KEY;

@@ -27,11 +27,19 @@ describe("Pi domain-validation endpoint", () => {
     expect(await res.text()).toBe("abc123validationkey");
   });
 
-  it("falls back to the committed portal key when the env var is unset", async () => {
+  it("falls back to the committed Mainnet portal key when the env var is unset", async () => {
     vi.stubEnv("PI_VALIDATION_KEY", "");
     const res = validationKeyGet();
     expect(res.status).toBe(200);
-    expect((await res.text()).startsWith("543ca58a6b5ede6870c9140ef12767f3")).toBe(true);
+    expect((await res.text()).startsWith("b3517d091dd3f9233ca949ae3b04c916")).toBe(true);
+  });
+
+  it("serves a key of the shape the portal issues: 128 lowercase hex chars", async () => {
+    // The portal's UI truncates the key on screen, so a copy-paste that drops
+    // the tail looks right and fails verification with no useful message.
+    vi.stubEnv("PI_VALIDATION_KEY", "");
+    const body = await validationKeyGet().text();
+    expect(body).toMatch(/^[0-9a-f]{128}$/);
   });
 });
 

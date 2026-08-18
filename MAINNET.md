@@ -28,15 +28,17 @@ as-is for future testing.
       trailing content.
 - [ ] Generate the mainnet **API key** and copy it (next section). Do not
       paste it into chats or commit it.
-- [ ] Copy the mainnet **validation key** shown in the "Verify Domain
-      Ownership" step (next section).
+- [x] Copy the mainnet **validation key** shown in the "Verify Domain
+      Ownership" step. **Done:** the Mainnet key is committed in
+      `src/app/validation-key.txt/route.ts` and served at
+      `https://cyberekt.vercel.app/validation-key.txt`.
 
 ## 2. Vercel environment variables (Settings -> Environment Variables)
 
 | Variable | Action | Why |
 | --- | --- | --- |
 | `PI_API_KEY` | **Replace** with the mainnet app's API key | The testnet key is rejected on mainnet; payments would 401 |
-| `PI_VALIDATION_KEY` | **Set** to the mainnet validation key | The committed fallback in the code is the testnet app's key; the env var takes precedence, no code change needed |
+| `PI_VALIDATION_KEY` | **Leave unset / delete it** | The Mainnet key is now the committed fallback and is served automatically. If this variable is set to the old Testnet key it OVERRIDES the correct one and verification keeps failing |
 | `NEXT_PUBLIC_PI_SANDBOX` | Confirm `false` (already done) | Sandbox handshake hangs in the real Pi Browser |
 | `NEXT_PUBLIC_SIGNALS_ENABLED` | Confirm **unset** (or `false`) | Directional calls stay off; COMPLIANCE.md section 2 |
 | `CRON_SECRET` | Recommended: set (any random string, 16+ chars) | Authorizes the daily 00:05 UTC report cron. The archive now self-heals: if the cron never runs, yesterday's report is generated on first request. The cron is still the tidy path |
